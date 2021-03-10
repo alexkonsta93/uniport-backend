@@ -2,10 +2,44 @@
   "name": "beartracks-backend",
   "version": "1.0.0",
   "description": "backend for beartracks",
-  "main": "server.js",
+  "main": "backend.js",
   "scripts": {
+    "start": "webpack --config ./webpack.config.js --mode development && node ./dist/bundle.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexkonsta93/beartracks-backend.git"
+  },
+  "author": "Alexandros Konstantopoulos",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alexkonsta93/beartracks-backend.git"
+  },
+  "homepage": "https://github.com/alexkonsta93/beartracks-backend#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "mongodb": "^3.6.4",
+    "mongoose": "^5.11.19"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.13.10",
+    "axios": "^0.21.1",
+    "babel-jest": "^26.6.3",
+    "babel-loader": "^8.2.2",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
+    "eslint": "^7.21.0",
+    "jest": "^26.6.3",
+    "moment": "^2.29.1",
+    "papaparse": "^5.3.0",
+    "webpack": "^5.24.4",
+    "webpack-cli": "^4.5.0",
+    "webpack-node-externals": "^2.5.2"
+  },
+  "babel": {
+    "plugins": [
+      "babel-plugin-transform-es2015-modules-commonjs"
+    ]
+  }
 }
