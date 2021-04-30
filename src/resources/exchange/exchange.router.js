@@ -1,25 +1,19 @@
 import express from 'express';
-import controllers from './order.controllers.js';
+import controllers form './exchange.controllers';
 
 var router = express.Router();
 
-// /api/order
+// /api/exchange
 router
   .route('/')
   .get(controllers.getOne)
   .post(controllers.createOne)
   .delete(controllers.deleteOne);
 
-// /api/order/all
+// /api/exchange/all
 router
   .route('/all')
   .get(controllers.getAll)
   .delete(controllers.deleteAll);
-
-// /api/order/:id
-router
-  .route('/:id')
-  .get(controllers.getOne)
-  .delete(controllers.deleteOne);
 
 export default router;
