@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import express from 'express';
 import orderRouter from './resources/order/order.router.js';
 import tradeRouter from './resources/trade/trade.router.js';
+import appRouter from './resources/app/app.router.js';
 import positionRouter from './resources/leveraged-position/leveraged-position.router.js';
 import bodyParser from 'body-parser';
 
@@ -19,6 +20,7 @@ app.use((req, res, next) => {
 app.use('/api/order', orderRouter);
 app.use('/api/trade', tradeRouter);
 app.use('/api/leveraged-position', positionRouter);
+app.use('/api/app', appRouter);
 
 export var start = async function() {
 		try {
