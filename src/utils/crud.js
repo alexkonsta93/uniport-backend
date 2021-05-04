@@ -48,10 +48,10 @@ var deleteOne = model => (req, res) => {
 
 var deleteAll = model => async (req, res) => {
   try {
-    let removed =``await model.deleteMany({});
+    let removed = await model.deleteMany({});
     if (!removed) return res.status(400).end();
 
-    res.status(200);
+    res.status(200).json({ data: removed });
   } catch (err) {
     console.log(err);
     res.status(400).end();

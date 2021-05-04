@@ -1,22 +1,21 @@
 {
-  "name": "beartracks-backend",
+  "name": "uniport-backend",
   "version": "1.0.0",
-  "description": "backend for beartracks",
-  "main": "backend.js",
+  "description": "backend for uniport",
   "scripts": {
     "start": "webpack --config ./webpack.config.js --mode development && node ./dist/bundle.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/alexkonsta93/beartracks-backend.git"
+    "url": "git+https://github.com/alexkonsta93/uniport-backend.git"
   },
   "author": "Alexandros Konstantopoulos",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/alexkonsta93/beartracks-backend.git"
+    "url": "https://github.com/alexkonsta93/uniport-backend.git"
   },
-  "homepage": "https://github.com/alexkonsta93/beartracks-backend#readme",
+  "homepage": "https://github.com/alexkonsta93/uniport-backend#readme",
   "dependencies": {
     "body-parser": "^1.19.0",
     "express": "^4.17.1",

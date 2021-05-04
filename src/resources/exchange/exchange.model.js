@@ -14,6 +14,9 @@ var exchangeSchema = new Schema({
   futuresApiUrl: {
     type: String,
     default: null
+  },
+  logoUri: {
+    type: String
   }
 })
 
@@ -21,3 +24,6 @@ var exchangeSchema = new Schema({
 exchangeSchema.index({
   name: 1
 }, { unique: true })
+
+var Exchange = new mongoose.model('Exchange', exchangeSchema);
+export default Exchange;

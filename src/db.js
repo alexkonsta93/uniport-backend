@@ -25,7 +25,7 @@ app.use('/api/exchange', exchangeRouter);
 export var start = async function() {
 		try {
 				await mongoose.connect(
-						'mongodb://localhost:27017/beartracks',
+						'mongodb://localhost:27017/uniport',
 						{ 	
 								useNewUrlParser: true,
 								useUnifiedTopology: true,

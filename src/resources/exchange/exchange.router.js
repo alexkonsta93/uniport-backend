@@ -1,5 +1,5 @@
 import express from 'express';
-import controllers form './exchange.controllers';
+import controllers from './exchange.controllers';
 
 var router = express.Router();
 
