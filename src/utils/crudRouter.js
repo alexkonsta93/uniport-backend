@@ -4,16 +4,21 @@ import crudControllers from './crud';
 var router = express.Router();
 
 // /api/exchange
-router
-  .route('/')
-  .get(crudControllers.getOne)
-  .post(crudControllers.createOne)
-  .delete(crudControllers.deleteOne);
+function setup(model) {
 
-// /api/exchange/all
-router
-  .route('/all')
-  .get(crudControllers.getAll)
-  .delete(crudControllers.deleteAll);
+  router
+    .route('/')
+    .get(crudControllers(model).getOne)
+    .post(crudControllers(model).createOne)
+    .delete(crudControllers(model).deleteOne);
 
-export default router;
+  // /api/exchange/all
+  router
+    .route('/all')
+    .get(crudControllers(model).getAll)
+    .delete(crudControllers(model).deleteAll);
+
+  return router;
+}
+
+export default model => setup(model);
