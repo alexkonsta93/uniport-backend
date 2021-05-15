@@ -17,13 +17,17 @@ var exchangeSchema = new Schema({
   },
   logoUri: {
     type: String
+  },
+  futures: {
+    type: Boolean,
+    default: false
   }
-})
+});
 
 /***Index***/
 exchangeSchema.index({
   name: 1
-}, { unique: true })
+}, { unique: true });
 
 var Exchange = new mongoose.model('Exchange', exchangeSchema);
 export default Exchange;
