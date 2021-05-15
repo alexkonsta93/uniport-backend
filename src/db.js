@@ -4,6 +4,7 @@ import orderRouter from './resources/order/order.router.js';
 import tradeRouter from './resources/trade/trade.router.js';
 import exchangeRouter from './resources/exchange/exchange.router.js';
 import positionRouter from './resources/leveraged-position/leveraged-position.router.js';
+import userRouter from './utils/crudRouter';
 import bodyParser from 'body-parser';
 
 export var app = express();
@@ -21,6 +22,7 @@ app.use('/api/order', orderRouter);
 app.use('/api/trade', tradeRouter);
 app.use('/api/leveraged-position', positionRouter);
 app.use('/api/exchange', exchangeRouter);
+app.use('/api/user', userRouter);
 
 export var start = async function() {
 		try {
