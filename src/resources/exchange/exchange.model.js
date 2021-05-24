@@ -9,11 +9,19 @@ var exchangeSchema = new Schema({
   },
   apiUrl: {
     type: String,
-    default: null
+    required: true
+  },
+  processUrl: {
+    type: String,
+    required: true
   },
   futuresApiUrl: {
     type: String,
-    default: null
+    required: false
+  },
+  processFuturesUrl: {
+    type: String,
+    required: false
   },
   logoUri: {
     type: String
@@ -28,6 +36,13 @@ var exchangeSchema = new Schema({
 exchangeSchema.index({
   name: 1
 }, { unique: true });
+
+/***Hooks***/
+exchangeSchema.pre('save', function(next) {
+  var err = new Error('Futures url info needed');
+  if (this.futures && (!this.futuresApiUrl || !this.processFuturesUrl)) next(err);
+  next();
+})
 
 var Exchange = new mongoose.model('Exchange', exchangeSchema);
 export default Exchange;
