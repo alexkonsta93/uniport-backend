@@ -42,7 +42,7 @@ exchangeSchema.pre('save', function(next) {
   var err = new Error('Futures url info needed');
   if (this.futures && (!this.futuresApiUrl || !this.processFuturesUrl)) next(err);
   next();
-})
+});
 
 var Exchange = new mongoose.model('Exchange', exchangeSchema);
 export default Exchange;

@@ -2,6 +2,10 @@ import mongoose from 'mongoose';
 var { Schema } = mongoose;
 
 var userSchema = new Schema({
+  email: {
+    type: String,
+    required: true
+  },
   firstName: {
     type: String,
     required: true
@@ -13,12 +17,17 @@ var userSchema = new Schema({
   orders: {
     type: [mongoose.Schema.Types.ObjectId],
     required: true,
-    ref: 'orders'
+    ref: 'Order'
   },
   trades: {
     type: [mongoose.Schema.Types.ObjectId],
     required: true,
-    ref: 'trades'
+    ref: 'Trade'
+  },
+  positions: {
+    type: [mongoose.Schema.Types.ObjectId],
+    required: true,
+    ref: 'Position'
   },
   exchanges: [{
     exchangeId: mongoose.Schema.Types.ObjectId,
@@ -26,6 +35,15 @@ var userSchema = new Schema({
     lastImport: Date, 
     numLastImport: Number
   }]
+});
+
+/***Index***/
+userSchema.index({
+  email: 1
+}, { unique: true });
+
+/***Hooks***/
+userSchema.pre('save', function() {
 });
 
 var User = mongoose.model('User', userSchema);
