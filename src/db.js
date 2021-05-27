@@ -4,6 +4,7 @@ import orderRouter from './resources/order/order.router.js';
 import tradeRouter from './resources/trade/trade.router.js';
 //import exchangeRouter from './resources/exchange/exchange.router.js';
 import positionRouter from './resources/leveraged-position/leveraged-position.router.js';
+import userRouter from './resources/user/user.router';
 import routerFactory from './utils/crudRouter';
 import User from './resources/user/user.model';
 import Exchange from './resources/exchange/exchange.model';
@@ -25,7 +26,7 @@ app.use('/api/trade', tradeRouter);
 app.use('/api/leveraged-position', positionRouter);
 var exchangeRouter = routerFactory(Exchange);
 app.use('/api/exchange', exchangeRouter);
-var userRouter = routerFactory(User);
+//var userRouter = routerFactory(User);
 app.use('/api/user', userRouter);
 
 export var start = async function() {

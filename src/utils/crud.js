@@ -22,6 +22,19 @@ var getOne = model => async (req, res) => {
   }
 };
 
+var getById = model => async (req, res) => {
+  try {
+    let doc = await model.findById(req.params.id)
+      .lean()
+      .exec();
+
+    res.status(200).json({ data: doc })
+  } catch (e) {
+    console.log(e);
+    res.status(400).end();
+  }
+};
+
 var getAll = model => async (req, res) => {
   try {
     let docs = await model.find({})
@@ -38,7 +51,18 @@ var getAll = model => async (req, res) => {
 var deleteOne = model => (req, res) => {
   try {
     model.findOneAndDelete({ ...req.body }, (err, removed) => {
-        return res.status(200).json({ data: removed });
+      return res.status(200).json({ data: removed });
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(400).end();
+  }
+}
+
+var deleteById = model => (req, res) => {
+  try {
+    model.findByIdAndDelete(req.params.id, (err, removed) => {
+      return res.status(200).json({ data: removed });
     });
   } catch (err) {
     console.log(err);
@@ -62,7 +86,9 @@ export default model => {
   return {
     createOne: createOne(model),
     getOne: getOne(model),
+    getById: getById(model),
     deleteOne: deleteOne(model),
+    deleteById: deleteById(model),
     deleteAll: deleteAll(model),
     getAll: getAll(model)
   }

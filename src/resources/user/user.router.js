@@ -1,19 +1,26 @@
-import express from 'express';
-import crudControllers from '../../utils/crud';
+import crudRouter from '../../utils/crudRouter';
+import User from './user.model';
+import Exchange from '../exchange/exchange.model';
 
-var router = express.Router();
+var router = crudRouter(User);
 
-// /api/exchange
 router
-  .route('/')
-  .get(crudControllers.getOne)
-  .post(crudControllers.createOne)
-  .delete(crudControllers.deleteOne);
-
-// /api/exchange/all
-router
-  .route('/all')
-  .get(crudControllers.getAll)
-  .delete(crudControllers.deleteAll);
+  .route('/:id/exchanges')
+  .get((req, res) => {
+    User
+      .findById(req.params.id, 'exchanges')
+      .populate({ 
+        path: 'exchanges',
+        populate: { path: 'info', model: Exchange }
+      })
+      .exec((err, exchanges) => {
+        if (err) {
+          console.log(err);
+          res.status(400).end();
+        }
+        return res.status(200).json({ data: exchanges });
+      })
+    }
+  );
 
 export default router;

@@ -18,8 +18,8 @@ function setup(model) {
 
   router
     .route('/:id')
-    .get(crudControllers(model).getOne)
-    .delete(crudControllers(model).deleteOne);
+    .get(crudControllers(model).getById)
+    .delete(crudControllers(model).deleteById);
 
   return router;
 }

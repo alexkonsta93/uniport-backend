@@ -30,7 +30,11 @@ var userSchema = new Schema({
     ref: 'Position'
   },
   exchanges: [{
-    exchangeId: mongoose.Schema.Types.ObjectId,
+    info: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'Exchange'
+    },
     numTrades: Number,
     lastImport: Date, 
     numLastImport: Number
