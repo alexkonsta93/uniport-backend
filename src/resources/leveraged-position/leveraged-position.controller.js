@@ -7,7 +7,7 @@ async function deleteOne(req, res) {
 				Position.findOneAndDelete({ ...req.body }, (err, removed) => {
 						if (err) res.status(400).end();
 
-						res.status(200).json({ data: removed });
+						res.status(200).json(removed);
 				});
 		} catch (err) {
 				res.status(400).end();
@@ -21,7 +21,7 @@ async function deleteAll(req, res) {
 
 				if (!removed) return res.status(400).end();
 
-				return res.status(200).json({ data: removed })
+				return res.status(200).json(removed)
 		} catch (err) {
 				console.log(err)
 				res.status(400).end();

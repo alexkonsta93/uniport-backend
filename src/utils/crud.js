@@ -1,7 +1,7 @@
 var createOne = model => async (req, res) => {
   try {
     let doc = await model.create({ ...req.body })
-    res.status(201).json({ data: doc })
+    res.status(201).json(doc)
   } catch (e) {
     console.log(e);
     res.status(400).end();
@@ -15,7 +15,7 @@ var getOne = model => async (req, res) => {
       .lean()
       .exec();
 
-    res.status(200).json({ data: doc })
+    res.status(200).json(doc)
   } catch (e) {
     console.log(e);
     res.status(400).end();
@@ -28,7 +28,7 @@ var getById = model => async (req, res) => {
       .lean()
       .exec();
 
-    res.status(200).json({ data: doc })
+    res.status(200).json(doc)
   } catch (e) {
     console.log(e);
     res.status(400).end();
@@ -41,7 +41,7 @@ var getAll = model => async (req, res) => {
       .lean()
       .exec();
 
-    res.status(200).json({ data: docs })
+    res.status(200).json(docs)
   } catch (e) {
     console.log(e);
     res.status(400).end();
@@ -51,7 +51,7 @@ var getAll = model => async (req, res) => {
 var deleteOne = model => (req, res) => {
   try {
     model.findOneAndDelete({ ...req.body }, (err, removed) => {
-      return res.status(200).json({ data: removed });
+      return res.status(200).json(removed);
     });
   } catch (err) {
     console.log(err);
@@ -62,7 +62,7 @@ var deleteOne = model => (req, res) => {
 var deleteById = model => (req, res) => {
   try {
     model.findByIdAndDelete(req.params.id, (err, removed) => {
-      return res.status(200).json({ data: removed });
+      return res.status(200).json(removed);
     });
   } catch (err) {
     console.log(err);

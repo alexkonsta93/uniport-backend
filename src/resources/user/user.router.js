@@ -18,7 +18,7 @@ router
           console.log(err);
           res.status(400).end();
         }
-        return res.status(200).json({ data: exchanges });
+        return res.status(200).json(exchanges);
       })
     }
   );

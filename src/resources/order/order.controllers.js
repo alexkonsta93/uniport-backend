@@ -13,7 +13,7 @@ async function deleteOne(req, res) {
         await Trade.deleteOne({ "_id": id });
       });
 
-      return res.status(200).json({ data: removed });
+      return res.status(200).json(removed);
     });
   } catch (err) {
     console.log(err);
@@ -31,7 +31,7 @@ async function deleteAll(req, res) {
     // if order deletion successful, delete all trades
     await Trade.deleteMany({});
 
-    return res.status(200).json({ data: removed })
+    return res.status(200).json(removed)
   } catch (err) {
     console.log(err)
     res.status(400).end();
