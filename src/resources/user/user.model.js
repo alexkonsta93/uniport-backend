@@ -47,8 +47,6 @@ userSchema.index({
 }, { unique: true });
 
 /***Hooks***/
-userSchema.pre('save', function() {
-});
 
 var User = mongoose.model('User', userSchema);
 export default User;
