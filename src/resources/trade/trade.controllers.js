@@ -15,7 +15,7 @@ async function deleteOne(req, res) {
 						tradeIds.splice(tradeIds.indexOf(removed.id), 1);
 						await parentOrder.updateOne({ tradeIds: tradeIds })
 
-						return res.status(200).json({ data: removed });
+						return res.status(200).json(removed);
 				});
 		} catch (err) {
 				console.log(err)
@@ -30,7 +30,7 @@ async function deleteAll(req, res) {
 
 				if (!removed) return res.status(400).end();
 
-				return res.status(200).json({ data: removed })
+				return res.status(200).json(removed)
 		} catch (err) {
 				console.log(err)
 				res.status(400).end();
