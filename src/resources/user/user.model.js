@@ -35,9 +35,18 @@ var userSchema = new Schema({
       required: true,
       ref: 'Exchange'
     },
-    numTrades: Number,
-    lastImport: Date, 
-    numLastImport: Number
+    numTrades: {
+      type: Number,
+      default: 0
+    },
+    lastImport: {
+      type: Date,
+      default: '1/1/2020'
+    }, 
+    numLastImport: {
+      type: Number,
+      default: 0
+    }
   }]
 });
 
