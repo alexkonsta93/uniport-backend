@@ -11,7 +11,7 @@ router
       .findById(req.params.id, 'exchanges')
       .populate({ 
         path: 'exchanges',
-        populate: { path: 'info', model: Exchange }
+        populate: { path: '_id', model: Exchange }
       })
       .exec((err, exchanges) => {
         if (err) {
@@ -22,32 +22,31 @@ router
       });
   })
   .post((req, res) => {
-    User.updateOne(
-      { "_id": req.params.id },
-      { "$push": { "exchanges": { "info" : req.body.info } } },
-      (err, doc) => {
-        if (err) res.status(400).end();
-        return res.status(200).json(doc);
+    User.findById(req.params.id, async (err, user) => {
+      if (err) {
+        console.log(err);
+        return res.status(400).end();
       }
-    );
-  })
-  /*
-  .delete((req, res) => {
-    User.update(
-      { "_id" : req.params.id },
-      { "$pull": { "exchanges": { "_id": req.body.userExchangeId } } },
-      (err, doc) => {
-        if (err) res.status(400).end();
+      let exchange = user.exchanges.id(req.body._id);
+      // if doc already exsits -> update
+      if (exchange) exchange.set(req.body);
+
+      // if doc deasn't exist -> create
+      else user.exchanges.push(req.body);
+      user.save((err, doc) => {
+        if (err) {
+          console.log(err);
+          return res.status(400).end();
+        }
         res.status(200).json(doc);
-      }
-    );
-  });
-  */
+      })
+    });
+  })
   .delete(async (req, res) => {
-    if (req.body.info) {
+    if (req.body.id) {
       User.updateOne(
         { "_id": req.params.id },
-        { "$pull": { "exchanges": { "info": req.body.info } } },
+        { "$pull": { "exchanges": { "_id": req.body.id } } },
         (err, doc) => {
           if (err) {
             console.log(err);
