@@ -30,7 +30,7 @@ var userSchema = new Schema({
     ref: 'Position'
   },
   exchanges: [{
-    info: {
+    _id: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: 'Exchange'
@@ -56,6 +56,12 @@ userSchema.index({
 }, { unique: true });
 
 /***Hooks***/
+/*
+userSchema.pre('update', function(next) {
+  let userExchangeIds = this.exchanges.map(exchange => exchange.info);
+  if (userExchangeIds.includes())
+})
+*/
 
 var User = mongoose.model('User', userSchema);
 export default User;
