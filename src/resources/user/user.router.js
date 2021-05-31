@@ -46,7 +46,7 @@ router
     if (req.body.id) {
       User.updateOne(
         { "_id": req.params.id },
-        { "$pull": { "exchanges": { "_id": req.body.id } } },
+        { "$pull": { "exchanges": { "_id": req.body._id } } },
         (err, doc) => {
           if (err) {
             console.log(err);
