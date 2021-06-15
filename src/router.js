@@ -42,7 +42,8 @@ app.post('/process-coinbase-trades', async (req, res, next) => {
 		res.status(200);
 		res.send('success');
 		var lines = Object.keys(req.body).map(key => req.body[key]);
-		await processCoinbaseLines(lines.reverse());
+	  console.log(req.userId);
+		//await processCoinbaseLines(lines.reverse(), req.userId);
 })
 
 app.get('/print-trades', async (req, res, next) => {

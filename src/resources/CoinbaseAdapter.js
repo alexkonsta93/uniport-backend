@@ -1,13 +1,15 @@
 import moment from 'moment';
 import Order from './order/order.model';
 
-export default async function processCoinbaseLines(lines) {
+export default async function processCoinbaseLines(lines, uId) {
 		var orders = linesToOrders(lines);		
+	  var processedOrders = [];
 
 		try {
 				for (let order of orders) {
-						await Order.create({ ...order });
+						processedOrders.push(await Order.create({ ...order }));
 				}
+			  return processedOrders;
 		} catch (err) {
 				console.log(err);
 		}

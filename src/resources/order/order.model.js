@@ -101,12 +101,11 @@ orderSchema.statics.sumAmount = function(orders) {
 /***Methods***/
 
 /***Hooks***/
+/*
 orderSchema.pre('save', async function() {
 		// if order exists in db -> skip
-		/*
-		var exists = await this.exists;
-		if (exists) throw Error("Order already exists");
-		*/
+		//var exists = await this.exists;
+		//if (exists) throw Error("Order already exists");
 });
 
 orderSchema.post('save', function() {
@@ -124,6 +123,7 @@ orderSchema.post('deleteMany', function() {
 orderSchema.post('updateOne', function() {
 		console.log("Order updated");
 })
+*/
 
 /***Virtuals***/
 /*

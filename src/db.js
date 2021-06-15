@@ -17,7 +17,8 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use((req, res, next) => {
 		res.header('Access-Control-Allow-Origin', '*');
 		res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
-		res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+	  //res.header('Access-Control-Allow-Headers', '*');
+		res.header('Access-Control-Allow-Headers', 'Origin, Cross-Origin, X-Requested-With, Content-Type, Accept');
 		next();
 });
 
