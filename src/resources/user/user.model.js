@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import Order from '../order/order.model';
+
 var { Schema } = mongoose;
 
 var userSchema = new Schema({
@@ -61,6 +63,24 @@ userSchema.pre('update', function(next) {
   let userExchangeIds = this.exchanges.map(exchange => exchange.info);
   if (userExchangeIds.includes())
 })
+*/
+
+/***Methods***/
+/*
+userSchema.methods.updateOrders = function(userId, orders, cb) {
+  console.log('here');
+  return mongoose.model('User').findById(userId, (err, user) => {
+    if (err) {
+      throw new Error(err);
+    }
+    orders.forEach(async order => {
+      let doc = await Order.save(order);
+      console.log(doc);
+      user.orders.push(doc.id);
+      user.save(cb);
+    })
+  })
+}
 */
 
 var User = mongoose.model('User', userSchema);

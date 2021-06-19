@@ -2,7 +2,7 @@ import crudRouter from '../../utils/crudRouter';
 import User from './user.model';
 import Exchange from '../exchange/exchange.model';
 import Order from '../order/order.model';
-import toCoinbaseOrders from '../CoinbaseAdapter';
+import { toCoinbaseOrders } from '../CoinbaseAdapter';
 
 var router = crudRouter(User);
 
@@ -56,7 +56,7 @@ router
           }
           res.status(200).json(doc);
         }
-      )
+      );
     } else {
       User.updateOne(
         { '_id': req.params.id },
@@ -68,17 +68,31 @@ router
           }
           res.status(200).json(doc);
         }
-      )
+      );
     }
   });
 
 router
   .route('/:id/orders')
   .post(async (req, res) => {
-    let orders = await toCoinbaseOrders(req.body);
+    let orders = toCoinbaseOrders(req.body);
+    let orderIds = [];
+
+    // Update Order db by creating new document if not a duplicate
+    for (let order of orders) {
+      try {
+        let doc = await Order.create(order);
+        orderIds.push(doc.id);
+      } catch (err) {
+        console.log(err);
+        continue;
+      }
+    }
+
+    // Update User.orders
     User.updateOne(
       { '_id': req.params.id },
-      { '$push': { 'orders': orders } },
+      { '$push': { 'orders': orderIds } },
       (err, doc) => {
         if (err) {
           console.log(err);
@@ -89,20 +103,35 @@ router
     );
   })
   .delete(async (req, res) => {
-    let orders = User.findById(req.params.id).orders;
-    await Order.deleteMany(orders);
-    User.updateOne(
-      { '_id': req.params.id },
-      { '$set': { 'orders': [] } },
-      (err, doc) => {
-        if (err) {
-          console.log(err);
-          return res.status(400).end();
+    if (req.body.id) {
+      await Order.findOneAndDelete({ '_id': req.body.id });
+      User.updateOne(
+        { '_id': req.params.id },
+        { '$pull': { 'orders': req.body.id } },
+        (err, doc) => {
+          if (err) {
+            console.log(err);
+            return res.status(400).end();
+          }
+          res.status(200).json(doc);
         }
-        res.status(200).json(doc);
-      }
-    )
-  });
+      );
+    } else {
+      let orders = User.findById(req.params.id).orders;
+      await Order.deleteMany(orders);
+      User.updateOne(
+        { '_id': req.params.id },
+        { '$set': { 'orders': [] } },
+        (err, doc) => {
+          if (err) {
+            console.log(err);
+            return res.status(400).end();
+          }
+          res.status(200).json(doc);
+        }
+      );
 
+    }
+  });
 
 export default router;

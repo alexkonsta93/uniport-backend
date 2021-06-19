@@ -115,7 +115,6 @@ orderSchema.post('save', function() {
 orderSchema.post('findOneAndDelete', function() {
 		console.log("Order deleted");
 })
-
 orderSchema.post('deleteMany', function() {
 		console.log("All orders deleted");
 })
