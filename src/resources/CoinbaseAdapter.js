@@ -15,7 +15,7 @@ export async function processCoinbaseLines(lines) {
 		}
 }
 
-export function toCoinbaseOrders(lines) {
+export function toCoinbaseOrders(lines, userId) {
 		var orders = [];
 		
 		for (let line of lines) {
@@ -34,6 +34,7 @@ export function toCoinbaseOrders(lines) {
 						amountUSD = parseFloat(amountUSD.slice(0, amountUSD.length - 4));
 						let price = amountUSD / amount;
 						orders.push({
+						    userId: userId,
 								exchange: 'coinbase',
 								dateTime: dateTime,
 								quote: line['ACCOUNT'].slice(0, 3),

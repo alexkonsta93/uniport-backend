@@ -169,6 +169,7 @@ tradeSchema.pre('save', async function(next) {
 
 });
 
+/*
 tradeSchema.post('save', async function() {
 		console.log("Trade created");
 });
@@ -192,6 +193,7 @@ tradeSchema.post('deleteMany', function() {
 tradeSchema.post('updateOne', function() {
 		console.log("Trade updated");
 })
+*/
 
 /***Virtuals***/
 tradeSchema.virtual('pair').get(function() {
