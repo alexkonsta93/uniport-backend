@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import Order from '../order/order.model';
 
 var { Schema } = mongoose;
 
@@ -20,11 +19,6 @@ var userSchema = new Schema({
     type: [mongoose.Schema.Types.ObjectId],
     required: true,
     ref: 'Order'
-  },
-  trades: {
-    type: [mongoose.Schema.Types.ObjectId],
-    required: true,
-    ref: 'Trade'
   },
   positions: {
     type: [mongoose.Schema.Types.ObjectId],

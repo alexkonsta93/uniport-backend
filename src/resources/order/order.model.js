@@ -154,5 +154,11 @@ orderSchema.virtual('isComplete').get(async function() {
 		return this.amount == Trade.sumAmount(trades);
 });
 
+orderSchema.methods.deleteTrades = async function() {
+  for (let tradeId of this.tradeIds) {
+    await Trade.findByIdAndDelete(tradeId);
+  }
+}
+
 var Order = new mongoose.model('Order', orderSchema); // Must be at bottom of file for hooks to work
 export default Order;

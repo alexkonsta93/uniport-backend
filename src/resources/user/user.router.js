@@ -143,7 +143,12 @@ router
   .delete(async (req, res) => {
     if (req.body.id) {
 
-      await Order.findOneAndDelete({ '_id': req.body.id });
+      let order = await Order.findOneAndDelete({ '_id': req.body.id });
+
+      // delete order's trades
+      await order.deleteTrades()
+
+      // update user orders
       User.updateOne(
         { '_id': req.params.id },
         { '$pull': { 'orders': req.body.id } },
@@ -165,9 +170,12 @@ router
       })
       let orderIds = [];
 
-      // Delete order in Order database
       try {
         for (let order of orders) {
+          // Delete order's trade
+          await order.deleteTrades();
+
+          // Delete order in Order database
           await Order.findOneAndDelete({ '_id': order.id });
           orderIds.push(order.id);
         }
@@ -191,8 +199,21 @@ router
 
     } else {
 
-      let orders = User.findById(req.params.id).orders;
-      await Order.deleteMany(orders);
+      try {
+        // Delete all user's orders
+        await Order.deleteMany({ userId: req.params.id });
+
+        // Delete all user's trades
+        await Trade.deleteMany({ userId: req.params.id });
+      } catch (err) {
+        console.log(err);
+        res.status(400).end();
+      }
+
+      //let orders = User.findById(req.params.id).orders;
+      //await Order.deleteMany(orders);
+
+      // Update user's order
       User.updateOne(
         { '_id': req.params.id },
         { '$set': { 'orders': [] } },
