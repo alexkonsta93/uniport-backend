@@ -5,6 +5,8 @@ import Order from '../order/order.model';
 import Trade from '../trade/trade.model';
 import { toCoinbaseOrders } from '../CoinbaseAdapter';
 import { toGdaxOrders } from '../GdaxAdapter';
+import { FtxClient } from '../../clients/FTX';
+import { processFtxData } from '../../adapters/FtxAdapter';
 
 var router = crudRouter(User);
 
@@ -76,6 +78,15 @@ router
 
 router
   .route('/:id/orders')
+  .get(async (req, res) => {
+    let client = new FtxClient(
+      'TiIp19Y1eldkSzT2pOXeODVN4FomuR3NQvzdLsmr',
+      '9sHJgt3l4svQ8ff7Q7BDJS3GR0rQ8Az6TvQd9gdz'
+    );
+    let data = await client.getFills();
+    let orders = processFtxData(data, req.params.id);
+    res.status(200).json(orders);
+  })
   .post(async (req, res) => {
     let adapter;
     switch (req.body.exchange) {
@@ -84,6 +95,9 @@ router
         break;
       case 'GDAX':
         adapter = toGdaxOrders;
+        break;
+      case 'Kraken':
+        adpater = toKrakenOrders;
         break;
       default:
         throw new Error('exchange not recognized');

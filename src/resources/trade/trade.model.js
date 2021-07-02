@@ -3,7 +3,6 @@ import Order from '../order/order.model.js';
 
 var { Schema } = mongoose;
 
-var currencies = ['ETH', 'BTC', 'USD'];
 var exchanges = ['bitfinex', 'poloniex', 'kraken', 'binance', 'gdax', 'gemini', 'coinbase'];
 
 var tradeSchema = new Schema({
@@ -18,7 +17,7 @@ var tradeSchema = new Schema({
 				required: true,
 				lowercase: true
 		},
-		exchangeTradeId: {
+		tradeId: {
 				type: String,
 				default: null
 		},
@@ -36,13 +35,11 @@ var tradeSchema = new Schema({
 		},
 		quote: {
 				type: String,
-				enum: currencies,
 				required: true,
 				uppercase: true
 		},
 		base: {
 				type: String,
-				enum: currencies,
 				uppercase: true,
 				required: true
 		},
@@ -52,14 +49,13 @@ var tradeSchema = new Schema({
 		},
 		feeCurrency: {
 				type: String,
-				enum: currencies,
 				default: "USD",
 				uppercase: true
 		},
 		type: {
 				type: String,
 				enum: [
-						'exchange', 
+						'spot', 
 						'margin', 
 						'futures-basis', 
 						'futures-funding',
@@ -67,12 +63,14 @@ var tradeSchema = new Schema({
 				],
 				required: true
 		},
+	  /*
 		orderId: {
 				type: mongoose.Schema.Types.ObjectId,
 				ref: 'Order',
 				default: null
 		},
-		exchangeOrderId: {
+		*/
+		orderId: {
 				type: Number,
 				default: null
 		}
