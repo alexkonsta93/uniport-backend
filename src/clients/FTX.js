@@ -1,5 +1,3 @@
-//import hmacSHA256 from 'crypto-js/hmac-sha256';
-import moment from 'moment';
 import axios from 'axios';
 import CryptoJS from 'crypto-js';
 
@@ -88,10 +86,34 @@ export class FtxClient {
   async getHistoricalPrices(marketName, dateTime) {
     var path = '/api/markets/' + marketName + '/candles?resolution=15';
     var endTimeParam = `&end_time=${Math.floor(new Date(dateTime)/1000)}`;
-    return await axios.get(this.mainUrl + path + endTimeParam);
+    try {
+      let res = await axios.get(this.mainUrl + path + endTimeParam);
+      let data = res.data.result[res.data.result.length - 1].close;
+      return data;
+    } catch (err) {
+      console.log(err);
+    }
   }
 
-  getBorrowHistory() {
+  async getBorrowHistory() {
+    var path = '/api/spot_margin/borrow_history';
+    var headers = this.generateAuthHeaders(path);
+    try {
+      let res = await axios.get(this.mainUrl + path, { headers: headers })
+      return res.data.result;
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
+  async getFundingPayments() {
+    var path = '/api/funding_payments';
+    var headers = this.generateAuthHeaders(path);
+    try {
+      let res = await axios.get(this.mainUrl + path, { headers: headers })
+      return res.data.result;
+    } catch (err) {
+      console.log(err);
+    }
   }
 }
