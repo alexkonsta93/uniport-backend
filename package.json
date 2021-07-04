@@ -18,6 +18,7 @@
   "homepage": "https://github.com/alexkonsta93/uniport-backend#readme",
   "dependencies": {
     "body-parser": "^1.19.0",
+    "crypto-js": "^4.0.0",
     "express": "^4.17.1",
     "mongodb": "^3.6.4",
     "mongoose": "^5.11.19"

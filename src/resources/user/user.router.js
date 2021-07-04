@@ -84,7 +84,7 @@ router
       '9sHJgt3l4svQ8ff7Q7BDJS3GR0rQ8Az6TvQd9gdz'
     );
     let data = await client.getFills();
-    let orders = processFtxData(data, req.params.id);
+    let orders = await processFtxData(data, req.params.id);
     res.status(200).json(orders);
   })
   .post(async (req, res) => {

@@ -85,12 +85,10 @@ export class FtxClient {
     }
   }
 
-  getHistoricalPrices(marketName, dateTime) {
+  async getHistoricalPrices(marketName, dateTime) {
     var path = '/api/markets/' + marketName + '/candles?resolution=15';
     var endTimeParam = `&end_time=${Math.floor(new Date(dateTime)/1000)}`;
-    axios.get(this.mainUrl + path + endTimeParam)
-    .then(res => res.data.result)
-    .catch(err => console.log(err))
+    return await axios.get(this.mainUrl + path + endTimeParam);
   }
 
   getBorrowHistory() {

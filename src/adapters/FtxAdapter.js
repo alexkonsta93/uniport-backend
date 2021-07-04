@@ -2,7 +2,7 @@ import moment from 'moment';
 
 import { FtxClient } from '../clients/FTX';
 
-export function processFtxData(data, userId) {
+export async function processFtxData(data, userId) {
   var trades = [];
 
   for (let line of data) {
@@ -34,10 +34,10 @@ export function processFtxData(data, userId) {
     trades.push(trade);
   }
 
-  return ordersFromTrades(trades, userId);
+  return await ordersFromTrades(trades, userId);
 }
 
-function ordersFromTrades(trades, userId) {
+async function ordersFromTrades(trades, userId) {
   var orders = [];
   var first = trades.shift();
   var order = new RawOrder(first, userId);
@@ -45,7 +45,7 @@ function ordersFromTrades(trades, userId) {
   for (let trade of trades) {
     if (trade.orderId === order.orderId) order.appendTrade(trade);
     else {
-      order.fixFee();
+      await order.fixFee();
       order.roundValues();
       orders.push(order);
       order = new RawOrder(trade);
@@ -84,13 +84,18 @@ class RawOrder {
     this.fee = Math.round(this.fee*100)/100;
   }
 
-  fixFee() {
+  async fixFee() {
     if (this.feeCurrency !== 'USD' && this.quote !== 'USD') {
-      console.log(this.orderId);
       let client = new FtxClient();
-      let price = client.getHistoricalPrices(this.base + '/' + this.quote, this.dateTime);
-      console.log(price);
+      let res = await client.getHistoricalPrices(this.feeCurrency + '/USD', this.dateTime);
+      let price = (res.data.result[res.data.result.length - 1]).close;
+      this.fee = price * this.fee;
+      this.feeCurrency = 'USD';
+    } else if (this.feeCurrency !== 'USD') {
+      this.fee = this.price * this.fee;
+      this.feeCurrency = 'USD';
     } else {
+      return;
     }
   }
 
