@@ -106,12 +106,22 @@ export class FtxClient {
     }
   }
 
-  async getFundingPayments() {
+  async getFundingPayments(startTime = 0, endTime = Date.now(), market = null) {
     var path = '/api/funding_payments';
-    var headers = this.generateAuthHeaders(path);
+    var startTimeParam = `?start_time=${Math.floor(startTime)/1000}`
+    var endTimeParam = `&end_time=${Math.floor(endTime/1000)}`;
+    var futureParam = '';
+    console.log(market);
+    if (market) futureParam = `&future=${market}`;
+    var headers = this.generateAuthHeaders(
+      path + startTimeParam + endTimeParam + futureParam
+    );
     try {
-      let res = await axios.get(this.mainUrl + path, { headers: headers })
-      return res.data.result;
+      let res = await axios.get(
+        this.mainUrl + path + startTimeParam + endTimeParam + futureParam,
+        { headers: headers }
+      )
+      return res;
     } catch (err) {
       console.log(err);
     }

@@ -5,8 +5,7 @@ import Trade from '../trade/trade.model.js';
 
 var { Schema } = mongoose;
 
-var currencies = ['ETH', 'BTC', 'USD'];
-var exchanges = ['kraken'];
+var exchanges = ['kraken', 'ftx'];
 
 var positionSchema = new Schema({		
 		userId: {
@@ -46,35 +45,37 @@ var positionSchema = new Schema({
 		},
 		fundingTradeIds: {
 				type: [mongoose.Schema.Types.ObjectId],
-				required: true
 		},
 		basisFee: {
 				type: Number,
 				required: true
 		},
+	  /*
 		basisFeeCurrency: {
 				type: String,
-				enum: currencies,
 				required: true,
 				uppercase: true
 		},
+		*/
+    basisFeeCurrency: {
+      type: String,
+      enum: ['USD'],
+      required: true
+    },
 		basisTradeIds: {
 				type: [mongoose.Schema.Types.ObjectId],
 				required: true
 		},
 		compensationTradeIds: {
 				type: [mongoose.Schema.Types.ObjectId],
-				required: true
-		},
-		quote: {
-				type: String,
-				enum: currencies,
-				required: true,
-				uppercase: true
 		},
 		base: {
 				type: String,
-				enum: currencies,
+				required: true,
+				uppercase: true
+		},
+		quote: {
+				type: String,
 				required: true,
 				uppercase: true
 		},
@@ -84,7 +85,7 @@ var positionSchema = new Schema({
 		},
 		type: {
 				type: String,
-				enum: ['futures'],
+				enum: ['future', 'margin'],
 				required: true
 		},
 });
