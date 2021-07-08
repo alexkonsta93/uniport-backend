@@ -31,16 +31,35 @@ export class FtxClient {
   }
 
   async getFills() {
+    // max return amount is 5000 trades
+
+    var fills = [];
     var path = '/api/fills';
     var startTimeParam = '?start_time=0'
     var endTimeParam = `&end_time=${Math.floor(Date.now()/1000)}`;
+    //var endTimeParam = '&end_time=1614300261';
     var headers = this.generateAuthHeaders(path + startTimeParam + endTimeParam);
     try {
       let res = await axios.get(this.mainUrl + path + startTimeParam + endTimeParam, {
         headers: headers
       })
       let data = res.data.result;
-      return data;
+      let firstDate = data[data.length - 1].time;
+      endTimeParam = `&end_time=${Math.floor(new Date(firstDate)/1000) - 1}`;
+      fills.push( ...data );
+
+      while (data.length === 5000) {
+        headers = this.generateAuthHeaders(path + startTimeParam + endTimeParam);
+        res = await axios.get(this.mainUrl + path + startTimeParam + endTimeParam, {
+          headers: headers
+        })
+        data = res.data.result;
+        firstDate = data[data.length - 1].time;
+        endTimeParam = `&end_time=${Math.floor(new Date(firstDate)/1000) - 1}`;
+        fills.push( ...data );
+      }
+
+      return fills;
     } catch (err) {
       console.log(err);
     }
@@ -71,7 +90,6 @@ export class FtxClient {
         });
         hasMoreData = res.data.hasMoreData;
         data = res.data.result;
-        console.log(data);
         orders.push(data);
         lastDate = data[data.length - 1].createdAt;
         endTimeParam = `&end_time=${Math.floor(new Date(lastDate)/1000)}`;
@@ -108,10 +126,9 @@ export class FtxClient {
 
   async getFundingPayments(startTime = 0, endTime = Date.now(), market = null) {
     var path = '/api/funding_payments';
-    var startTimeParam = `?start_time=${Math.floor(startTime)/1000}`
+    var startTimeParam = `?start_time=${Math.floor(startTime/1000)}`
     var endTimeParam = `&end_time=${Math.floor(endTime/1000)}`;
     var futureParam = '';
-    console.log(market);
     if (market) futureParam = `&future=${market}`;
     var headers = this.generateAuthHeaders(
       path + startTimeParam + endTimeParam + futureParam
@@ -120,8 +137,8 @@ export class FtxClient {
       let res = await axios.get(
         this.mainUrl + path + startTimeParam + endTimeParam + futureParam,
         { headers: headers }
-      )
-      return res;
+      );
+      return res.data.result;
     } catch (err) {
       console.log(err);
     }

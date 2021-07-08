@@ -58,9 +58,10 @@ var orderSchema = new Schema({
 				enum: [
 						'spot', 
 						'margin', 
-						'futures-basis', 
-						'futures-funding', 
-						'futures-pnl'
+						'future-basis', 
+					  'future-basis-split',
+						'future-funding', 
+						'future-pnl'
 				],
 				required: true
 		},

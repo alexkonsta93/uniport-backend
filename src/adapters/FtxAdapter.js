@@ -14,12 +14,12 @@ export async function processFtxData(data, userId, userClient) {
     };
      
     if (line['future']) {
-      trade.type = 'future'
+      trade.type = 'future basis'
       let baseQuote = line['market'].split('-');
       trade.base = baseQuote[0]; 
       trade.quote = baseQuote[1];
     } else {
-      trade.type = 'exchange';
+      trade.type = 'spot';
       trade.base = line['baseCurrency'];
       trade.quote = line['quoteCurrency'];
     }
@@ -37,8 +37,10 @@ export async function processFtxData(data, userId, userClient) {
   }
 
   var orders = await buildOrders(trades, userId);
+  orders = orders.reverse();
+  console.log(orders);
   //orders = await mapMarginOrders(orders);
-  var positions = await buildPositions(orders, userId);
+  //var positions = await buildPositions(orders, userId);
   return orders;
 }
 
@@ -53,7 +55,7 @@ async function buildOrders(trades, userId) {
       await order.fixFee();
       order.roundValues();
       orders.push(order);
-      order = new Order(trade);
+      order = new Order(trade, userId);
     }
   }
 
@@ -61,53 +63,50 @@ async function buildOrders(trades, userId) {
 }
 
 async function buildPositions(orders, userId) {
-  await client.getFundingPayments();
   var positions = [];
-  /*
   var router = new PositionRouter(userId);
 
   for (let order of orders) {
+    console.log(order.dateTime);
+    console.log(order.base + '/' + order.quote + ' ' + order.amount);
+    if (order.type === 'spot' || order.type === 'margin') continue;
     let position = router.route(order);
     if (position.isComplete()) {
-      await position.handleFunding();
+      //await position.calcFunding();
       positions.push(position);
       router.finalize(position);
     } else {
-      position.handleOrder(order);
+      let splitOrder = position.handleOrder(order);
+      if (splitOrder) orders.unshift(splitOrder);
     }
   }
-  */
+
   return positions;
 }
 
 class PositionRouter {
 
-  constructor(userId, positions = []) {
+  constructor(userId) {
     this.userId = userId;
-    this.positions = positions;
+    this.positions = {};
   }
 
   route(order) {
-    for (let position of this.positions) {
-      if (
-        position.base === order.base &&
-        position.quote === order.quote
-      ) return position;
-
-      position = new Position(this.userId);
-      this.positions.push(position);
-      return position;
+    var position;
+    var market = order.base + '/' + order.quote;
+    if (!this.positions[market]) {
+      position = new Position(order.userId);
+      this.positions[market] = position;
+    } else {
+      position = this.positions[market];
     }
+    return position;
   }
 
   finalize(position) {
-    this.positions = this.positions.filter(item => item !== position);
+    var market = position.base + '/' + position.quote;
+    this.positions[market] = new Position(position.userId);
   }
-}
-
-async function mapMarginOrders(orders) {
-  let history = await client.getFundingPayments();
-  console.log(history);
 }
 
 class Position {
@@ -126,6 +125,13 @@ class Position {
     this.dateClose = null;
     this.base = null;
     this.quote = null;
+    this.side = 'long';
+  }
+
+  print() {
+    console.log(this.base);
+    console.log(this.quote);
+    console.log(this.outstanding);
   }
 
   isEmpty() {
@@ -137,28 +143,42 @@ class Position {
   }
 
   handleOrder(order) {
+    var splitOrder = null;
 
     if (this.isEmpty()) {
-      // initialized
+      // initialize
+      console.log('initialize');
+      //this.print();
       this.dateOpen = order.dateTime;
-      this.base = order.basis;
+      this.base = order.base;
       this.quote = order.quote;
-    } else if (Math.abs(this.outstanding) < Math.abs(order.amount)) {
+      if (this.amount < 0) this.side = 'short';
+    } 
+    else if (
+      (this.side = 'long' && (this.outstanding - order.amount < 0)) ||
+      (this.side = 'short' && (this.outstanding + order.amount > 0))
+    ) {
+      console.log('split');
+      //this.print();
+      console.log(order.base + '/' + order.quote + ' ' + order.amount);
       //handle closing corner case
-      let [ order1, order2 ] = order.split(this.outstanding);
-      order = order1;
-      this.dateClose = order.dateTime;
+      var [ orderLeft, orderRight ] = order.split(this.outstanding);
+      splitOrder = orderRight;
+      order = orderLeft;
     } 
 
     this.outstanding += order.amount;
     this.avgEntryPrice = 
       this.avgEntryPrice*this.amount + order.price*order.amount / (this.amount + order.amount);
+    this.closePrice = order.price;
     this.basisTrades.push(order);
     this.basisFee += order.fee;
     this.dateClose = order.dateTime;
+
+    return splitOrder;
   }
 
-  async hanldeFunding() {
+  async calcFunding() {
     if (!this.dateOpen || !this.dateClose) {
       throw Error('Position not initialized');
     }
@@ -204,6 +224,38 @@ class Order {
     this.fee = Math.round(this.fee*100)/100;
   }
 
+  split(amount) {
+    var orderLeft = {
+        orderId: this.orderId,
+        exchange: this.exchange,
+        base: this.base,
+        quote: this.quote,
+        amount: amount,
+        price: this.price,
+        dateTime: this.dateTime,
+        feeCurrency: this.feeCurrency,
+        fee: this.fee,
+        type: 'futures basis split',
+        userId: this.userId,
+        trades: this.trades
+      };
+    var orderRight = {
+        orderId: this.orderId,
+        exchange: this.exchange,
+        base: this.base,
+        quote: this.quote,
+        amount: this.amount - amount,
+        price: this.price,
+        dateTime: this.dateTime,
+        feeCurrency: this.feeCurrency,
+        fee: this.fee,
+        type: 'futures basis split',
+        userId: this.userId,
+        trades: this.trades
+      };
+    return [orderLeft, orderRight];
+  }
+
   async fixFee() {
     if (this.feeCurrency !== 'USD' && this.quote !== 'USD') {
       let price = await client.getHistoricalPrices(this.feeCurrency + '/USD', this.dateTime);
@@ -215,9 +267,6 @@ class Order {
     } else {
       return;
     }
-  }
-
-  checkMargin() {
   }
 
 }
