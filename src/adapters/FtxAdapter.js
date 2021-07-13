@@ -38,10 +38,11 @@ export async function processFtxData(data, userId, userClient) {
 
   var orders = await buildOrders(trades, userId);
   orders = orders.reverse();
-  console.log(orders);
-  //orders = await mapMarginOrders(orders);
-  //var positions = await buildPositions(orders, userId);
-  return orders;
+  var positions = await buildPositions(orders, userId);
+  return {
+    orders: orders,
+    positions: positions
+  };
 }
 
 async function buildOrders(trades, userId) {
@@ -58,6 +59,7 @@ async function buildOrders(trades, userId) {
       order = new Order(trade, userId);
     }
   }
+  orders.push(order);
 
   return orders;
 }
@@ -66,18 +68,22 @@ async function buildPositions(orders, userId) {
   var positions = [];
   var router = new PositionRouter(userId);
 
-  for (let order of orders) {
-    console.log(order.dateTime);
-    console.log(order.base + '/' + order.quote + ' ' + order.amount);
+  for (let i = 0; i < orders.length; i++) {
+    let order = orders[i];
+
     if (order.type === 'spot' || order.type === 'margin') continue;
     let position = router.route(order);
     if (position.isComplete()) {
-      //await position.calcFunding();
+      await position.calcFunding();
       positions.push(position);
-      router.finalize(position);
+      position = router.finalize(position);
+      position.handleOrder(order);
     } else {
       let splitOrder = position.handleOrder(order);
-      if (splitOrder) orders.unshift(splitOrder);
+      if (splitOrder) {
+        orders[i] = splitOrder;
+        i -= 1;
+      }
     }
   }
 
@@ -106,6 +112,7 @@ class PositionRouter {
   finalize(position) {
     var market = position.base + '/' + position.quote;
     this.positions[market] = new Position(position.userId);
+    return this.positions[market];
   }
 }
 
@@ -119,7 +126,8 @@ class Position {
     this.fundingFeeCurrency = 'USD';
     this.pnl = 0.0;
     this.outstanding = 0.0;
-    this.avgEntryPrice = 0.0;
+    //this.avgEntryPrice = 0.0;
+    this.openPrice = 0.0;
     this.closePrice = 0.0;
     this.dateOpen = null;
     this.dateClose = null;
@@ -143,37 +151,32 @@ class Position {
   }
 
   handleOrder(order) {
+    //console.log(order.base + '/' + order.quote + ' ' + order.amount + ' ' + order.price);
     var splitOrder = null;
 
     if (this.isEmpty()) {
       // initialize
-      console.log('initialize');
-      //this.print();
       this.dateOpen = order.dateTime;
       this.base = order.base;
       this.quote = order.quote;
-      if (this.amount < 0) this.side = 'short';
+      if (order.amount < 0) this.side = 'short';
+      this.openPrice = order.price;
     } 
     else if (
-      (this.side = 'long' && (this.outstanding - order.amount < 0)) ||
-      (this.side = 'short' && (this.outstanding + order.amount > 0))
+      (this.side === 'long' && (this.outstanding + order.amount < 0)) ||
+      (this.side === 'short' && (this.outstanding + order.amount > 0))
     ) {
-      console.log('split');
-      //this.print();
-      console.log(order.base + '/' + order.quote + ' ' + order.amount);
       //handle closing corner case
-      var [ orderLeft, orderRight ] = order.split(this.outstanding);
+      var [ orderLeft, orderRight ] = order.split(-this.outstanding);
       splitOrder = orderRight;
       order = orderLeft;
     } 
-
     this.outstanding += order.amount;
-    this.avgEntryPrice = 
-      this.avgEntryPrice*this.amount + order.price*order.amount / (this.amount + order.amount);
     this.closePrice = order.price;
     this.basisTrades.push(order);
     this.basisFee += order.fee;
     this.dateClose = order.dateTime;
+    this.pnl -= order.amount * order.price;
 
     return splitOrder;
   }
@@ -188,8 +191,7 @@ class Position {
       this.dateClose,
       this.base + '-' + this.quote
     );
-    console.log(fundingPayments);
-    for (let payment of fundingPayments) this.fundingFee += payment;
+    for (let obj of fundingPayments) this.fundingFee += obj.payment;
   }
 
 }
@@ -209,6 +211,7 @@ class Order {
     this.type = trade.type;
     this.userId = userId;
     this.trades = [trade];
+    this.isSplit = false;
   }
 
   appendTrade(trade) {
@@ -235,9 +238,10 @@ class Order {
         dateTime: this.dateTime,
         feeCurrency: this.feeCurrency,
         fee: this.fee,
-        type: 'futures basis split',
+        type: 'future basis',
         userId: this.userId,
-        trades: this.trades
+        trades: this.trades,
+        isSplit: true,
       };
     var orderRight = {
         orderId: this.orderId,
@@ -249,9 +253,10 @@ class Order {
         dateTime: this.dateTime,
         feeCurrency: this.feeCurrency,
         fee: this.fee,
-        type: 'futures basis split',
+        type: 'future basis',
         userId: this.userId,
-        trades: this.trades
+        trades: this.trades,
+        isSplit: true
       };
     return [orderLeft, orderRight];
   }

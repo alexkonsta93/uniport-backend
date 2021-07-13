@@ -31,10 +31,10 @@ var positionSchema = new Schema({
 				type: Number,
 				required: true
 		},
-		avgEntryPrice: {
-				type: Number,
-				required: true
-		},
+    openPrice: {
+      type: Number,
+      required: true
+    },
 		closePrice: {
 				type: Number,
 				required: true
@@ -50,13 +50,6 @@ var positionSchema = new Schema({
 				type: Number,
 				required: true
 		},
-	  /*
-		basisFeeCurrency: {
-				type: String,
-				required: true,
-				uppercase: true
-		},
-		*/
     basisFeeCurrency: {
       type: String,
       enum: ['USD'],
