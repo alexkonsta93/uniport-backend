@@ -1,11 +1,12 @@
 import moment from 'moment';
 
-import { FtxClient } from '../clients/FTX';
+import { FtxClient } from '../clients/FtxClient';
 var client;
 
-export async function processFtxData(data, userId, userClient) {
+export async function processFtxApiData(userId, userClient) {
   client = userClient;
   var trades = [];
+  var data = await client.getFills();
 
   for (let line of data) {
     let trade = { 
@@ -14,7 +15,7 @@ export async function processFtxData(data, userId, userClient) {
     };
      
     if (line['future']) {
-      trade.type = 'future basis'
+      trade.type = 'future-basis'
       let baseQuote = line['market'].split('-');
       trade.base = baseQuote[0]; 
       trade.quote = baseQuote[1];
@@ -238,7 +239,7 @@ class Order {
         dateTime: this.dateTime,
         feeCurrency: this.feeCurrency,
         fee: this.fee,
-        type: 'future basis',
+        type: this.type,
         userId: this.userId,
         trades: this.trades,
         isSplit: true,
@@ -253,7 +254,7 @@ class Order {
         dateTime: this.dateTime,
         feeCurrency: this.feeCurrency,
         fee: this.fee,
-        type: 'future basis',
+        type: this.type,
         userId: this.userId,
         trades: this.trades,
         isSplit: true

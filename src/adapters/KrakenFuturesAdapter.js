@@ -1,9 +1,12 @@
 import moment from 'moment';
-import Order from './order/order.model';
-import Trade from './trade/trade.model';
-import Position from './leveraged-position/leveraged-position.model';
+import Order from '../resources/order/order.model';
+import Trade from '../resources/trade/trade.model';
+import Position from '../resources/leveraged-position/leveraged-position.model';
 
-export default async function processKrakenFuturesLines(lines) {
+export function processKrakenFuturesApiData() {}
+export function processKrakenFuturesCsvData() {}
+
+async function processKrakenFuturesLines(lines) {
 		var validTypes = ['funding rate change', 'futures trade', 'futures liquidation'];
 		const dateToCheck = moment.utc('2020-03-29 23:07:09')
 

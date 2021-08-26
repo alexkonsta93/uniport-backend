@@ -3,13 +3,90 @@ import User from './user.model';
 import Exchange from '../exchange/exchange.model';
 import Order from '../order/order.model';
 import Trade from '../trade/trade.model';
-import { toCoinbaseOrders } from '../CoinbaseAdapter';
-import { toGdaxOrders } from '../GdaxAdapter';
-import { FtxClient } from '../../clients/FTX';
-import { processFtxData } from '../../adapters/FtxAdapter';
+//import { toCoinbaseOrders } from '../CoinbaseAdapter';
+//import { toGdaxOrders } from '../GdaxAdapter';
+
+// Clients
+import { FtxClient } from '../../clients/FtxClient';
+import { CoinbaseClient } from '../../clients/CoinbaseClient';
+import { KrakenClient } from '../../clients/KrakenClient';
+import { KrakenFuturesClient } from '../../clients/KrakenFuturesClient';
+import { BinanceClient } from '../../clients/BinanceClient';
+import { GeminiClient } from '../../clients/GeminiClient'
+
+// Adapters
+import { processFtxApiData } from '../../adapters/FtxAdapter';
+import { processCoinbaseApiData } from '../../adapters/CoinbaseAdapter';
+import { processKrakenApiData } from '../../adapters/KrakenAdapter';
+import { processKrakenFuturesApiData } from '../../adapters/KrakenFuturesAdapter';
+import { processBinanceApiData } from '../../adapters/BinanceAdapter';
+import { processGeminiApiData } from '../../adapters/GeminiAdapter';
 
 var router = crudRouter(User);
 
+async function updateDb(userId, data) {
+  var { orders, positions } = data;
+
+  // Inject Orders and Trades
+  let orderIds = [];
+  let tradeIds = [];
+  for (let order of orders) {
+    try {
+      // Add to Order db
+      let doc = await Order.create(order);
+      orderIds.push(doc.id);
+
+      // Handle subtrades
+      if (order.trades) {
+        for (let trade of order.trades) {
+          trade.userId = userId;
+          try {
+            let doc = await Trade.create(trade);
+            tradeIds.push(doc.id);
+          } catch(err) {
+            console.log(err);
+            continue;
+          }
+        }
+      }
+
+      // Update order.trades if necessary
+      if (tradeIds.length > 0) {
+        await Order.updateOne(
+          { '_id': doc.id },
+          { '$push': { 'tradeIds' : tradeIds } }
+        );
+        tradeIds = [];
+      }
+    } catch (err) {
+      console.log(err);
+      continue;
+    }
+  }
+
+  // Inject Positions
+  /*
+  let positionIds = [];
+  for (let position of positions) {
+    
+  }
+  */
+
+
+  // Update User.orders
+  User.updateOne(
+    { '_id': userId },
+    { '$push': { 'orders': orderIds } },
+    (err, doc) => {
+      if (err) {
+        throw err;
+      }
+      return doc;
+    }
+  );
+}
+
+/*** /:ID/EXCHANGES ***/
 router
   .route('/:id/exchanges')
   .get((req, res) => {
@@ -76,9 +153,63 @@ router
     }
   });
 
+/*** /:ID/ORDERS/API ***/
+router
+  .route('/:id/orders/api')
+  .post(async (req, res) => {
+    let key = req.body.data.apiKey; // NOT SAFE!!!!
+    let secret = req.body.data.apiSecret; // NOT SAFE!!!
+    let client, process;
+    switch (req.body.data.exchange) {
+      case 'Coinbase':
+        client = new CoinbaseClient(key, secret);
+        process = processFtxApiData;
+        break;
+      case 'Gemini':
+        client = new GeminiClient(key, secret);
+        process = processGeminiApiData;
+        break;
+      case 'Kraken':
+        client = new KrakenClient(key, secret);
+        process = processKrakenApiData;
+        break;
+      case 'Kraken Futures':
+        client = new KrakenFuturesClient(key, secret);
+        process = processKrakenFuturesApiData;
+        break;
+      case 'Binance':
+        client = new BinanceClient(key, secret);
+        process = processBinanceApiData;
+        break;
+      case 'Ftx':
+        client = new FtxClient(key, secret);
+        process = processFtxApiData;
+        break;
+      default:
+        throw new Error('exchange client not recognized');
+    }
+    let data = await process(req.params.id, client);
+    try {
+      await updateDb(req.params.id, data);
+      res.status(200).json(data);
+    } catch (err) {
+      console.log(err);
+      res.status(400).end();
+    }
+  })
+
+/*** /:ID/ORDERS/CSV ***/
+router
+  .route('/:id/orders/csv')
+  .post()
+
+/*** /:ID/EXCHANGE/:NAME/AUTH_DATA
+
+/*** /:ID/ORDERS ***/
 router
   .route('/:id/orders')
   .get(async (req, res) => {
+    /*
     let client = new FtxClient(
       'TiIp19Y1eldkSzT2pOXeODVN4FomuR3NQvzdLsmr',
       '9sHJgt3l4svQ8ff7Q7BDJS3GR0rQ8Az6TvQd9gdz'
@@ -86,6 +217,8 @@ router
     let data = await client.getFills();
     let orders = await processFtxData(data, req.params.id, client);
     res.status(200).json(orders);
+    */
+    
   })
   .post(async (req, res) => {
     let adapter;
@@ -100,7 +233,7 @@ router
         adpater = toKrakenOrders;
         break;
       default:
-        throw new Error('exchange not recognized');
+        throw new Error('exchange adapter not recognized');
     }
 
     let orders = adapter(req.body.lines, req.params.id);

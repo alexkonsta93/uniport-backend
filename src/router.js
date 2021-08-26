@@ -1,7 +1,9 @@
 import { app, start, stop } from './db';
+/*
 import processKrakenFuturesLines from './resources/KrakenFuturesAdapter';
 import processCoinbaseLines from './resources/CoinbaseAdapter';
 import processGdaxLines from './resources/GdaxAdapter';
+*/
 
 import Papa from 'papaparse';
 import axios from 'axios';
@@ -24,6 +26,7 @@ app.use((req, res, next) => {
 });
 */
 
+/*
 app.post('/process-kraken-futures-trades', async (req, res, next) => {
 		res.status(200);
 		res.send('success');
@@ -45,6 +48,7 @@ app.post('/process-coinbase-trades', async (req, res, next) => {
 	  console.log(req.userId);
 		//await processCoinbaseLines(lines.reverse(), req.userId);
 })
+*/
 
 app.get('/print-trades', async (req, res, next) => {
 		try {

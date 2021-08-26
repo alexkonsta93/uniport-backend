@@ -4,7 +4,7 @@ import Trade from '../trade/trade.model.js';
 var { Schema } = mongoose;
 
 var exchanges = ['bitfinex', 'poloniex', 'kraken', 'binance', 'gemini',
-'coinbase', 'gdax'];
+'coinbase', 'gdax', 'ftx'];
 
 var orderSchema = new Schema({
   userId: {
@@ -64,7 +64,7 @@ var orderSchema = new Schema({
     ],
     required: true
   },
-  split: {
+  isSplit: {
     type: Boolean,
     required: true
   },
