@@ -74,8 +74,7 @@ var orderSchema = new Schema({
   },
   tradeIds: {
     type: [mongoose.Schema.Types.ObjectId],
-    required: true,
-    ref: 'Trade'
+    default: []
   },
 });
 
@@ -144,20 +143,23 @@ orderSchema.virtual('exists').get(async function() {
 });
 */
 
-  orderSchema.virtual('isComplete').get(async function() {
-    var trades = [];
-    try {
-      trades = await Trade.find({ orderId: this._id }).exec();	
-    } catch (err) {
-      console.error(err);
-    }
-    return this.amount == Trade.sumAmount(trades);
-  });
+orderSchema.virtual('isComplete').get(async function() {
+  var trades = [];
+  try {
+    trades = await Trade.find({ orderId: this._id }).exec();	
+  } catch (err) {
+    console.log(err);
+  }
+  return this.amount == Trade.sumAmount(trades);
+});
 
 orderSchema.methods.deleteTrades = async function() {
+  var count = 0;
   for (let tradeId of this.tradeIds) {
     await Trade.findByIdAndDelete(tradeId);
+    count += 1;
   }
+  return count;
 }
 
 var Order = new mongoose.model('Order', orderSchema); // Must be at bottom of file for hooks to work

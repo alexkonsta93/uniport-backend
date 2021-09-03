@@ -25,7 +25,6 @@ app.use((req, res, next) => {
 		next();
 });
 */
-
 /*
 app.post('/process-kraken-futures-trades', async (req, res, next) => {
 		res.status(200);

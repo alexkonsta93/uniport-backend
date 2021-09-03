@@ -40,6 +40,7 @@ export async function processFtxApiData(userId, userClient) {
   var orders = await buildOrders(trades, userId);
   orders = orders.reverse();
   var positions = await buildPositions(orders, userId);
+
   return {
     orders: orders,
     positions: positions
@@ -52,8 +53,9 @@ async function buildOrders(trades, userId) {
   var order = new Order(first, userId);
 
   for (let trade of trades) {
-    if (trade.orderId === order.orderId) order.appendTrade(trade);
-    else {
+    if (trade.orderId == order.orderId) {
+      order.appendTrade(trade);
+    } else {
       await order.fixFee();
       order.roundValues();
       orders.push(order);
@@ -61,7 +63,6 @@ async function buildOrders(trades, userId) {
     }
   }
   orders.push(order);
-
   return orders;
 }
 
@@ -223,9 +224,9 @@ class Order {
   }
 
   roundValues() {
-    this.amount = Math.round(this.amount*100)/100;
-    this.price = Math.round(this.price*100)/100;
-    this.fee = Math.round(this.fee*100)/100;
+    this.amount = Math.round(this.amount*10000)/10000;
+    this.price = Math.round(this.price*10000)/10000;
+    this.fee = Math.round(this.fee*10000)/10000;
   }
 
   split(amount) {

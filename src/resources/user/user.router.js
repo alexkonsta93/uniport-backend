@@ -24,67 +24,73 @@ import { processGeminiApiData } from '../../adapters/GeminiAdapter';
 
 var router = crudRouter(User);
 
+async function createOrderEntry(userDoc, order, trades) {
+
+  var tradeIds = [];
+  for (let trade of trades) {
+    let tradeDoc = await Trade.create(trade);
+    tradeIds.push(tradeDoc.id);
+  }
+
+  order.tradeIds = tradeIds;
+  var orderDoc = await Order.create(order);
+  
+  userDoc.orders.push(orderDoc.id);
+  await userDoc.save();
+}
+
+async function createDbEntry(userId, data) {
+  var userDoc = await User.findById(userId);
+  var { orders, positions } = data;
+  for (let order of orders) {
+    let trades = order.trades;
+    delete order.trades;
+    await createOrderEntry(userDoc, order, trades);   
+  }
+  // positions
+}
+
+/*
 async function updateDb(userId, data) {
   var { orders, positions } = data;
 
-  // Inject Orders and Trades
-  let orderIds = [];
-  let tradeIds = [];
+  // Handle Orders and Trades
+  var userDoc = await User.findById(userId);
+  
   for (let order of orders) {
     try {
       // Add to Order db
-      let doc = await Order.create(order);
-      orderIds.push(doc.id);
+      let orderDoc = await Order.create(order);
 
+      var m = 0;
       // Handle subtrades
-      if (order.trades) {
-        for (let trade of order.trades) {
-          trade.userId = userId;
-          try {
-            let doc = await Trade.create(trade);
-            tradeIds.push(doc.id);
-          } catch(err) {
-            console.log(err);
-            continue;
-          }
-        }
+      for (let trade of order.trades) {
+        m += 1;
+        //n += 1;
+        let tradeDoc = await Trade.create(trade);
+        console.log(tradeDoc.id);
+        orderDoc.tradeIds.push(tradeDoc.id);
+        await orderDoc.save();
+        //await orderDoc.addTrade(tradeDoc);
       }
+      console.log(orderDoc);
+      console.log(m);
+      console.log(orderDoc.tradeIds.length);
+      console.log('***********');
+      //console.log(orderDoc.trades());
+      //n += orderDoc.tradesLength();
 
-      // Update order.trades if necessary
-      if (tradeIds.length > 0) {
-        await Order.updateOne(
-          { '_id': doc.id },
-          { '$push': { 'tradeIds' : tradeIds } }
-        );
-        tradeIds = [];
-      }
+      // Update User.orders
+      userDoc.orders.push(orderDoc.id);
+      await userDoc.save();
     } catch (err) {
       console.log(err);
       continue;
     }
   }
 
-  // Inject Positions
-  /*
-  let positionIds = [];
-  for (let position of positions) {
-    
-  }
-  */
-
-
-  // Update User.orders
-  User.updateOne(
-    { '_id': userId },
-    { '$push': { 'orders': orderIds } },
-    (err, doc) => {
-      if (err) {
-        throw err;
-      }
-      return doc;
-    }
-  );
 }
+*/
 
 /*** /:ID/EXCHANGES ***/
 router
@@ -156,6 +162,27 @@ router
 /*** /:ID/ORDERS/API ***/
 router
   .route('/:id/orders/api')
+  .get(async (req, res) => {
+    try {
+      let orders = await Order.find({
+        userId: req.params.id, 
+        exchange: req.query.exchange
+      })
+      console.log(orders);
+
+      let count = 0;
+      for (let order of orders) {
+        count += 1 
+        let m = order.tradeIds.length;
+        count += m;
+      }
+      
+      res.status(200).json(count);
+    } catch (err) {
+      console.log(err);
+      res.status(400).end();
+    }
+  })
   .post(async (req, res) => {
     let key = req.body.data.apiKey; // NOT SAFE!!!!
     let secret = req.body.data.apiSecret; // NOT SAFE!!!
@@ -190,7 +217,7 @@ router
     }
     let data = await process(req.params.id, client);
     try {
-      await updateDb(req.params.id, data);
+      await createDbEntry(req.params.id, data);
       res.status(200).json(data);
     } catch (err) {
       console.log(err);
@@ -318,14 +345,17 @@ router
       let orderIds = [];
 
       try {
+        let count = 0;
         for (let order of orders) {
           // Delete order's trade
-          await order.deleteTrades();
+          let n = await order.deleteTrades();
+          count += n;
 
           // Delete order in Order database
           await Order.findOneAndDelete({ '_id': order.id });
           orderIds.push(order.id);
         }
+        console.log(count);
       } catch (err) {
         console.log(err);
         res.status(400).end();
