@@ -15,16 +15,6 @@ var userSchema = new Schema({
     type: String,
     required: true
   },
-  orders: {
-    type: [mongoose.Schema.Types.ObjectId],
-    required: true,
-    ref: 'Order'
-  },
-  positions: {
-    type: [mongoose.Schema.Types.ObjectId],
-    required: true,
-    ref: 'Position'
-  },
   exchanges: [{
     _id: {
       type: mongoose.Schema.Types.ObjectId,

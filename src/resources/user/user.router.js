@@ -24,6 +24,7 @@ import { processGeminiApiData } from '../../adapters/GeminiAdapter';
 
 var router = crudRouter(User);
 
+/*
 async function createOrderEntry(userDoc, order, trades) {
 
   var tradeIds = [];
@@ -34,7 +35,7 @@ async function createOrderEntry(userDoc, order, trades) {
 
   order.tradeIds = tradeIds;
   var orderDoc = await Order.create(order);
-  
+  console.log(orderDoc); 
   userDoc.orders.push(orderDoc.id);
   await userDoc.save();
 }
@@ -42,55 +43,27 @@ async function createOrderEntry(userDoc, order, trades) {
 async function createDbEntry(userId, data) {
   var userDoc = await User.findById(userId);
   var { orders, positions } = data;
+  var count = 0;
   for (let order of orders) {
+    if (count === 2) break;
     let trades = order.trades;
     delete order.trades;
     await createOrderEntry(userDoc, order, trades);   
+    count += 1;
   }
   // positions
 }
-
-/*
-async function updateDb(userId, data) {
-  var { orders, positions } = data;
-
-  // Handle Orders and Trades
-  var userDoc = await User.findById(userId);
-  
-  for (let order of orders) {
-    try {
-      // Add to Order db
-      let orderDoc = await Order.create(order);
-
-      var m = 0;
-      // Handle subtrades
-      for (let trade of order.trades) {
-        m += 1;
-        //n += 1;
-        let tradeDoc = await Trade.create(trade);
-        console.log(tradeDoc.id);
-        orderDoc.tradeIds.push(tradeDoc.id);
-        await orderDoc.save();
-        //await orderDoc.addTrade(tradeDoc);
-      }
-      console.log(orderDoc);
-      console.log(m);
-      console.log(orderDoc.tradeIds.length);
-      console.log('***********');
-      //console.log(orderDoc.trades());
-      //n += orderDoc.tradesLength();
-
-      // Update User.orders
-      userDoc.orders.push(orderDoc.id);
-      await userDoc.save();
-    } catch (err) {
-      console.log(err);
-      continue;
-    }
-  }
-
-}
 */
+
+async function createDbEntries(userId, data) {
+  var { orders, positions } = data;
+  for (let order of orders) {
+    let tradeDocs = await Trade.insertMany(order.trades); 
+    order.tradeIds = tradeDocs.map(tradeDoc => tradeDoc.id);
+    delete order.trades;
+  }
+  let orderDocs = await Order.insertMany(orders);
+}
 
 /*** /:ID/EXCHANGES ***/
 router
@@ -117,10 +90,10 @@ router
         res.status(400).end();
       }
       let exchange = user.exchanges.id(req.body._id);
-      // if doc already exsits -> update
+      // if exchange already exsits -> update
       if (exchange) exchange.set(req.body);
 
-      // if doc deasn't exist -> create
+      // if exchange deasn't exist -> create
       else user.exchanges.push(req.body);
       user.save((err, doc) => {
         if (err) {
@@ -133,6 +106,7 @@ router
   })
   .delete((req, res) => {
     if (req.body.id) {
+      // Delete specific exchange
       User.updateOne(
         { '_id': req.params.id },
         { '$pull': { 'exchanges': { '_id': req.body.id } } },
@@ -145,6 +119,7 @@ router
         }
       );
     } else {
+      // Delete all exchanges
       User.updateOne(
         { '_id': req.params.id },
         { '$set':  { 'exchanges': [] } },
@@ -164,15 +139,14 @@ router
   .route('/:id/orders/api')
   .get(async (req, res) => {
     try {
+      // All orders
       let orders = await Order.find({
         userId: req.params.id, 
         exchange: req.query.exchange
       })
-      console.log(orders);
 
       let count = 0;
       for (let order of orders) {
-        count += 1 
         let m = order.tradeIds.length;
         count += m;
       }
@@ -217,7 +191,7 @@ router
     }
     let data = await process(req.params.id, client);
     try {
-      await createDbEntry(req.params.id, data);
+      await createDbEntries(req.params.id, data);
       res.status(200).json(data);
     } catch (err) {
       console.log(err);
@@ -236,17 +210,28 @@ router
 router
   .route('/:id/orders')
   .get(async (req, res) => {
-    /*
-    let client = new FtxClient(
-      'TiIp19Y1eldkSzT2pOXeODVN4FomuR3NQvzdLsmr',
-      '9sHJgt3l4svQ8ff7Q7BDJS3GR0rQ8Az6TvQd9gdz'
-    );
-    let data = await client.getFills();
-    let orders = await processFtxData(data, req.params.id, client);
-    res.status(200).json(orders);
-    */
-    
+    var orders;
+    try {
+      // Specific exchange
+      if (req.query.exchange) {
+        orders = await Order.find({
+          userId: req.params.id, 
+          exchange: req.query.exchange
+        });
+      }
+      // All orders
+      else {
+        orders = await Order.find({
+          userId: req.params.id
+        });
+      }
+      res.status(200).json(orders);
+    } catch (err) {
+      console.log(err);
+      res.status(400).end();
+    }
   })
+  /*
   .post(async (req, res) => {
     let adapter;
     switch (req.body.exchange) {
@@ -300,109 +285,55 @@ router
         continue;
       }
     }
-
-    // Update User.orders
-    User.updateOne(
-      { '_id': req.params.id },
-      { '$push': { 'orders': orderIds } },
-      (err, doc) => {
-        if (err) {
-          console.log(err);
-          res.status(400).end();
-        }
-        res.status(200).json(doc);
-      }
-    );
   })
+  */
   .delete(async (req, res) => {
-    if (req.body.id) {
+    try {
+      if (req.body.id) {
 
-      let order = await Order.findOneAndDelete({ '_id': req.body.id });
+        let orderDoc = await Order.findOneAndDelete({ '_id': req.body.id });
 
-      // delete order's trades
-      await order.deleteTrades()
+        // Delete order's trades
+        await orderDoc.deleteTrades()
 
-      // update user orders
-      User.updateOne(
-        { '_id': req.params.id },
-        { '$pull': { 'orders': req.body.id } },
-        (err, doc) => {
-          if (err) {
-            console.log(err);
-            res.status(400).end();
-          }
-          res.status(200).json(doc);
+      } else if (req.body.exchange) {
+
+        // Find orders in Order database for exchange
+        let orderDocs = await Order.find({
+          userId: req.params.id, 
+          exchange: req.body.exchange
+        })
+        /*
+        let orderIds = orderDocs.map(orderDoc => orderDoc.id);
+
+        // Delete trades
+        for (let orderDoc of orderDocs) {
+          await orderDoc.deleteTrades();
         }
-      );
 
-    } else if (req.body.exchange) {
+        // Delete all orders
+        await Order.deleteMany(orderIds);
+        */
 
-      // Find orders in Order database
-      let orders = await Order.find({
-        userId: req.params.id, 
-        exchange: req.body.exchange
-      })
-      let orderIds = [];
-
-      try {
-        let count = 0;
-        for (let order of orders) {
+        for (let orderDoc of orderDocs) {
           // Delete order's trade
-          let n = await order.deleteTrades();
-          count += n;
+          await orderDoc.deleteTrades();
 
           // Delete order in Order database
-          await Order.findOneAndDelete({ '_id': order.id });
-          orderIds.push(order.id);
+          await Order.findOneAndDelete({ '_id': orderDoc.id });
         }
-        console.log(count);
-      } catch (err) {
-        console.log(err);
-        res.status(400).end();
-      }
-      
-      // Delete order in User.orders database
-      User.updateOne(
-        { '_id': req.params.id },
-        { '$pull': { 'orders': { '$in': orderIds } } },
-        (err, doc) => {
-          if (err) {
-            console.log(err);
-            res.status(400).end();
-          }
-          res.status(200).json(doc);
-        }
-      );
+      } else {
 
-    } else {
-
-      try {
         // Delete all user's orders
         await Order.deleteMany({ userId: req.params.id });
 
         // Delete all user's trades
         await Trade.deleteMany({ userId: req.params.id });
-      } catch (err) {
-        console.log(err);
-        res.status(400).end();
       }
-
-      //let orders = User.findById(req.params.id).orders;
-      //await Order.deleteMany(orders);
-
-      // Update user's order
-      User.updateOne(
-        { '_id': req.params.id },
-        { '$set': { 'orders': [] } },
-        (err, doc) => {
-          if (err) {
-            console.log(err);
-            res.status(400).end();
-          }
-          res.status(200).json(doc);
-        }
-      );
-
+      res.status(200).json('Success');
+    } catch (err) {
+      console.log(err);
+      res.status(400).end();
     }
   });
 
