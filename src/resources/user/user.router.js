@@ -3,6 +3,7 @@ import User from './user.model';
 import Exchange from '../exchange/exchange.model';
 import Order from '../order/order.model';
 import Trade from '../trade/trade.model';
+import Position from '../position/position.model';
 //import { toCoinbaseOrders } from '../CoinbaseAdapter';
 //import { toGdaxOrders } from '../GdaxAdapter';
 
@@ -57,12 +58,40 @@ async function createDbEntry(userId, data) {
 
 async function createDbEntries(userId, data) {
   var { orders, positions } = data;
+
+  // Handle orders and trades
   for (let order of orders) {
     let tradeDocs = await Trade.insertMany(order.trades); 
     order.tradeIds = tradeDocs.map(tradeDoc => tradeDoc.id);
     delete order.trades;
   }
-  let orderDocs = await Order.insertMany(orders);
+  var orderDocs = await Order.insertMany(orders);
+
+  // Handle positions
+  for (let position of positions) {
+    let basisIds = position.basisTrades.map(trade => trade.orderId);
+    let basisTradeIds = await Order.find({ orderId: { $in: basisIds } }, 'id');
+    position.basisTradeIds = basisTradeIds;
+    delete position.basisTrades;
+
+    if (position.collateralType === 'crypto') {
+      let fundingIds = position.fundingTrades.map(trade => trade.orderId);
+      let fundingTradeIds = await Order.find({ orderId: { $in: fundingIds } }, 'id')
+      position.fundingTradeIds = fundingTradeIds;
+      delete position.fundingTrades;
+
+      let compensationIds = position.compensationTrades.map(trade => trade.orderId);
+      let compensationTradeIds = await Order.find({ orderId : { $in : compensationIds } }, 'id');
+      position.compensationTradeIds = compensationTradeIds;
+      delete position.compensationTrades;
+    }
+  }
+  var positionDocs = await Position.insertMany(positions);
+
+  return { 
+    orders: orderDocs,
+    positions: positionDocs
+  }
 }
 
 /*** /:ID/EXCHANGES ***/
@@ -137,26 +166,6 @@ router
 /*** /:ID/ORDERS/API ***/
 router
   .route('/:id/orders/api')
-  .get(async (req, res) => {
-    try {
-      // All orders
-      let orders = await Order.find({
-        userId: req.params.id, 
-        exchange: req.query.exchange
-      })
-
-      let count = 0;
-      for (let order of orders) {
-        let m = order.tradeIds.length;
-        count += m;
-      }
-      
-      res.status(200).json(count);
-    } catch (err) {
-      console.log(err);
-      res.status(400).end();
-    }
-  })
   .post(async (req, res) => {
     let key = req.body.data.apiKey; // NOT SAFE!!!!
     let secret = req.body.data.apiSecret; // NOT SAFE!!!
@@ -290,30 +299,16 @@ router
   .delete(async (req, res) => {
     try {
       if (req.body.id) {
-
         let orderDoc = await Order.findOneAndDelete({ '_id': req.body.id });
 
         // Delete order's trades
         await orderDoc.deleteTrades()
-
       } else if (req.body.exchange) {
-
         // Find orders in Order database for exchange
         let orderDocs = await Order.find({
           userId: req.params.id, 
           exchange: req.body.exchange
         })
-        /*
-        let orderIds = orderDocs.map(orderDoc => orderDoc.id);
-
-        // Delete trades
-        for (let orderDoc of orderDocs) {
-          await orderDoc.deleteTrades();
-        }
-
-        // Delete all orders
-        await Order.deleteMany(orderIds);
-        */
 
         for (let orderDoc of orderDocs) {
           // Delete order's trade
@@ -323,18 +318,66 @@ router
           await Order.findOneAndDelete({ '_id': orderDoc.id });
         }
       } else {
-
         // Delete all user's orders
         await Order.deleteMany({ userId: req.params.id });
 
         // Delete all user's trades
         await Trade.deleteMany({ userId: req.params.id });
       }
-      res.status(200).json('Success');
+      res.status(200).json('Delete orders success');
     } catch (err) {
       console.log(err);
       res.status(400).end();
     }
   });
+
+/*** /:ID/POSITIONS ***/
+router
+  .route('/:id/positions')
+  .get(async (req, res) => {
+    var positions;
+    try {
+      if (req.query.exchange) {
+        // Specific exchange
+        positions = await Position.find({
+          userId: req.params.id,
+          exchange: req.query.exchange
+        });
+      }
+      else {
+        // All positions
+        positions = await Position.find({
+          userId: req.params.id
+        });
+      }
+      res.status(200).json(positions);
+    } catch (err) {
+      console.log(err);
+      res.status(400).end();
+    }
+  })
+  .delete(async (req, res) => {
+    try {
+      if (req.body.id) {
+        // Delete one position
+        await Position.findOneAndDelete({ '_id': req.body.id });
+      }
+      else if (req.body.exchange) {
+        // Delete all of user's positions for specific exchange
+        await Position.deleteMany({
+          userId: req.params.id,
+          exchange: req.body.exchange
+        });
+      }
+      else {
+        // Delete all user's positions
+        await Position.deleteMany({ userId: req.params.id });
+      }
+      res.status(200).json('Delete positions success');
+    } catch (err) {
+      console.log(err);
+      res.status(400).end();
+    }
+  })
 
 export default router;

@@ -1,6 +1,6 @@
 import crudControllers from '../../utils/crud';
 import Trade from '../trade/trade.model';
-import Position from '../leveraged-position/leveraged-position.model';
+import Position from '../position/position.model';
 
 async function deleteOne(req, res) {
 		try {

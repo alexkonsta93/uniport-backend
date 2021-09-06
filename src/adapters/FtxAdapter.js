@@ -121,6 +121,7 @@ class PositionRouter {
 class Position {
   
   constructor(userId) {
+    this.collateralType = 'cash';
     this.userId = userId;
     this.basisTrades = [];
     this.basisFee = 0.0;
@@ -136,6 +137,8 @@ class Position {
     this.base = null;
     this.quote = null;
     this.side = 'long';
+    this.exchange = 'ftx';
+    this.type = 'future';
   }
 
   print() {
