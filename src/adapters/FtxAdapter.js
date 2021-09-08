@@ -13,7 +13,7 @@ export async function processFtxApiData(userId, userClient) {
       userId: userId,
       exchange: 'ftx',
     };
-     
+
     if (line['future']) {
       trade.type = 'future-basis'
       let baseQuote = line['market'].split('-');
@@ -119,7 +119,7 @@ class PositionRouter {
 }
 
 class Position {
-  
+
   constructor(userId) {
     this.collateralType = 'cash';
     this.userId = userId;
@@ -202,7 +202,7 @@ class Position {
 }
 
 class Order {
-  
+
   constructor(trade, userId) {
     this.orderId = trade.orderId;
     this.exchange = trade.exchange;
@@ -234,35 +234,35 @@ class Order {
 
   split(amount) {
     var orderLeft = {
-        orderId: this.orderId,
-        exchange: this.exchange,
-        base: this.base,
-        quote: this.quote,
-        amount: amount,
-        price: this.price,
-        dateTime: this.dateTime,
-        feeCurrency: this.feeCurrency,
-        fee: this.fee,
-        type: this.type,
-        userId: this.userId,
-        trades: this.trades,
-        isSplit: true,
-      };
+      orderId: this.orderId,
+      exchange: this.exchange,
+      base: this.base,
+      quote: this.quote,
+      amount: amount,
+      price: this.price,
+      dateTime: this.dateTime,
+      feeCurrency: this.feeCurrency,
+      fee: this.fee,
+      type: this.type,
+      userId: this.userId,
+      trades: this.trades,
+      isSplit: true,
+    };
     var orderRight = {
-        orderId: this.orderId,
-        exchange: this.exchange,
-        base: this.base,
-        quote: this.quote,
-        amount: this.amount - amount,
-        price: this.price,
-        dateTime: this.dateTime,
-        feeCurrency: this.feeCurrency,
-        fee: this.fee,
-        type: this.type,
-        userId: this.userId,
-        trades: this.trades,
-        isSplit: true
-      };
+      orderId: this.orderId,
+      exchange: this.exchange,
+      base: this.base,
+      quote: this.quote,
+      amount: this.amount - amount,
+      price: this.price,
+      dateTime: this.dateTime,
+      feeCurrency: this.feeCurrency,
+      fee: this.fee,
+      type: this.type,
+      userId: this.userId,
+      trades: this.trades,
+      isSplit: true
+    };
     return [orderLeft, orderRight];
   }
 

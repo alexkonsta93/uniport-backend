@@ -63,17 +63,13 @@ var tradeSchema = new Schema({
 				],
 				required: true
 		},
-	  /*
-		orderId: {
-				type: mongoose.Schema.Types.ObjectId,
-				ref: 'Order',
-				default: null
-		},
-		*/
 		orderId: {
 				type: String,
 				default: null
-		}
+		},
+    comment: {
+      type: String
+    }
 });
 
 /***Index***/

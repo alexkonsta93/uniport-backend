@@ -56,44 +56,6 @@ async function createDbEntry(userId, data) {
 }
 */
 
-async function createDbEntries(userId, data) {
-  var { orders, positions } = data;
-
-  // Handle orders and trades
-  for (let order of orders) {
-    let tradeDocs = await Trade.insertMany(order.trades); 
-    order.tradeIds = tradeDocs.map(tradeDoc => tradeDoc.id);
-    delete order.trades;
-  }
-  var orderDocs = await Order.insertMany(orders);
-
-  // Handle positions
-  for (let position of positions) {
-    let basisIds = position.basisTrades.map(trade => trade.orderId);
-    let basisTradeIds = await Order.find({ orderId: { $in: basisIds } }, 'id');
-    position.basisTradeIds = basisTradeIds;
-    delete position.basisTrades;
-
-    if (position.collateralType === 'crypto') {
-      let fundingIds = position.fundingTrades.map(trade => trade.orderId);
-      let fundingTradeIds = await Order.find({ orderId: { $in: fundingIds } }, 'id')
-      position.fundingTradeIds = fundingTradeIds;
-      delete position.fundingTrades;
-
-      let compensationIds = position.compensationTrades.map(trade => trade.orderId);
-      let compensationTradeIds = await Order.find({ orderId : { $in : compensationIds } }, 'id');
-      position.compensationTradeIds = compensationTradeIds;
-      delete position.compensationTrades;
-    }
-  }
-  var positionDocs = await Position.insertMany(positions);
-
-  return { 
-    orders: orderDocs,
-    positions: positionDocs
-  }
-}
-
 /*** /:ID/EXCHANGES ***/
 router
   .route('/:id/exchanges')
@@ -163,6 +125,136 @@ router
     }
   });
 
+async function createDbEntries(userId, data) {
+  var { orders, positions } = data;
+
+  // Orders + Positions
+  if (orders) {
+    // Handle orders and trades
+    for (let order of orders) {
+      let tradeDocs = await Trade.insertMany(order.trades); 
+      order.tradeIds = tradeDocs.map(tradeDoc => tradeDoc.id);
+      delete order.trades;
+    }
+    var orderDocs = await Order.insertMany(orders);
+
+    // Handle positions
+    for (let position of positions) {
+      let basisIds = position.basisTrades.map(trade => trade.orderId);
+      let basisTradeIds = await Order.find({ orderId: { $in: basisIds } }, 'id');
+      position.basisTradeIds = basisTradeIds;
+      delete position.basisTrades;
+
+      if (position.collateralType === 'crypto') {
+        let fundingIds = position.fundingTrades.map(trade => trade.orderId);
+        let fundingTradeIds = await Order.find({ orderId: { $in: fundingIds } }, 'id')
+        position.fundingTradeIds = fundingTradeIds;
+        delete position.fundingTrades;
+
+        let compensationIds = position.compensationTrades.map(trade => trade.orderId);
+        let compensationTradeIds = await Order.find({ orderId : { $in : compensationIds } }, 'id');
+        position.compensationTradeIds = compensationTradeIds;
+        delete position.compensationTrades;
+      }
+    }
+    var positionDocs = await Position.insertMany(positions);
+
+    return { 
+      orders: orderDocs,
+      positions: positionDocs
+    }
+  }
+
+  // Just Positions
+  for (let position of positions) {
+
+    // Basis trades
+    position.basisTradeIds = [];
+    for (let trade of position.basisTrades) {
+      let doc = await Trade.create(trade);
+      position.basisTradeIds.push(doc.id);
+    }
+    delete position.basisTrades;
+
+    // Compensation trades
+    position.compensationTradeIds = [];
+    for (let trade of position.compensationTrades) {
+      let doc = await Trade.create(trade);
+      position.compensationTradeIds.push(doc.id);
+    }
+    delete position.compensationTrades;
+
+    // Funding trades
+    position.fundingTradeIds = [];
+    for (let trade of position.fundingTrades) {
+      let doc = await Trade.create(trade);
+      position.fundingTradeIds.push(doc.id);
+    }
+    delete position.fundingTrades;
+
+  }
+  var positionDocs = await Position.inserMany(positions);
+
+  return {
+    positions: positionDocs
+  }
+}
+
+function selectAdapter(userId) {
+  var adapter;
+  switch (req.body.data.exchange) {
+    case 'Coinbase':
+      adapter = new CoinbaseAdaptert(userId);
+      break;
+    case 'Gemini':
+      adapter = new GeminiAdaptert(userId);
+      break;
+    case 'Kraken':
+      adapter = new KrakenAdaptert(userId);
+      break;
+    case 'Kraken Futures':
+      adapter = new KrakenFuturesAdaptert(userId);
+      break;
+    case 'Binance':
+      adapter = new BinanceAdaptert(userId);
+      break;
+    case 'Ftx':
+      adapter = new FtxAdaptert(userId);
+      break;
+    default:
+      throw new Error('exchange not recognized');
+  }
+  return adapter
+}
+
+
+function selectClient(req, apiKey, apiSecret) {
+  var client;
+  switch (req.body.data.exchange) {
+    case 'Coinbase':
+      client = new CoinbaseClient(key, secret);
+      break;
+    case 'Gemini':
+      client = new GeminiClient(key, secret);
+      break;
+    case 'Kraken':
+      client = new KrakenClient(key, secret);
+      break;
+    case 'Kraken Futures':
+      client = new KrakenFuturesClient(key, secret);
+      break;
+    case 'Binance':
+      client = new BinanceClient(key, secret);
+      break;
+    case 'Ftx':
+      client = new FtxClient(key, secret);
+      break;
+    default:
+      throw new Error('exchange client not recognized');
+  }
+  return client;
+}
+
 /*** /:ID/ORDERS/API ***/
 router
   .route('/:id/orders/api')
@@ -211,7 +303,16 @@ router
 /*** /:ID/ORDERS/CSV ***/
 router
   .route('/:id/orders/csv')
-  .post()
+  .post(async (req, res) => {
+    try {
+      let adapter = selectAdapter(req.params.id);
+      let data = adapter.processCsvData(req.body.data);
+      await createDbEntries(req.params.id)
+      res.status(200).json(data);
+    } catch (err) {
+      console.log(err);
+    }
+  })
 
 /*** /:ID/EXCHANGE/:NAME/AUTH_DATA
 

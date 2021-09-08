@@ -54,6 +54,10 @@ var positionSchema = new Schema({
     type: String,
     default: 'USD'
   },
+  fundingFeeCurrency: {
+    type: String,
+    default: 'USD'
+  },
   basisTradeIds: {
     type: [mongoose.Schema.Types.ObjectId],
     required: true
@@ -61,6 +65,9 @@ var positionSchema = new Schema({
   compensationTradeIds: {
     type: [mongoose.Schema.Types.ObjectId],
   },
+  pnlTradeIds: {
+    type: [mongoose.Schema.Types.ObjectId],
+  }
   base: {
     type: String,
     required: true,
