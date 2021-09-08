@@ -1,7 +1,7 @@
 import axios from 'axios';
 import CryptoJS from 'crypto-js';
 
-export class FtxClient {
+export default class FtxClient {
   constructor(key, secret) {
     this.key = key;
     this.secret = secret;

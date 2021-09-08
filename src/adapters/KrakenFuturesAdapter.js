@@ -5,7 +5,7 @@ export default class KrakenFuturesAdapter {
     this.userId = userId;
   }
 
-  processApiData() {}
+  async processApiData() {}
 
   processCsvData(lines) {
     lines = lines.reverse();

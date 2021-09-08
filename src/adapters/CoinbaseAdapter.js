@@ -1,2 +1,9 @@
-export function processCoinbaseApiData() {}
-export function processCoinbaseCsvData() {}
+export default class CoinbaseAdapter {
+  constructor(userId) {
+    this.userId = userId;
+  }
+
+  async processApiData(userClient) {}
+  processCsvData() {}
+
+}

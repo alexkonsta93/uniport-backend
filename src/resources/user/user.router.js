@@ -8,21 +8,29 @@ import Position from '../position/position.model';
 //import { toGdaxOrders } from '../GdaxAdapter';
 
 // Clients
-import { FtxClient } from '../../clients/FtxClient';
-import { CoinbaseClient } from '../../clients/CoinbaseClient';
-import { KrakenClient } from '../../clients/KrakenClient';
-import { KrakenFuturesClient } from '../../clients/KrakenFuturesClient';
-import { BinanceClient } from '../../clients/BinanceClient';
-import { GeminiClient } from '../../clients/GeminiClient'
+import FtxClient from '../../clients/FtxClient';
+import CoinbaseClient from '../../clients/CoinbaseClient';
+import KrakenClient from '../../clients/KrakenClient';
+import KrakenFuturesClient from '../../clients/KrakenFuturesClient';
+import BinanceClient from '../../clients/BinanceClient';
+import GeminiClient from '../../clients/GeminiClient'
 
 // Adapters
 import KrakenFuturesAdapter from '../../adapters/KrakenFuturesAdapter';
+import FtxAdapter from '../../adapters/FtxAdapter';
+import CoinbaseAdapter from '../../adapters/CoinbaseAdapter';
+import KrakenAdapter from '../../adapters/KrakenAdapter';
+import BinanceAdapter from '../../adapters/BinanceAdapter';
+import GeminiAdapter from '../../adapters/GeminiAdapter';
+import GdaxAdapter from '../../adapters/GdaxAdapter';
+/*
 import { processFtxApiData } from '../../adapters/FtxAdapter';
 import { processCoinbaseApiData } from '../../adapters/CoinbaseAdapter';
 import { processKrakenApiData } from '../../adapters/KrakenAdapter';
 import { processKrakenFuturesApiData } from '../../adapters/KrakenFuturesAdapter';
 import { processBinanceApiData } from '../../adapters/BinanceAdapter';
 import { processGeminiApiData } from '../../adapters/GeminiAdapter';
+*/
 
 var router = crudRouter(User);
 
@@ -208,22 +216,25 @@ function selectAdapter(exchange, userId) {
   var adapter;
   switch (exchange) {
     case 'Coinbase':
-      adapter = new CoinbaseAdaptert(userId);
+      adapter = new CoinbaseAdapter(userId);
       break;
     case 'Gemini':
-      adapter = new GeminiAdaptert(userId);
+      adapter = new GeminiAdapter(userId);
       break;
     case 'Kraken':
-      adapter = new KrakenAdaptert(userId);
+      adapter = new KrakenAdapter(userId);
       break;
     case 'Kraken Futures':
       adapter = new KrakenFuturesAdapter(userId);
       break;
     case 'Binance':
-      adapter = new BinanceAdaptert(userId);
+      adapter = new BinanceAdapter(userId);
       break;
     case 'Ftx':
-      adapter = new FtxAdaptert(userId);
+      adapter = new FtxAdapter(userId);
+      break;
+    case 'Gdax':
+      adapter = new GdaxAdapter(userId);
       break;
     default:
       throw new Error('exchange not recognized');
@@ -232,26 +243,26 @@ function selectAdapter(exchange, userId) {
 }
 
 
-function selectClient(req, apiKey, apiSecret) {
+function selectClient(exchange, apiKey, apiSecret) {
   var client;
-  switch (req.body.data.exchange) {
+  switch (exchange) {
     case 'Coinbase':
-      client = new CoinbaseClient(key, secret);
+      client = new CoinbaseClient(apiKey, apiSecret);
       break;
     case 'Gemini':
-      client = new GeminiClient(key, secret);
+      client = new GeminiClient(apiKey, apiSecret);
       break;
     case 'Kraken':
-      client = new KrakenClient(key, secret);
+      client = new KrakenClient(apiKey, apiSecret);
       break;
     case 'Kraken Futures':
-      client = new KrakenFuturesClient(key, secret);
+      client = new KrakenFuturesClient(apiKey, apiSecret);
       break;
     case 'Binance':
-      client = new BinanceClient(key, secret);
+      client = new BinanceClient(apiKey, apiSecret);
       break;
     case 'Ftx':
-      client = new FtxClient(key, secret);
+      client = new FtxClient(apiKey, apiSecret);
       break;
     default:
       throw new Error('exchange not recognized');
@@ -263,38 +274,11 @@ function selectClient(req, apiKey, apiSecret) {
 router
   .route('/:id/orders/api')
   .post(async (req, res) => {
-    let key = req.body.data.apiKey; // NOT SAFE!!!!
-    let secret = req.body.data.apiSecret; // NOT SAFE!!!
-    let client, process;
-    switch (req.body.data.exchange) {
-      case 'Coinbase':
-        client = new CoinbaseClient(key, secret);
-        process = processFtxApiData;
-        break;
-      case 'Gemini':
-        client = new GeminiClient(key, secret);
-        process = processGeminiApiData;
-        break;
-      case 'Kraken':
-        client = new KrakenClient(key, secret);
-        process = processKrakenApiData;
-        break;
-      case 'Kraken Futures':
-        client = new KrakenFuturesClient(key, secret);
-        process = processKrakenFuturesApiData;
-        break;
-      case 'Binance':
-        client = new BinanceClient(key, secret);
-        process = processBinanceApiData;
-        break;
-      case 'Ftx':
-        client = new FtxClient(key, secret);
-        process = processFtxApiData;
-        break;
-      default:
-        throw new Error('exchange not recognized');
-    }
-    let data = await process(req.params.id, client);
+    let apiKey = req.body.data.apiKey; // NOT SAFE!!!!
+    let apiSecret = req.body.data.apiSecret; // NOT SAFE!!!
+    let client = selectClient(req.body.data.exchange, apiKey, apiSecret);
+    let adapter = selectAdapter(req.body.data.exchange, req.params.id);
+    let data = await adapter.processApiData(client);
     try {
       await createDbEntries(req.params.id, data);
       res.status(200).json(data);

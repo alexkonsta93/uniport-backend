@@ -1,95 +1,102 @@
 import moment from 'moment';
 
-import { FtxClient } from '../clients/FtxClient';
 var client;
 
-export async function processFtxApiData(userId, userClient) {
-  client = userClient;
-  var trades = [];
-  var data = await client.getFills();
+export default class FtxAdapter {
+  constructor(userId) {
+    this.userId = userId;
+  }
 
-  for (let line of data) {
-    let trade = { 
-      userId: userId,
-      exchange: 'ftx',
+  processCsvData() {}
+
+  async processApiData(userClient) {
+    var trades = [];
+    client = userClient;
+    var data = await client.getFills();
+
+    for (let line of data) {
+      let trade = { 
+        userId: this.userId,
+        exchange: 'ftx',
+      };
+
+      if (line['future']) {
+        trade.type = 'future-basis'
+        let baseQuote = line['market'].split('-');
+        trade.base = baseQuote[0]; 
+        trade.quote = baseQuote[1];
+      } else {
+        trade.type = 'spot';
+        trade.base = line['baseCurrency'];
+        trade.quote = line['quoteCurrency'];
+      }
+
+      trade.price = line['price'];
+      trade.feeCurrency = line['feeCurrency'];
+      trade.fee = line['fee'];
+      trade.amount = line['size'];
+      if (line['side'] === 'sell') trade.amount = -trade.amount;
+      trade.dateTime = moment.utc(line['time']);
+      trade.orderId = line['orderId'];
+      trade.tradeId = line['tradeId'];
+
+      trades.push(trade);
+    }
+
+    var orders = await this.buildOrders(trades);
+    orders = orders.reverse();
+    var positions = await this.buildPositions(orders);
+
+    return {
+      orders: orders,
+      positions: positions
     };
-
-    if (line['future']) {
-      trade.type = 'future-basis'
-      let baseQuote = line['market'].split('-');
-      trade.base = baseQuote[0]; 
-      trade.quote = baseQuote[1];
-    } else {
-      trade.type = 'spot';
-      trade.base = line['baseCurrency'];
-      trade.quote = line['quoteCurrency'];
-    }
-
-    trade.price = line['price'];
-    trade.feeCurrency = line['feeCurrency'];
-    trade.fee = line['fee'];
-    trade.amount = line['size'];
-    if (line['side'] === 'sell') trade.amount = -trade.amount;
-    trade.dateTime = moment.utc(line['time']);
-    trade.orderId = line['orderId'];
-    trade.tradeId = line['tradeId'];
-
-    trades.push(trade);
   }
 
-  var orders = await buildOrders(trades, userId);
-  orders = orders.reverse();
-  var positions = await buildPositions(orders, userId);
+  async buildOrders(trades) {
+    var orders = [];
+    var first = trades.shift();
+    var order = new Order(first, this.userId);
 
-  return {
-    orders: orders,
-    positions: positions
-  };
-}
-
-async function buildOrders(trades, userId) {
-  var orders = [];
-  var first = trades.shift();
-  var order = new Order(first, userId);
-
-  for (let trade of trades) {
-    if (trade.orderId == order.orderId) {
-      order.appendTrade(trade);
-    } else {
-      await order.fixFee();
-      order.roundValues();
-      orders.push(order);
-      order = new Order(trade, userId);
-    }
-  }
-  orders.push(order);
-  return orders;
-}
-
-async function buildPositions(orders, userId) {
-  var positions = [];
-  var router = new PositionRouter(userId);
-
-  for (let i = 0; i < orders.length; i++) {
-    let order = orders[i];
-
-    if (order.type === 'spot' || order.type === 'margin') continue;
-    let position = router.route(order);
-    if (position.isComplete()) {
-      await position.calcFunding();
-      positions.push(position);
-      position = router.finalize(position);
-      position.handleOrder(order);
-    } else {
-      let splitOrder = position.handleOrder(order);
-      if (splitOrder) {
-        orders[i] = splitOrder;
-        i -= 1;
+    for (let trade of trades) {
+      if (trade.orderId == order.orderId) {
+        order.appendTrade(trade);
+      } else {
+        await order.fixFee();
+        order.roundValues();
+        orders.push(order);
+        order = new Order(trade, this.userId);
       }
     }
+    orders.push(order);
+    return orders;
   }
 
-  return positions;
+  async buildPositions(orders) {
+    var positions = [];
+    var router = new PositionRouter(this.userId);
+
+    for (let i = 0; i < orders.length; i++) {
+      let order = orders[i];
+
+      if (order.type === 'spot' || order.type === 'margin') continue;
+      let position = router.route(order);
+      if (position.isComplete()) {
+        await position.calcFunding();
+        positions.push(position);
+        position = router.finalize(position);
+        position.handleOrder(order);
+      } else {
+        let splitOrder = position.handleOrder(order);
+        if (splitOrder) {
+          orders[i] = splitOrder;
+          i -= 1;
+        }
+      }
+    }
+
+    return positions;
+  }
 }
 
 class PositionRouter {

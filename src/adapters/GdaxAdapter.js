@@ -1,1 +1,6 @@
-export function processGdaxCsvData() {}
+export default class GdaxAdapter {
+  constructor(userId) {
+    this.userId = userId;
+  }
+
+}
