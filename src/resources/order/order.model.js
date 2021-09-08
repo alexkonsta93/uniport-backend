@@ -3,8 +3,7 @@ import Trade from '../trade/trade.model.js';
 
 var { Schema } = mongoose;
 
-var exchanges = ['bitfinex', 'poloniex', 'kraken', 'binance', 'gemini',
-'coinbase', 'gdax', 'ftx'];
+var exchanges = ['bitfinex', 'poloniex', 'kraken', 'binance', 'gdax', 'gemini', 'coinbase', 'ftx', 'kraken futures'];
 
 var orderSchema = new Schema({
   userId: {
@@ -154,12 +153,9 @@ orderSchema.virtual('isComplete').get(async function() {
 });
 
 orderSchema.methods.deleteTrades = async function() {
-  var count = 0;
   for (let tradeId of this.tradeIds) {
     await Trade.findByIdAndDelete(tradeId);
-    count += 1;
   }
-  return count;
 }
 
 var Order = new mongoose.model('Order', orderSchema); // Must be at bottom of file for hooks to work

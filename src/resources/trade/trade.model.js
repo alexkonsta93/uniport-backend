@@ -3,7 +3,7 @@ import Order from '../order/order.model.js';
 
 var { Schema } = mongoose;
 
-var exchanges = ['bitfinex', 'poloniex', 'kraken', 'binance', 'gdax', 'gemini', 'coinbase', 'ftx'];
+var exchanges = ['bitfinex', 'poloniex', 'kraken', 'binance', 'gdax', 'gemini', 'coinbase', 'ftx', 'kraken futures'];
 
 var tradeSchema = new Schema({
 		userId: {

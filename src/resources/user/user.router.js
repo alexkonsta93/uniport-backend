@@ -16,6 +16,7 @@ import { BinanceClient } from '../../clients/BinanceClient';
 import { GeminiClient } from '../../clients/GeminiClient'
 
 // Adapters
+import KrakenFuturesAdapter from '../../adapters/KrakenFuturesAdapter';
 import { processFtxApiData } from '../../adapters/FtxAdapter';
 import { processCoinbaseApiData } from '../../adapters/CoinbaseAdapter';
 import { processKrakenApiData } from '../../adapters/KrakenAdapter';
@@ -130,6 +131,7 @@ async function createDbEntries(userId, data) {
 
   // Orders + Positions
   if (orders) {
+    let orders = data.orders;
     // Handle orders and trades
     for (let order of orders) {
       let tradeDocs = await Trade.insertMany(order.trades); 
@@ -157,7 +159,7 @@ async function createDbEntries(userId, data) {
         delete position.compensationTrades;
       }
     }
-    var positionDocs = await Position.insertMany(positions);
+    let positionDocs = await Position.insertMany(positions);
 
     return { 
       orders: orderDocs,
@@ -165,44 +167,46 @@ async function createDbEntries(userId, data) {
     }
   }
 
-  // Just Positions
-  for (let position of positions) {
+  else {
+    // Just Positions
+    for (let position of positions) {
 
-    // Basis trades
-    position.basisTradeIds = [];
-    for (let trade of position.basisTrades) {
-      let doc = await Trade.create(trade);
-      position.basisTradeIds.push(doc.id);
+      // Basis trades
+      position.basisTradeIds = [];
+      for (let trade of position.basisTrades) {
+        let doc = await Trade.create(trade);
+        position.basisTradeIds.push(doc.id);
+      }
+      delete position.basisTrades;
+
+      // Compensation trades
+      position.compensationTradeIds = [];
+      for (let trade of position.compensationTrades) {
+        let doc = await Trade.create(trade);
+        position.compensationTradeIds.push(doc.id);
+      }
+      delete position.compensationTrades;
+
+      // Funding trades
+      position.fundingTradeIds = [];
+      for (let trade of position.fundingTrades) {
+        let doc = await Trade.create(trade);
+        position.fundingTradeIds.push(doc.id);
+      }
+      delete position.fundingTrades;
     }
-    delete position.basisTrades;
 
-    // Compensation trades
-    position.compensationTradeIds = [];
-    for (let trade of position.compensationTrades) {
-      let doc = await Trade.create(trade);
-      position.compensationTradeIds.push(doc.id);
+    let positionDocs = await Position.insertMany(positions);
+
+    return {
+      positions: positionDocs
     }
-    delete position.compensationTrades;
-
-    // Funding trades
-    position.fundingTradeIds = [];
-    for (let trade of position.fundingTrades) {
-      let doc = await Trade.create(trade);
-      position.fundingTradeIds.push(doc.id);
-    }
-    delete position.fundingTrades;
-
-  }
-  var positionDocs = await Position.inserMany(positions);
-
-  return {
-    positions: positionDocs
   }
 }
 
-function selectAdapter(userId) {
+function selectAdapter(exchange, userId) {
   var adapter;
-  switch (req.body.data.exchange) {
+  switch (exchange) {
     case 'Coinbase':
       adapter = new CoinbaseAdaptert(userId);
       break;
@@ -213,7 +217,7 @@ function selectAdapter(userId) {
       adapter = new KrakenAdaptert(userId);
       break;
     case 'Kraken Futures':
-      adapter = new KrakenFuturesAdaptert(userId);
+      adapter = new KrakenFuturesAdapter(userId);
       break;
     case 'Binance':
       adapter = new BinanceAdaptert(userId);
@@ -250,7 +254,7 @@ function selectClient(req, apiKey, apiSecret) {
       client = new FtxClient(key, secret);
       break;
     default:
-      throw new Error('exchange client not recognized');
+      throw new Error('exchange not recognized');
   }
   return client;
 }
@@ -288,7 +292,7 @@ router
         process = processFtxApiData;
         break;
       default:
-        throw new Error('exchange client not recognized');
+        throw new Error('exchange not recognized');
     }
     let data = await process(req.params.id, client);
     try {
@@ -305,9 +309,9 @@ router
   .route('/:id/orders/csv')
   .post(async (req, res) => {
     try {
-      let adapter = selectAdapter(req.params.id);
-      let data = adapter.processCsvData(req.body.data);
-      await createDbEntries(req.params.id)
+      let adapter = selectAdapter(req.body.exchange, req.params.id);
+      let data = adapter.processCsvData(req.body.lines);
+      await createDbEntries(req.params.id, data)
       res.status(200).json(data);
     } catch (err) {
       console.log(err);
@@ -404,7 +408,8 @@ router
 
         // Delete order's trades
         await orderDoc.deleteTrades()
-      } else if (req.body.exchange) {
+      }
+      else if (req.body.exchange) {
         // Find orders in Order database for exchange
         let orderDocs = await Order.find({
           userId: req.params.id, 
@@ -418,7 +423,8 @@ router
           // Delete order in Order database
           await Order.findOneAndDelete({ '_id': orderDoc.id });
         }
-      } else {
+      }
+      else {
         // Delete all user's orders
         await Order.deleteMany({ userId: req.params.id });
 
@@ -464,11 +470,19 @@ router
         await Position.findOneAndDelete({ '_id': req.body.id });
       }
       else if (req.body.exchange) {
-        // Delete all of user's positions for specific exchange
-        await Position.deleteMany({
+        // Find positions in Position database for exchange
+        let positionDocs = await Position.find({
           userId: req.params.id,
           exchange: req.body.exchange
         });
+
+        for (let positionDoc of positionDocs) {
+          // Delete position's trades
+          await positionDoc.deleteTrades();
+
+          // Delete position in Position database
+          await Position.findOneAndDelete({ '_id': positionDoc.id });
+        }
       }
       else {
         // Delete all user's positions

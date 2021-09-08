@@ -5,7 +5,7 @@ import Trade from '../trade/trade.model.js';
 
 var { Schema } = mongoose;
 
-var exchanges = ['kraken', 'ftx'];
+var exchanges = ['bitfinex', 'poloniex', 'kraken', 'binance', 'gdax', 'gemini', 'coinbase', 'ftx', 'kraken futures'];
 
 var positionSchema = new Schema({		
   userId: {
@@ -65,9 +65,6 @@ var positionSchema = new Schema({
   compensationTradeIds: {
     type: [mongoose.Schema.Types.ObjectId],
   },
-  pnlTradeIds: {
-    type: [mongoose.Schema.Types.ObjectId],
-  }
   base: {
     type: String,
     required: true,
@@ -106,6 +103,15 @@ positionSchema.index({
 /***Virtual***/
 
 /***Methods***/
+positionSchema.methods.deleteTrades = async function() {
+  var tradeIds = [];
+  this.basisTradeIds.forEach(id => tradeIds.push(id));
+  this.fundingTradeIds.forEach(id => tradeIds.push(id));
+  this.compensationTradeIds.forEach(id => tradeIds.push(id));
+  for (let id of tradeIds) {
+    await Trade.findByIdAndDelete(id);
+  }
+}
 
 /***Hooks***/
 /*
