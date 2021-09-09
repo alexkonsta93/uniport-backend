@@ -143,8 +143,8 @@ class Position {
       type: 'future-basis',
       exchange: this.exchange,
       base: this.base,
-      quote: this.quote
-
+      quote: this.quote,
+      userId: this.userId
     }
     this.basisTrades.push(trade);
   }
@@ -187,6 +187,7 @@ class Position {
       exchange: this.exchange,
       type: 'future-pnl',	
       comment: 'Compensative trade for futures position',
+      userId: this.userId
     };
     this.compensationTrades.push(trade);
   }
@@ -204,7 +205,8 @@ class Position {
       amount: -amount,
       price: price,
       type: 'future-funding',	
-      exchange: this.exchange
+      exchange: this.exchange,
+      userId: this.userId
     };
     this.fundingTrades.push(trade);
   }

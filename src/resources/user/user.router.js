@@ -302,7 +302,33 @@ router
     }
   })
 
-/*** /:ID/EXCHANGE/:NAME/AUTH_DATA
+/*** /:ID/EXCHANGE/:NAME/AUTH_DATA ***/
+
+/*** /:ID/TRADES ***/
+router
+  .route('/:id/trades')
+  .get(async (req, res) => {
+    var trades;
+    try {
+      // Specific exchange
+      if (req.query.exchange) {
+        trades = await Trade.find({
+          userId: req.params.id, 
+          exchange: req.query.exchange
+        });
+      }
+      // All orders
+      else {
+        trades = await Trade.find({
+          userId: req.params.id
+        });
+      }
+      res.status(200).json(trades);
+    } catch (err) {
+      console.log(err);
+      res.status(400).end();
+    }
+  })
 
 /*** /:ID/ORDERS ***/
 router
@@ -329,62 +355,6 @@ router
       res.status(400).end();
     }
   })
-  /*
-  .post(async (req, res) => {
-    let adapter;
-    switch (req.body.exchange) {
-      case 'Coinbase':
-        adapter = toCoinbaseOrders;
-        break;
-      case 'GDAX':
-        adapter = toGdaxOrders;
-        break;
-      case 'Kraken':
-        adpater = toKrakenOrders;
-        break;
-      default:
-        throw new Error('exchange adapter not recognized');
-    }
-
-    let orders = adapter(req.body.lines, req.params.id);
-    let orderIds = [];
-    let tradeIds = [];
-    // Update Order db by creating new document if not a duplicate
-    // Update Trade db if necessary
-    for (let order of orders) {
-      try {
-        let doc = await Order.create(order);
-        orderIds.push(doc.id);
-
-        // Handle subtrades
-        if (order.trades) {
-          for (let trade of order.trades) {
-            trade.userId = req.params.id;
-            try {
-              let doc = await Trade.create(trade);
-              tradeIds.push(doc.id);
-            } catch(err) {
-              console.log(err);
-              continue;
-            }
-          }
-        }
-
-        // Update order.trades if necessary
-        if (tradeIds.length > 0) {
-          await Order.updateOne(
-            { '_id': doc.id },
-            { '$push': { 'tradeIds' : tradeIds } }
-          );
-          tradeIds = [];
-        }
-      } catch (err) {
-        console.log(err);
-        continue;
-      }
-    }
-  })
-  */
   .delete(async (req, res) => {
     try {
       if (req.body.id) {
