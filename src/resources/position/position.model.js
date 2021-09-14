@@ -93,6 +93,7 @@ var positionSchema = new Schema({
 
 /***Index***/
 positionSchema.index({ 
+  userId: 1,
   exchange: 1, 
   dateClose: 1,
   dateOpen: 1,

@@ -33,7 +33,13 @@ var userSchema = new Schema({
       type: Number,
       default: 0
     }
-  }]
+  }],
+  settings: {
+    maxLines: {
+      type: Number,
+      default: 25
+    }
+  }
 });
 
 /***Index***/
@@ -66,6 +72,11 @@ userSchema.methods.updateOrders = function(userId, orders, cb) {
   })
 }
 */
+
+userSchema.methods.updateSettings = async function(settingsObj) {
+  this.settings = settingsObj;
+  await this.save();
+}
 
 var User = mongoose.model('User', userSchema);
 export default User;

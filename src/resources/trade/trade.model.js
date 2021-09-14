@@ -74,6 +74,7 @@ var tradeSchema = new Schema({
 
 /***Index***/
 tradeSchema.index({ 
+    userId: 1,
 		dateTime: 1, 
 		type: 1,
 		exchange: 1, 

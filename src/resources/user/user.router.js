@@ -23,47 +23,8 @@ import KrakenAdapter from '../../adapters/KrakenAdapter';
 import BinanceAdapter from '../../adapters/BinanceAdapter';
 import GeminiAdapter from '../../adapters/GeminiAdapter';
 import GdaxAdapter from '../../adapters/GdaxAdapter';
-/*
-import { processFtxApiData } from '../../adapters/FtxAdapter';
-import { processCoinbaseApiData } from '../../adapters/CoinbaseAdapter';
-import { processKrakenApiData } from '../../adapters/KrakenAdapter';
-import { processKrakenFuturesApiData } from '../../adapters/KrakenFuturesAdapter';
-import { processBinanceApiData } from '../../adapters/BinanceAdapter';
-import { processGeminiApiData } from '../../adapters/GeminiAdapter';
-*/
 
 var router = crudRouter(User);
-
-/*
-async function createOrderEntry(userDoc, order, trades) {
-
-  var tradeIds = [];
-  for (let trade of trades) {
-    let tradeDoc = await Trade.create(trade);
-    tradeIds.push(tradeDoc.id);
-  }
-
-  order.tradeIds = tradeIds;
-  var orderDoc = await Order.create(order);
-  console.log(orderDoc); 
-  userDoc.orders.push(orderDoc.id);
-  await userDoc.save();
-}
-
-async function createDbEntry(userId, data) {
-  var userDoc = await User.findById(userId);
-  var { orders, positions } = data;
-  var count = 0;
-  for (let order of orders) {
-    if (count === 2) break;
-    let trades = order.trades;
-    delete order.trades;
-    await createOrderEntry(userDoc, order, trades);   
-    count += 1;
-  }
-  // positions
-}
-*/
 
 /*** /:ID/EXCHANGES ***/
 router
@@ -417,6 +378,17 @@ router
       res.status(400).end();
     }
   })
+  .post(async (req, res) => {
+    try {
+      let userDoc = User.findById(req.params.id, 'settings');
+      await userDoc.updateSettings(req.body.data.userSettings);
+      await userDoc.save();
+      res.status(200).json('User settings updated');
+    } catch (err) {
+      console.log(err);
+      res.status(400).end();
+    }
+  })
   .delete(async (req, res) => {
     try {
       if (req.body.id) {
@@ -449,4 +421,26 @@ router
     }
   })
 
+/*** /:ID/SETTINGS ***/
+router
+  .route('/:id/settings')
+  .get(async (req, res) => {
+    try {
+      let userSettings = await User.findById(req.params.id, 'settings');
+      return res.status(200).json(userSettings.settings);
+    } catch (err) {
+      console.log(err);
+      res.status(400).end();
+    }
+  })
+  .post(async (req, res) => {
+    try {
+      let userDoc = await User.findById(req.params.id);
+      await userDoc.updateSettings(req.body);
+      res.status(200).json('User settings updated');
+    } catch (err) {
+      console.log(err);
+      res.status(400).end();
+    }
+  })
 export default router;

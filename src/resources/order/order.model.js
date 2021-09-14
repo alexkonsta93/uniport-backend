@@ -79,6 +79,7 @@ var orderSchema = new Schema({
 
 /***Index***/
 orderSchema.index({
+  userId: 1,
   dateTime: 1,
   type: 1,
   exchange: 1, 
