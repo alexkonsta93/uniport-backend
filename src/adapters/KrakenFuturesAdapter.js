@@ -158,7 +158,6 @@ class Position {
     if (funding && funding != 0.0) {
       this.fundingFee += funding;
       this.createFuturesFundingTrade(line);
-      //console.log('created futures funding trade');
     }
 
     // if position open or close trade
