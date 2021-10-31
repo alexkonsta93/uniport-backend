@@ -79,13 +79,11 @@ class Position {
     this.basisTrades = [];
     this.basisFee = 0.0;
     this.fundingFee = 0.0;
-    this.fundingFeeCurrency = 'USD';
     this.pnl = 0.0;
     this.outstanding = 0.0;
+    this.basisFeeCurrency = 'USD';
     this.fundingTrades = [];
     this.compensationTrades = [];
-    this.fundingFee = 0.0;
-    this.basisFee = 0.0;
     this.outstanding = 0.0;
     this.openPrice = 0.0;
     this.closePrice = 0.0;
@@ -110,6 +108,7 @@ class Position {
       let pair = line.account.slice(2).split(':');
       this.base = pair[0];
       this.quote = pair[1];
+      this.fundingFeeCurrency = pair[0].toUpperCase();
       if (this.base === 'xbt') this.base = 'btc';
       if (this.quote === 'xbt') this.quote = 'btc';
       this.dateOpen = line.dateTime;
@@ -156,7 +155,7 @@ class Position {
     var fee = parseFloat(line['fee']);
 
     if (funding && funding != 0.0) {
-      this.fundingFee += funding;
+      this.fundingFee -= funding;
       this.createFuturesFundingTrade(line);
     }
 

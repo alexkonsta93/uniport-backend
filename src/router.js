@@ -51,9 +51,10 @@ app.post('/process-coinbase-trades', async (req, res, next) => {
 
 app.get('/print-trades', async (req, res, next) => {
 		try {
-				var orders = await axios.get('http://localhost:3000/api/order/all');
-				var trades = await axios.get('http://localhost:3000/api/trade/all');
-				var csv = tradesToCsv(orders.data.data, trades.data.data);
+        const userId = '61400b497fd2a23babe82716';
+			  //const orders = await axios.get('http://localhost:3000/api/user/' + userId + '/orders')
+			  const trades = await axios.get('http://localhost:3000/api/user/' + userId + '/trades')
+				var csv = tradesToCsv(trades.data);
 				fs.writeFile('../trades.csv', csv, err => {
 						if (err) throw err;
 				});
@@ -68,8 +69,9 @@ app.get('/print-trades', async (req, res, next) => {
 
 app.get('/print-positions', async (req, res, next) => {
 		try {
-				var positions = await axios.get('http://localhost:3000/api/leveraged-position/all');
-				var csv = positionsToCsv(positions.data.data);
+        const userId = '61400b497fd2a23babe82716';
+        const positions = await axios.get('http://localhost:3000/api/user/' + userId + '/positions')
+				const csv = positionsToCsv(positions.data);
 				fs.writeFile('../positions.csv', csv, err => {
 						if (err) throw err;
 				});
@@ -111,14 +113,14 @@ function converToObj(item) {
 		}
 }
 
-function tradesToCsv(orders, trades) {
+function tradesToCsv(trades) {
 		var ret = [];
 		
-		for (let order of orders) {
-				ret.push(converToObj(order))
-		}
 		for (let trade of trades) {
-				if (trade.type === 'futures-pnl') {
+				if (
+			    trade.type === 'future-pnl' ||
+			    trade.type === 'spot'
+		    ) {
 						ret.push(converToObj(trade));
 				}
 		}
@@ -130,20 +132,25 @@ function tradesToCsv(orders, trades) {
 function positionsToCsv(positions) {
 		var ret = [];
 		for (let position of positions) {
+		    const fundingFeeUSD =
+		      (position.fundingFeeCurrency === 'USD') ?
+		      position.fundingFee :
+		      position.fundingFee * position.closePrice;
 				ret.push({
+						'Exchange': position.exchange,
 						'Date Open': position.dateOpen,
 						'Date Close': position.dateClose,
-						'Quote': position.quote,
 						'Base': position.base,
-						'Average Entry Price': position.avgEntryPrice,
+						'Quote': position.quote,
+						'Open Price': position.openPrice,
 						'Close Price': position.closePrice,
-						'Gross PNL': position.pnl,
 						'Basis Fee': position.basisFee,
 						'Basis Fee Currency': position.basisFeeCurrency,
 						'Funding Fee': position.fundingFee,
-						'Funding Fee Currency':  position.quote,
-						'Net PNL': position.pnl - position.basisFee - (position.fundingFee * position.closePrice),
-						'Exchange': position.exchange
+						'Funding Fee Currency':  position.fundingFeeCurrency,
+					  'Gross PNL': position.pnl,
+						'Net PNL': position.pnl - position.basisFee - fundingFeeUSD,
+					  'Collateral Type': position.collateralType
 				})
 		}
 		return Papa.unparse(ret, {
