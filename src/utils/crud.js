@@ -11,8 +11,7 @@ var createOne = model => async (req, res) => {
 var getOne = model => async (req, res) => {
   try {
     let doc = await model.find({ ...req.body })
-      .lean()
-      .exec();
+      .lean();
 
     res.status(200).json(doc)
   } catch (e) {
@@ -24,8 +23,7 @@ var getOne = model => async (req, res) => {
 var getById = model => async (req, res) => {
   try {
     let doc = await model.findById(req.params.id)
-      .lean()
-      .exec();
+      .lean();
 
     res.status(200).json(doc)
   } catch (e) {
@@ -37,8 +35,7 @@ var getById = model => async (req, res) => {
 var getAll = model => async (req, res) => {
   try {
     let docs = await model.find({})
-      .lean()
-      .exec();
+      .lean();
 
     res.status(200).json(docs)
   } catch (e) {

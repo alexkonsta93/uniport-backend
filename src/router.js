@@ -88,25 +88,25 @@ function converToObj(item) {
 		let buyAmount, buyCurrency, sellAmount, sellCurrency;
 		if (item.amount > 0) {
 				buyAmount = item.amount;		
-				buyCurrency = item.quote;
+				buyCurrency = item.base;
 				sellAmount = item.amount * item.price;
-				sellCurrency = item.base;
+				sellCurrency = item.quote;
 		} else {
 				buyAmount = -item.amount * item.price;
-				buyCurrency = item.base;
+				buyCurrency = item.quote;
 				sellAmount = -item.amount;
-				sellCurrency = item.quote;
+				sellCurrency = item.base;
 		}
 		return {
 				'Type': 'Trade',
-				'Buy Amount': buyAmount,
-				'Buy Currency': buyCurrency,
-				'Sell Amount': sellAmount,
-				'Sell Currency': sellCurrency,
-				'Fee': item.fee,
-				'Fee Currency': item.feeCurrency,
+				'BuyAmount': buyAmount,
+				'BuyCurrency': buyCurrency,
+				'SellAmount': sellAmount,
+				'SellCurrency': sellCurrency,
+				'FeeAmount': item.fee,
+				'FeeCurrency': item.feeCurrency,
 				'Exchange': item.exchange,
-				'Trade-Group': null,
+				'Group': null,
 				'Comment': null,
 				'Date': item.dateTime
 
