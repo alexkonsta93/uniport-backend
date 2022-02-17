@@ -3,11 +3,11 @@ import mongoose from 'mongoose';
 import Order from '../order/order.model.js';
 import Trade from '../trade/trade.model.js';
 
-var { Schema } = mongoose;
+const { Schema } = mongoose;
 
-var exchanges = ['bitfinex', 'poloniex', 'kraken', 'binance', 'gdax', 'gemini', 'coinbase', 'ftx', 'kraken futures'];
+const exchanges = ['bitfinex', 'poloniex', 'kraken', 'binance', 'gdax', 'gemini', 'coinbase', 'ftx', 'kraken futures'];
 
-var positionSchema = new Schema({		
+const positionSchema = new Schema({		
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -89,6 +89,8 @@ var positionSchema = new Schema({
     enum: ['cash', 'crypto'],
     required: true
   }
+}, {
+  versionKey: false
 });
 
 /***Index***/
@@ -101,11 +103,30 @@ positionSchema.index({
   base: 1
 }, { unique: true });
 
+/***Hooks***/
+/*
+const cb = function(next) {
+  this.select('-__v');
+  next();
+}
+
+positionSchema.pre('find', cb);
+
+positionSchema.pre('findOne', cb);
+
+positionSchema.pre('findOneAndDelete', cb);
+
+positionSchema.pre('deleteMany', cb);
+*/
+
 /***Virtual***/
+positionSchema.virtual('id').get(function() {
+  return this._id.toHexString();
+})
 
 /***Methods***/
 positionSchema.methods.deleteTrades = async function() {
-  var tradeIds = [];
+  const tradeIds = [];
   this.basisTradeIds.forEach(id => tradeIds.push(id));
   this.fundingTradeIds.forEach(id => tradeIds.push(id));
   this.compensationTradeIds.forEach(id => tradeIds.push(id));
@@ -141,5 +162,15 @@ positionSchema.post('updateOne', function() {
 })
 */
 
-var Position = new mongoose.model('Position', positionSchema);
+/***Settings***/
+const settings = {
+	virtuals: true,
+	transform: function(doc, ret) {
+		delete ret._id;
+	}
+};
+positionSchema.set('toJSON', settings);
+positionSchema.set('toObject', settings);
+
+const Position = new mongoose.model('Position', positionSchema);
 export default Position;

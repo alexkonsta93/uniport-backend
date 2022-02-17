@@ -34,7 +34,7 @@ router
       .findById(req.params.id, 'exchanges')
       .populate({ 
         path: 'exchanges',
-        populate: { path: '_id', model: Exchange }
+        populate: { path: 'exchange', model: Exchange }
       })
       .exec((err, exchanges) => {
         if (err) {
@@ -50,14 +50,15 @@ router
         console.log(err);
         res.status(400).end();
       }
-      let exchange = user.exchanges.id(req.body._id);
+      let exchange = user.exchanges.id(req.body.id);
       // if exchange already exsits -> update
       if (exchange) exchange.set(req.body);
 
       // if exchange deasn't exist -> create
-      else user.exchanges.push(req.body);
+      else user.exchanges.push({ 'exchange': req.body.id });
       user.save((err, doc) => {
         if (err) {
+          console.log('here');
           console.log(err);
           res.status(400).end();
         }
@@ -70,7 +71,7 @@ router
       // Delete specific exchange
       User.updateOne(
         { '_id': req.params.id },
-        { '$pull': { 'exchanges': { '_id': req.body.id } } },
+        { '$pull': { 'exchanges': { 'exchange': req.body.id } } },
         (err, doc) => {
           if (err) {
             console.log(err);

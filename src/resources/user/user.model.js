@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 
-var { Schema } = mongoose;
+const { Schema } = mongoose;
 
-var userSchema = new Schema({
+const userSchema = new Schema({
   email: {
     type: String,
     required: true
@@ -16,7 +16,7 @@ var userSchema = new Schema({
     required: true
   },
   exchanges: [{
-    _id: {
+    exchange: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: 'Exchange'
@@ -40,6 +40,8 @@ var userSchema = new Schema({
       default: 25
     }
   }
+}, {
+  versionKey: false
 });
 
 /***Index***/
@@ -48,6 +50,24 @@ userSchema.index({
 }, { unique: true });
 
 /***Hooks***/
+/*
+const cb = function(next) {
+  this.select('-__v');
+  next();
+}
+userSchema.pre('find', cb);
+
+userSchema.pre('findOne', cb);
+
+userSchema.pre('findOneAndDelete', cb);
+
+userSchema.pre('deleteMany', cb);
+*/
+
+/***Virtuals***/
+userSchema.virtual('id').get(function() {
+	return this._id.toHexString();
+});
 /*
 userSchema.pre('update', function(next) {
   let userExchangeIds = this.exchanges.map(exchange => exchange.info);
@@ -73,10 +93,21 @@ userSchema.methods.updateOrders = function(userId, orders, cb) {
 }
 */
 
-userSchema.methods.updateSettings = async function(settingsObj) {
-  this.settings = settingsObj;
+userSchema.methods.updateSettings = async function(settings) {
+  this.settings = settings;
   await this.save();
 }
+
+/***Settings***/
+const settings = {
+	virtuals: true,
+	transform: function(doc, ret) {
+		delete ret._id;
+	}
+};
+
+userSchema.set('toJSON', settings);
+userSchema.set('toObject', settings);
 
 var User = mongoose.model('User', userSchema);
 export default User;

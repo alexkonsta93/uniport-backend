@@ -70,6 +70,8 @@ var tradeSchema = new Schema({
     comment: {
       type: String
     }
+}, {
+	versionKey: false
 });
 
 /***Index***/
@@ -163,50 +165,18 @@ tradeSchema.pre('save', async function(next) {
 		await this.associate(parentOrder);
 });
 
-/*
-tradeSchema.post('save', async function() {
-		console.log("Trade created");
-});
-*/
+const cb = function(next) {
+  this.select('-__v');
+  next();
+}
 
-tradeSchema.pre('find', function(next) {
-	this.select('-__v');
-	next();
-});
+tradeSchema.pre('find', cb);
 
-tradeSchema.pre('findOne', function(next) {
-	this.select('-__v');
-	next();
-});
+tradeSchema.pre('findOne', cb);
 
-tradeSchema.pre('findOneAndDelete', function(next) {
-	this.select('-__v');
-	next();
-});
+tradeSchema.pre('findOneAndDelete', cb);
 
-tradeSchema.pre('deleteMany', function(next) {
-	this.select('-__v');
-	this.select('-_id');
-	next();
-});
-/*
-tradeSchema.post('deleteOne', function() {
-		console.log("Trade deleted");
-});
-
-tradeSchema.post('findOneAndDelete', function() {
-		console.log("Trade deleted");
-});
-
-
-tradeSchema.post('deleteMany', function() {
-		console.log("All trades deleted");
-});
-
-tradeSchema.post('updateOne', function() {
-		console.log("Trade updated");
-})
-*/
+tradeSchema.pre('deleteMany', cb);
 
 /***Virtuals***/
 tradeSchema.virtual('id').get(function() {
@@ -242,12 +212,17 @@ tradeSchema.virtual('orderIsComplete').get(async function() {
 });
 */
 
-tradeSchema.set('toJSON', {
+
+/***Settings***/
+const settings = {
 	virtuals: true,
 	transform: function(doc, ret) {
 		delete ret._id;
 	}
-});
+};
+
+tradeSchema.set('toJSON', settings);
+tradeSchema.set('toObject', settings);
 
 var Trade = new mongoose.model('Trade', tradeSchema);
 export default Trade;

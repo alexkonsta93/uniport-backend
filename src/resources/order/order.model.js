@@ -75,6 +75,8 @@ var orderSchema = new Schema({
     type: [mongoose.Schema.Types.ObjectId],
     default: []
   },
+}, {
+  versionKey: false
 });
 
 /***Index***/
@@ -98,8 +100,27 @@ orderSchema.statics.sumAmount = function(orders) {
 };
 
 /***Methods***/
+orderSchema.methods.deleteTrades = async function() {
+  for (let tradeId of this.tradeIds) {
+    await Trade.findByIdAndDelete(tradeId);
+  }
+}
 
 /***Hooks***/
+/*
+const cb = function(next) {
+  this.select('-__v');
+  next();
+}
+
+orderSchema.pre('find', cb);
+
+orderSchema.pre('findOne', cb);
+
+orderSchema.pre('findOneAndDelete', cb);
+
+orderSchema.pre('deleteMany', cb);
+*/
 /*
 orderSchema.pre('save', async function() {
   // if order exists in db -> skip
@@ -123,25 +144,10 @@ orderSchema.post('updateOne', function() {
 })
 */
 
-  /***Virtuals***/
-  /*
-orderSchema.virtual('exists').get(async function() {
-    var queryParams = {
-        exchange: this.exchange,
-        exchangeOrderId: this.exchangeOrderId,
-        dateTime: this.dateTime,
-    };
-
-    var exists = false;
-    try {
-        let doc = await Order.findOne(queryParams);
-        if (doc) exists = true;
-    } catch (err) {
-        console.error(err);
-    }
-    return exists;
+/***Virtuals***/
+orderSchema.virtual('id').get(function() {
+	return this._id.toHexString();
 });
-*/
 
 orderSchema.virtual('isComplete').get(async function() {
   var trades = [];
@@ -153,11 +159,16 @@ orderSchema.virtual('isComplete').get(async function() {
   return this.amount == Trade.sumAmount(trades);
 });
 
-orderSchema.methods.deleteTrades = async function() {
-  for (let tradeId of this.tradeIds) {
-    await Trade.findByIdAndDelete(tradeId);
-  }
-}
+/***Settings***/
+const settings = {
+	virtuals: true,
+	transform: function(doc, ret) {
+		delete ret._id;
+	}
+};
+
+orderSchema.set('toJSON', settings);
+orderSchema.set('toObject', settings);
 
 var Order = new mongoose.model('Order', orderSchema); // Must be at bottom of file for hooks to work
 export default Order;

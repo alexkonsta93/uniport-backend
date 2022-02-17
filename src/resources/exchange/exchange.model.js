@@ -7,22 +7,12 @@ var exchangeSchema = new Schema({
     type: String,
     required: true,
   },
-  apiUrl: {
-    type: String,
-    required: true
-  },
-  futuresApiUrl: {
-    type: String,
-    required: false
-  },
   logoUri: {
     type: String,
     required: true
   },
-  futures: {
-    type: Boolean,
-    default: false
-  }
+}, {
+  versionKey: false
 });
 
 /***Index***/
