@@ -134,11 +134,12 @@ class Position {
   }
 
   createBasisTrade(line) {
-    var trade = {
+    const price = parseFloat(line['trade price']);
+    const trade = {
       tradeId: line.uid,
       dateTime: line.dateTime,
-      amount: line.change,
-      price: parseFloat(line['trade price']),
+      amount: parseFloat(line.change) / price,
+      price: price,
       type: 'future-basis',
       exchange: this.exchange,
       base: this.base,
