@@ -279,7 +279,7 @@ router
           exchange: req.query.exchange
         });
       }
-      // All orders
+      // All trades
       else {
         trades = await Trade.find({
           userId: req.params.id
@@ -291,6 +291,14 @@ router
       res.status(400).end();
     }
   })
+  .delete(async (req, res) => {
+    try {
+      await Trade.deleteMany({ userId: req.params.id });
+      res.status(200).json('Delete trades success');
+    } catch (err) {
+      res.status(400).end();
+    }
+  });
 
 /*** /:ID/ORDERS ***/
 router
