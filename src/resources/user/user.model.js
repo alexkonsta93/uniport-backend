@@ -32,6 +32,14 @@ const userSchema = new Schema({
     numLastImport: {
       type: Number,
       default: 0
+    },
+    apiKey: {
+      type: String,
+      default: ''
+    },
+    apiSecret: {
+      type: String,
+      default: ''
     }
   }],
   settings: {
