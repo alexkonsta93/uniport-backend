@@ -51,9 +51,10 @@ app.post('/process-coinbase-trades', async (req, res, next) => {
 
 app.get('/print-trades', async (req, res, next) => {
 		try {
-        const userId = '61400b497fd2a23babe82716';
+        const userId = '62015b3eec19272ccca25765';
 			  //const orders = await axios.get('http://localhost:3000/api/user/' + userId + '/orders')
-			  const trades = await axios.get('http://localhost:3000/api/user/' + userId + '/trades')
+			  const trades = await axios.get('http://localhost:3000/api/user/' + userId + '/trades');
+				//console.log('trades', trades);
 				var csv = tradesToCsv(trades.data);
 				fs.writeFile('../trades.csv', csv, err => {
 						if (err) throw err;
@@ -69,8 +70,8 @@ app.get('/print-trades', async (req, res, next) => {
 
 app.get('/print-positions', async (req, res, next) => {
 		try {
-        const userId = '61400b497fd2a23babe82716';
-        const positions = await axios.get('http://localhost:3000/api/user/' + userId + '/positions')
+        const userId = '62015b3eec19272ccca25765';
+        const positions = await axios.get('http://localhost:3000/api/user/' + userId + '/positions');
 				const csv = positionsToCsv(positions.data);
 				fs.writeFile('../positions.csv', csv, err => {
 						if (err) throw err;

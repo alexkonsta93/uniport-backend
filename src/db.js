@@ -31,20 +31,20 @@ app.use('/api/exchange', exchangeRouter);
 app.use('/api/user', userRouter);
 
 export var start = async function() {
-		try {
-				await mongoose.connect(
-						'mongodb://localhost:27017/uniport',
-						{ 	
-								useNewUrlParser: true,
-								useUnifiedTopology: true,
-								useFindAndModify: false,
-								useCreateIndex: true
-						}
-				);
-				console.log("Mongoose connection success!");
-		}	catch (err) {
-				console.error(err);
-		}
+	try {
+			await mongoose.connect(
+					'mongodb://localhost:27017/uniport',
+					{ 	
+							useNewUrlParser: true,
+							useUnifiedTopology: true,
+							useFindAndModify: false,
+							useCreateIndex: true
+					}
+			);
+			console.log("Mongoose connection success!");
+	}	catch (err) {
+			console.error(err);
+	}
 };
 
 export var stop = async function() {

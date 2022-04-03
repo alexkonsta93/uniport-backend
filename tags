@@ -405,6 +405,10 @@ BinanceAdapter	src/adapters/BinanceAdapter.js	/^export default class BinanceAdap
 BinanceClient	src/clients/BinanceClient.js	/^export default class BinanceClient {$/;"	c
 CoinbaseAdapter	src/adapters/CoinbaseAdapter.js	/^export default class CoinbaseAdapter {$/;"	c
 CoinbaseClient	src/clients/CoinbaseClient.js	/^export default class CoinbaseClient {$/;"	c
+DatePriceMap	src/ohlc/btc.js	/^export default class DatePriceMap {$/;"	c
+DatePriceMap	src/ohlc/data-price-map.js	/^export default class DatePriceMap {$/;"	c
+DatePriceMap	src/ohlcv/data-price-map.js	/^export default class DatePriceMap {$/;"	c
+DatePriceMap	src/ohlcv/date-price-map.js	/^export default class DatePriceMap {$/;"	c
 Exchange	src/resources/exchange/exchange.model.js	/^var Exchange = new mongoose.model('Exchange', exchangeSchema);$/;"	v
 FtxAdapter	src/adapters/FtxAdapter.js	/^export default class FtxAdapter {$/;"	c
 FtxClient	src/clients/FtxClient.js	/^export default class FtxClient {$/;"	c
@@ -418,6 +422,8 @@ KrakenFuturesAdapter	src/adapters/KrakenFuturesAdapter.js	/^export default class
 KrakenFuturesClient	src/clients/KrakenFuturesClient.js	/^export default class KrakenFuturesClient {$/;"	c
 Order	src/adapters/FtxAdapter.js	/^class Order {$/;"	c
 Order	src/resources/order/order.model.js	/^var Order = new mongoose.model('Order', orderSchema); \/\/ Must be at bottom of file for hooks t/;"	v
+PoloniexAdapter	src/adapters/PoloniexAdapter.js	/^export default class PoloniexAdapter {$/;"	c
+PoloniexAdapter	src/resources/PoloniexAdapter.js	/^export default class PoloniexAdapter {$/;"	c
 Position	src/adapters/FtxAdapter.js	/^class Position {$/;"	c
 Position	src/adapters/KrakenFuturesAdapter.js	/^class Position {$/;"	c
 Position	src/resources/position/position.model.js	/^const Position = new mongoose.model('Position', positionSchema);$/;"	C
@@ -913,13 +919,19 @@ constructor	src/adapters/KrakenAdapter.js	/^  constructor(userId) {$/;"	m	class:
 constructor	src/adapters/KrakenFuturesAdapter.js	/^  constructor(userId) {$/;"	m	class:KrakenFuturesAdapter
 constructor	src/adapters/KrakenFuturesAdapter.js	/^  constructor(userId) {$/;"	m	class:Position
 constructor	src/adapters/KrakenFuturesAdapter.js	/^  constructor(userId) {$/;"	m	class:PositionRouter
+constructor	src/adapters/PoloniexAdapter.js	/^  constructor(userId) {$/;"	m	class:PoloniexAdapter
 constructor	src/clients/BinanceClient.js	/^  constructor(key, secret) {$/;"	m	class:BinanceClient
 constructor	src/clients/CoinbaseClient.js	/^  constructor(key, secret) {$/;"	m	class:CoinbaseClient
 constructor	src/clients/FtxClient.js	/^  constructor(key, secret) {$/;"	m	class:FtxClient
 constructor	src/clients/GeminiClient.js	/^  constructor(key, secret) {$/;"	m	class:GeminiClient
 constructor	src/clients/KrakenClient.js	/^  constructor(key, secret) {$/;"	m	class:KrakenClient
 constructor	src/clients/KrakenFuturesClient.js	/^  constructor(key, secret) {$/;"	m	class:KrakenFuturesClient
+constructor	src/ohlc/btc.js	/^	constructor(ticker) {$/;"	m	class:DatePriceMap
+constructor	src/ohlc/data-price-map.js	/^	constructor(ticker) {$/;"	m	class:DatePriceMap
+constructor	src/ohlcv/data-price-map.js	/^	constructor(ticker) {$/;"	m	class:DatePriceMap
+constructor	src/ohlcv/date-price-map.js	/^	constructor(ticker) {$/;"	m	class:DatePriceMap
 constructor	src/resources/GdaxAdapter.js	/^  constructor(trade, userId) {$/;"	m	class:GdaxOrder
+constructor	src/resources/PoloniexAdapter.js	/^  constructor(userId) {$/;"	m	class:PoloniexAdapter
 constructor	src/utils/rawOrder.js	/^  constructor(trade, userId) {$/;"	m	class:RawOrder
 content-disposition	package-lock.json	/^        "content-disposition": "0.5.3",$/;"	s	object:dependencies.express.requires
 content-disposition	package-lock.json	/^    "content-disposition": {$/;"	o	object:dependencies
@@ -2105,9 +2117,9 @@ exchangeTradeId	src/adapters/KrakenFuturesAdapter.js	/^      exchangeTradeId: li
 exchangeTradeId	src/resources/GdaxAdapter.js	/^            exchangeTradeId: line['ID']$/;"	p	class:linesToTrades.trade
 exchangeTradeId	src/resources/GdaxAdapter.js	/^          exchangeTradeId: line['ID'],$/;"	p	class:linesToTrades.trade
 exchangeTradeId	src/resources/GdaxAdapter.js	/^        exchangeTradeId: line['ID'],	$/;"	p	class:linesToTrades.trade
-exchanges	src/resources/order/order.model.js	/^var exchanges = ['bitfinex', 'poloniex', 'kraken', 'binance', 'gdax', 'gemini', 'coinbase', 'ftx/;"	v
+exchanges	src/resources/order/order.model.js	/^var exchanges = ['Bitfinex', 'Poloniex', 'Kraken', 'Binance', 'Gdax', 'Gemini', 'Coinbase', 'Ftx/;"	v
 exchanges	src/resources/position/position.model.js	/^const exchanges = ['bitfinex', 'poloniex', 'kraken', 'binance', 'gdax', 'gemini', 'coinbase', 'f/;"	C
-exchanges	src/resources/trade/trade.model.js	/^var exchanges = ['bitfinex', 'poloniex', 'kraken', 'binance', 'gdax', 'gemini', 'coinbase', 'ftx/;"	v
+exchanges	src/resources/trade/trade.model.js	/^var exchanges = ['Bitfinex', 'Poloniex', 'Kraken', 'Binance', 'Gdax', 'Gemini', 'Coinbase', 'Ftx/;"	v
 exec-sh	package-lock.json	/^        "exec-sh": "^0.3.2",$/;"	s	object:dependencies.@cnakazawa/watch.requires
 exec-sh	package-lock.json	/^        "exec-sh": "^0.3.2",$/;"	s	object:dependencies.sane.requires
 exec-sh	package-lock.json	/^    "exec-sh": {$/;"	o	object:dependencies
@@ -2259,9 +2271,16 @@ getById	src/utils/crud.js	/^var getById = model => async (req, res) => {$/;"	v
 getFills	src/clients/FtxClient.js	/^  async getFills() {$/;"	m	class:FtxClient
 getFundingPayments	src/clients/FtxClient.js	/^  async getFundingPayments(startTime = 0, endTime = Date.now(), market = null) {$/;"	m	class:FtxClient
 getHistoricalPrices	src/clients/FtxClient.js	/^  async getHistoricalPrices(marketName, dateTime) {$/;"	m	class:FtxClient
+getKeyValuePairsArray	src/ohlc/data-price-map.js	/^	getKeyValuePairsArray() {$/;"	m	class:DatePriceMap
+getKeyValuePairsArray	src/ohlcv/data-price-map.js	/^	getKeyValuePairsArray() {$/;"	m	class:DatePriceMap
+getKeyValuePairsArray	src/ohlcv/date-price-map.js	/^	getKeyValuePairsArray() {$/;"	m	class:DatePriceMap
 getOne	src/utils/crud.js	/^var getOne = model => async (req, res) => {$/;"	v
 getOrderHistory	src/clients/FtxClient.js	/^  async getOrderHistory() {$/;"	m	class:FtxClient
 getPositions	src/clients/FtxClient.js	/^  getPositions() {$/;"	m	class:FtxClient
+getValue	src/ohlc/btc.js	/^	getValue(key) {$/;"	m	class:DatePriceMap
+getValue	src/ohlc/data-price-map.js	/^	getValue(key) {$/;"	m	class:DatePriceMap
+getValue	src/ohlcv/data-price-map.js	/^	getValue(key) {$/;"	m	class:DatePriceMap
+getValue	src/ohlcv/date-price-map.js	/^	getValue(key) {$/;"	m	class:DatePriceMap
 getpass	package-lock.json	/^        "getpass": "^0.1.1",$/;"	s	object:dependencies.sshpk.requires
 getpass	package-lock.json	/^    "getpass": {$/;"	o	object:dependencies
 glob	package-lock.json	/^        "glob": "^7.1.1",$/;"	s	object:dependencies.jest-config.requires
@@ -2306,9 +2325,15 @@ graceful-fs	package-lock.json	/^    "graceful-fs": {$/;"	o	object:dependencies
 growly	package-lock.json	/^        "growly": "^1.3.0",$/;"	s	object:dependencies.node-notifier.requires
 growly	package-lock.json	/^    "growly": {$/;"	o	object:dependencies
 handleBasisTrade	src/adapters/KrakenFuturesAdapter.js	/^  handleBasisTrade(line) {$/;"	m	class:Position
+handleExchangeTrade	src/adapters/PoloniexAdapter.js	/^  handleExchangeTrade(line) {$/;"	m	class:PoloniexAdapter
+handleExchangeTrade	src/resources/PoloniexAdapter.js	/^  function handleExchangeTrade(line) {$/;"	f	function:PoloniexAdapter.processCsvData
 handleFundingTrade	src/adapters/KrakenFuturesAdapter.js	/^  handleFundingTrade(line) {$/;"	m	class:Position
 handleLine	src/adapters/KrakenFuturesAdapter.js	/^  handleLine(line) {$/;"	m	class:Position
+handleMarginTrade	src/adapters/PoloniexAdapter.js	/^  handleMarginTrade(line) {}$/;"	m	class:PoloniexAdapter
+handleMarginTrade	src/resources/PoloniexAdapter.js	/^  function handleMarginTrade(line) {};$/;"	f	function:PoloniexAdapter.processCsvData
 handleOrder	src/adapters/FtxAdapter.js	/^  handleOrder(order) {$/;"	m	class:Position
+handleSettleMentTrade	src/adapters/PoloniexAdapter.js	/^  handleSettleMentTrade(line) {}$/;"	m	class:PoloniexAdapter
+handleSettleMentTrade	src/resources/PoloniexAdapter.js	/^  function handleSettleMentTrade(line) {};$/;"	f	function:PoloniexAdapter.processCsvData
 har-schema	package-lock.json	/^        "har-schema": "^2.0.0"$/;"	s	object:dependencies.har-validator.requires
 har-schema	package-lock.json	/^    "har-schema": {$/;"	o	object:dependencies
 har-validator	package-lock.json	/^        "har-validator": "~5.1.3",$/;"	s	object:dependencies.request.requires
@@ -2417,6 +2442,10 @@ inherits	package-lock.json	/^        "inherits": "2.0.3",$/;"	s	object:dependenc
 inherits	package-lock.json	/^        "inherits": "~2.0.3",$/;"	s	object:dependencies.readable-stream.requires
 inherits	package-lock.json	/^    "inherits": {$/;"	o	object:dependencies
 initializeOrdersData	src/resources/__tests__/leveraged-position.spec.js	/^function initializeOrdersData() {$/;"	f
+insert	src/ohlc/btc.js	/^	insert(key, value) {$/;"	m	class:DatePriceMap
+insert	src/ohlc/data-price-map.js	/^	insert(key, value) {$/;"	m	class:DatePriceMap
+insert	src/ohlcv/data-price-map.js	/^	insert(key, value) {$/;"	m	class:DatePriceMap
+insert	src/ohlcv/date-price-map.js	/^	insert(key, value) {$/;"	m	class:DatePriceMap
 integrity	package-lock.json	/^              "integrity": "sha1-8GVWEJaj8dou9GJy+BXIQNh+DIk=",$/;"	s	object:dependencies.unset-value.dependencies.has-value.dependencies.isobject
 integrity	package-lock.json	/^              "integrity": "sha1-MeohpzS6ubuw8yRm2JOupR5KPGQ=",$/;"	s	object:dependencies.has-values.dependencies.is-number.dependencies.kind-of
 integrity	package-lock.json	/^              "integrity": "sha1-MeohpzS6ubuw8yRm2JOupR5KPGQ=",$/;"	s	object:dependencies.sane.dependencies.is-number.dependencies.kind-of
@@ -3695,6 +3724,9 @@ license	package.json	/^  "license": "ISC",$/;"	s
 lines-and-columns	package-lock.json	/^        "lines-and-columns": "^1.1.6"$/;"	s	object:dependencies.parse-json.requires
 lines-and-columns	package-lock.json	/^    "lines-and-columns": {$/;"	o	object:dependencies
 linesToTrades	src/resources/GdaxAdapter.js	/^function linesToTrades(lines) {$/;"	f
+load	src/ohlc/data-price-map.js	/^	load(filePath) {$/;"	m	class:DatePriceMap
+load	src/ohlcv/data-price-map.js	/^	load(filePath) {$/;"	m	class:DatePriceMap
+load	src/ohlcv/date-price-map.js	/^	load(filePath) {$/;"	m	class:DatePriceMap
 loader-runner	package-lock.json	/^        "loader-runner": "^4.2.0",$/;"	s	object:dependencies.webpack.requires
 loader-runner	package-lock.json	/^    "loader-runner": {$/;"	o	object:dependencies
 loader-utils	package-lock.json	/^        "loader-utils": "^1.4.0",$/;"	s	object:dependencies.babel-loader.requires
@@ -4000,6 +4032,11 @@ processCsvData	src/adapters/FtxAdapter.js	/^  processCsvData() {}$/;"	m	class:Ft
 processCsvData	src/adapters/GeminiAdapter.js	/^  processCsvData() {}$/;"	m	class:GeminiAdapter
 processCsvData	src/adapters/KrakenAdapter.js	/^  processCsvData() {}$/;"	m	class:KrakenAdapter
 processCsvData	src/adapters/KrakenFuturesAdapter.js	/^  processCsvData(lines) {$/;"	m	class:KrakenFuturesAdapter
+processCsvData	src/adapters/PoloniexAdapter.js	/^  processCsvData(lines) {$/;"	m	class:PoloniexAdapter
+processCsvData	src/resources/PoloniexAdapter.js	/^  async processCsvData(lines) {$/;"	m	class:PoloniexAdapter
+processLine	src/ohlc/data-price-map.js	/^		function processLine(classObj, line) {$/;"	f	function:DatePriceMap.load
+processLine	src/ohlcv/data-price-map.js	/^		function processLine(classObj, line) {$/;"	f	function:DatePriceMap.load
+processLine	src/ohlcv/date-price-map.js	/^		function processLine(classObj, line) {$/;"	f	function:DatePriceMap.load
 progress	package-lock.json	/^        "progress": "^2.0.0",$/;"	s	object:dependencies.eslint.requires
 progress	package-lock.json	/^    "progress": {$/;"	o	object:dependencies
 prompts	package-lock.json	/^            "prompts": "^2.0.1",$/;"	s	object:dependencies.jest.dependencies.jest-cli.requires
@@ -5937,6 +5974,7 @@ unpipe	package-lock.json	/^        "unpipe": "~1.0.0"$/;"	s	object:dependencies.
 unpipe	package-lock.json	/^    "unpipe": {$/;"	o	object:dependencies
 unset-value	package-lock.json	/^        "unset-value": "^1.0.0"$/;"	s	object:dependencies.cache-base.requires
 unset-value	package-lock.json	/^    "unset-value": {$/;"	o	object:dependencies
+update	src/ohlc/btc.js	/^	async update() {$/;"	m	class:DatePriceMap
 updateSettings	src/resources/user/user.model.js	/^userSchema.methods.updateSettings = async function(settings) {$/;"	c	class:userSchema.methods
 uri-js	package-lock.json	/^            "uri-js": "^4.2.2"$/;"	s	object:dependencies.table.dependencies.ajv.requires
 uri-js	package-lock.json	/^        "uri-js": "^4.2.2"$/;"	s	object:dependencies.ajv.requires

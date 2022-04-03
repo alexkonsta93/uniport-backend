@@ -23,6 +23,7 @@ import KrakenAdapter from '../../adapters/KrakenAdapter';
 import BinanceAdapter from '../../adapters/BinanceAdapter';
 import GeminiAdapter from '../../adapters/GeminiAdapter';
 import GdaxAdapter from '../../adapters/GdaxAdapter';
+import PoloniexAdapter from '../../adapters/PoloniexAdapter';
 
 var router = crudRouter(User);
 
@@ -198,6 +199,9 @@ function selectAdapter(exchange, userId) {
     case 'Gdax':
       adapter = new GdaxAdapter(userId);
       break;
+    case 'Poloniex':
+      adapter = new PoloniexAdapter(userId);
+      break;
     default:
       throw new Error('exchange not recognized');
   }
@@ -257,7 +261,7 @@ router
     try {
       let adapter = selectAdapter(req.body.exchange, req.params.id);
       let data = adapter.processCsvData(req.body.lines);
-      await createDbEntries(req.params.id, data)
+      //await createDbEntries(req.params.id, data)
       res.status(200).json(data);
     } catch (err) {
       console.log(err);
