@@ -11,8 +11,6 @@ export default class PoloniexAdapter {
     this.btcHistory.load("/home/alexandros/Projects/uniport/uniport-backend/src/ohlcv/daily_BTCUSD.csv");
     this.ethHistory = new DatePriceMap('ETH');
     this.ethHistory.load("/home/alexandros/Projects/uniport/uniport-backend/src/ohlcv/daily_ETHUSD.csv")
-    //this.trades = [];
-    //this.orders = [];
     this.spotOrders = [];
     this.marginOrders = [];
     this.positions = [];
@@ -37,7 +35,10 @@ export default class PoloniexAdapter {
       }
     }
     //this.printMarginOrders(this.marginOrders);
-    console.log(this.positions);
+    return {
+      'spotOrders': this.spotOrders,
+      'positions': this.positions
+    };
   }
 
   printMarginOrders(orders) {
@@ -331,15 +332,17 @@ class Position {
       pnl += (order.amount * order.price);
       fees += fees;
     }
-    this.pnl = -pnl - fees;
+    pnl = -pnl;
+    pnl -= Math.abs(this.outstanding * order.price);
+    this.pnl = pnl * order.usdPrice / order.price - fees;
 
-    this.buildCompensationTrade(order, this.pnl);
+    this.buildCompensationTrade(order);
   }
 
-  buildCompensationTrade(order, pnl) {
+  buildCompensationTrade(order) {
     const compensation = {}
 
-    if (Math.abs(this.outstanding) > 1) {
+    if (this.pnl < 0) {
       // If negative pnl
       compensation.dateTime =  order.dateTime;
       compensation.price = order.usdPrice;
@@ -351,15 +354,7 @@ class Position {
       compensation.fee = 0.0;
       compensation.feeCurrency = 'USD';
       compensation.exchange = 'Poloniex';
-      if (this.basisTrades[0] > 0) {
-        // If long
-        compensation.amount = -this.outstanding;
-      } else {
-        // If short
-        compensation.amount = this.outstanding;
-      }
-      this.pnl -= Math.abs(this.outstanding * order.price);
-      this.pnl = this.pnl * order.usdPrice
+      compensation.amount = this.pnl / order.usdPrice;
     } else {
       // If positive pnl
       compensation.dateTime = order.dateTime;
@@ -372,7 +367,6 @@ class Position {
       compensation.fee = 0.0;
       compensation.feeCurrency = 'USD';
       compensation.exchange = 'Poloniex';
-      this.pnl = this.pnl * order.usdPrice;
       compensation.amount = this.pnl/(order.usdPrice/order.price);
     }
 
@@ -392,6 +386,7 @@ class Order {
     this.usdPrice = trade.usdPrice;
     this.amount = trade.amount;
     this.orderId = trade.orderId;
+    this.userId = trade.userId;
     this.type = trade.type;
     this.fee = trade.fee;
     this.feeCurrency = trade.feeCurrency;

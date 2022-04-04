@@ -702,7 +702,7 @@ buffer-from	package-lock.json	/^        "buffer-from": "^1.0.0",$/;"	s	object:de
 buffer-from	package-lock.json	/^    "buffer-from": {$/;"	o	object:dependencies
 bugs	package.json	/^  "bugs": {$/;"	o
 buildAmount	src/adapters/PoloniexAdapter.js	/^  buildAmount(line) {$/;"	m	class:PoloniexAdapter
-buildCompensationTrade	src/adapters/PoloniexAdapter.js	/^  buildCompensationTrade(order, pnl) {$/;"	m	class:Position
+buildCompensationTrade	src/adapters/PoloniexAdapter.js	/^  buildCompensationTrade(order) {$/;"	m	class:Position
 buildOrders	src/adapters/FtxAdapter.js	/^  async buildOrders(trades) {$/;"	m	class:FtxAdapter
 buildOrders	src/adapters/PoloniexAdapter.js	/^  buildOrders(lines) {$/;"	m	class:PoloniexAdapter
 buildPair	src/adapters/PoloniexAdapter.js	/^  buildPair(line) {$/;"	m	class:PoloniexAdapter
