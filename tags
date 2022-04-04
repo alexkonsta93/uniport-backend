@@ -16,6 +16,7 @@
 ./src/adapters/GeminiAdapter.js	dist/bundle.js	/^\/***\/ ".\/src\/adapters\/GeminiAdapter.js":$/;"	p	class:__webpack_modules__
 ./src/adapters/KrakenAdapter.js	dist/bundle.js	/^\/***\/ ".\/src\/adapters\/KrakenAdapter.js":$/;"	p	class:__webpack_modules__
 ./src/adapters/KrakenFuturesAdapter.js	dist/bundle.js	/^\/***\/ ".\/src\/adapters\/KrakenFuturesAdapter.js":$/;"	p	class:__webpack_modules__
+./src/adapters/PoloniexAdapter.js	dist/bundle.js	/^\/***\/ ".\/src\/adapters\/PoloniexAdapter.js":$/;"	p	class:__webpack_modules__
 ./src/clients/BinanceClient.js	dist/bundle.js	/^\/***\/ ".\/src\/clients\/BinanceClient.js":$/;"	p	class:__webpack_modules__
 ./src/clients/CoinbaseClient.js	dist/bundle.js	/^\/***\/ ".\/src\/clients\/CoinbaseClient.js":$/;"	p	class:__webpack_modules__
 ./src/clients/FtxClient.js	dist/bundle.js	/^\/***\/ ".\/src\/clients\/FtxClient.js":$/;"	p	class:__webpack_modules__
@@ -23,6 +24,7 @@
 ./src/clients/KrakenClient.js	dist/bundle.js	/^\/***\/ ".\/src\/clients\/KrakenClient.js":$/;"	p	class:__webpack_modules__
 ./src/clients/KrakenFuturesClient.js	dist/bundle.js	/^\/***\/ ".\/src\/clients\/KrakenFuturesClient.js":$/;"	p	class:__webpack_modules__
 ./src/db.js	dist/bundle.js	/^\/***\/ ".\/src\/db.js":$/;"	p	class:__webpack_modules__
+./src/ohlcv/date-price-map.js	dist/bundle.js	/^\/***\/ ".\/src\/ohlcv\/date-price-map.js":$/;"	p	class:__webpack_modules__
 ./src/resources/exchange/exchange.model.js	dist/bundle.js	/^\/***\/ ".\/src\/resources\/exchange\/exchange.model.js":$/;"	p	class:__webpack_modules__
 ./src/resources/order/order.controllers.js	dist/bundle.js	/^\/***\/ ".\/src\/resources\/order\/order.controllers.js":$/;"	p	class:__webpack_modules__
 ./src/resources/order/order.model.js	dist/bundle.js	/^\/***\/ ".\/src\/resources\/order\/order.model.js":$/;"	p	class:__webpack_modules__
@@ -36,6 +38,7 @@
 ./src/resources/user/user.model.js	dist/bundle.js	/^\/***\/ ".\/src\/resources\/user\/user.model.js":$/;"	p	class:__webpack_modules__
 ./src/resources/user/user.router.js	dist/bundle.js	/^\/***\/ ".\/src\/resources\/user\/user.router.js":$/;"	p	class:__webpack_modules__
 ./src/router.js	dist/bundle.js	/^\/***\/ ".\/src\/router.js":$/;"	p	class:__webpack_modules__
+./src/utils/Map.js	dist/bundle.js	/^\/***\/ ".\/src\/utils\/Map.js":$/;"	p	class:__webpack_modules__
 ./src/utils/crud.js	dist/bundle.js	/^\/***\/ ".\/src\/utils\/crud.js":$/;"	p	class:__webpack_modules__
 ./src/utils/crudRouter.js	dist/bundle.js	/^\/***\/ ".\/src\/utils\/crudRouter.js":$/;"	p	class:__webpack_modules__
 0	package.json	/^      "babel-plugin-transform-es2015-modules-commonjs"$/;"	s	array:babel.plugins
@@ -389,6 +392,7 @@
 @xtuc/long	package-lock.json	/^        "@xtuc\/long": "4.2.2"$/;"	s	object:dependencies.@webassemblyjs/leb128.requires
 @xtuc/long	package-lock.json	/^        "@xtuc\/long": "4.2.2"$/;"	s	object:dependencies.@webassemblyjs/wast-printer.requires
 @xtuc/long	package-lock.json	/^    "@xtuc\/long": {$/;"	o	object:dependencies
+Amount	src/adapters/PoloniexAdapter.js	/^          'Amount': order.amount,$/;"	p	class:PoloniexAdapter.ordersToCsv.obj
 AnonymousFunction0bc68ebf0100	src/resources/trade/trade.model.js	/^tradeSchema.pre('save', async function(next) {$/;"	f
 AnonymousFunction0bc68ebf0200	src/resources/trade/trade.model.js	/^tradeSchema.virtual('id').get(function() {$/;"	f
 AnonymousFunction2f50e7970100	src/resources/order/order.model.js	/^orderSchema.virtual('id').get(function() {$/;"	f
@@ -405,9 +409,7 @@ BinanceAdapter	src/adapters/BinanceAdapter.js	/^export default class BinanceAdap
 BinanceClient	src/clients/BinanceClient.js	/^export default class BinanceClient {$/;"	c
 CoinbaseAdapter	src/adapters/CoinbaseAdapter.js	/^export default class CoinbaseAdapter {$/;"	c
 CoinbaseClient	src/clients/CoinbaseClient.js	/^export default class CoinbaseClient {$/;"	c
-DatePriceMap	src/ohlc/btc.js	/^export default class DatePriceMap {$/;"	c
-DatePriceMap	src/ohlc/data-price-map.js	/^export default class DatePriceMap {$/;"	c
-DatePriceMap	src/ohlcv/data-price-map.js	/^export default class DatePriceMap {$/;"	c
+Date	src/adapters/PoloniexAdapter.js	/^          'Date': order.dateTime,$/;"	p	class:PoloniexAdapter.ordersToCsv.obj
 DatePriceMap	src/ohlcv/date-price-map.js	/^export default class DatePriceMap {$/;"	c
 Exchange	src/resources/exchange/exchange.model.js	/^var Exchange = new mongoose.model('Exchange', exchangeSchema);$/;"	v
 FtxAdapter	src/adapters/FtxAdapter.js	/^export default class FtxAdapter {$/;"	c
@@ -420,15 +422,22 @@ KrakenAdapter	src/adapters/KrakenAdapter.js	/^export default class KrakenAdapter
 KrakenClient	src/clients/KrakenClient.js	/^export default class KrakenClient {$/;"	c
 KrakenFuturesAdapter	src/adapters/KrakenFuturesAdapter.js	/^export default class KrakenFuturesAdapter {$/;"	c
 KrakenFuturesClient	src/clients/KrakenFuturesClient.js	/^export default class KrakenFuturesClient {$/;"	c
+Map	src/utils/Map.js	/^export default class Map {$/;"	c
+Map	src/utils/map.js	/^export default class Map {$/;"	c
 Order	src/adapters/FtxAdapter.js	/^class Order {$/;"	c
+Order	src/adapters/PoloniexAdapter.js	/^class Order {$/;"	c
 Order	src/resources/order/order.model.js	/^var Order = new mongoose.model('Order', orderSchema); \/\/ Must be at bottom of file for hooks t/;"	v
+Pair	src/adapters/PoloniexAdapter.js	/^          'Pair': order.base + order.quote,$/;"	p	class:PoloniexAdapter.ordersToCsv.obj
 PoloniexAdapter	src/adapters/PoloniexAdapter.js	/^export default class PoloniexAdapter {$/;"	c
-PoloniexAdapter	src/resources/PoloniexAdapter.js	/^export default class PoloniexAdapter {$/;"	c
 Position	src/adapters/FtxAdapter.js	/^class Position {$/;"	c
 Position	src/adapters/KrakenFuturesAdapter.js	/^class Position {$/;"	c
+Position	src/adapters/PoloniexAdapter.js	/^class Position {$/;"	c
 Position	src/resources/position/position.model.js	/^const Position = new mongoose.model('Position', positionSchema);$/;"	C
 PositionRouter	src/adapters/FtxAdapter.js	/^class PositionRouter {$/;"	c
 PositionRouter	src/adapters/KrakenFuturesAdapter.js	/^class PositionRouter {$/;"	c
+PositionRouter	src/adapters/PoloniexAdapter.js	/^class PositionRouter {$/;"	c
+Price	src/adapters/PoloniexAdapter.js	/^          'Price': order.price,$/;"	p	class:PoloniexAdapter.ordersToCsv.obj
+PriceUSD	src/adapters/PoloniexAdapter.js	/^          'PriceUSD': order.usdPrice$/;"	p	class:PoloniexAdapter.ordersToCsv.obj
 RawOrder	src/utils/rawOrder.js	/^class RawOrder {$/;"	c
 Trade	src/resources/trade/trade.model.js	/^var Trade = new mongoose.model('Trade', tradeSchema);$/;"	v
 User	src/resources/user/user.model.js	/^var User = mongoose.model('User', userSchema);$/;"	v
@@ -692,8 +701,14 @@ bson	package-lock.json	/^    "bson": {$/;"	o	object:dependencies
 buffer-from	package-lock.json	/^        "buffer-from": "^1.0.0",$/;"	s	object:dependencies.source-map-support.requires
 buffer-from	package-lock.json	/^    "buffer-from": {$/;"	o	object:dependencies
 bugs	package.json	/^  "bugs": {$/;"	o
+buildAmount	src/adapters/PoloniexAdapter.js	/^  buildAmount(line) {$/;"	m	class:PoloniexAdapter
 buildOrders	src/adapters/FtxAdapter.js	/^  async buildOrders(trades) {$/;"	m	class:FtxAdapter
+buildOrders	src/adapters/PoloniexAdapter.js	/^  buildOrders(lines) {$/;"	m	class:PoloniexAdapter
+buildPair	src/adapters/PoloniexAdapter.js	/^  buildPair(line) {$/;"	m	class:PoloniexAdapter
 buildPositions	src/adapters/FtxAdapter.js	/^  async buildPositions(orders) {$/;"	m	class:FtxAdapter
+buildPrice	src/adapters/PoloniexAdapter.js	/^  buildPrice(line) {$/;"	m	class:PoloniexAdapter
+buildTrade	src/adapters/PoloniexAdapter.js	/^  buildTrade(line) {$/;"	m	class:PoloniexAdapter
+buildType	src/adapters/PoloniexAdapter.js	/^  buildType(line) {$/;"	m	class:PoloniexAdapter
 bytes	package-lock.json	/^        "bytes": "3.1.0",$/;"	s	object:dependencies.body-parser.requires
 bytes	package-lock.json	/^        "bytes": "3.1.0",$/;"	s	object:dependencies.raw-body.requires
 bytes	package-lock.json	/^    "bytes": {$/;"	o	object:dependencies
@@ -919,20 +934,21 @@ constructor	src/adapters/KrakenAdapter.js	/^  constructor(userId) {$/;"	m	class:
 constructor	src/adapters/KrakenFuturesAdapter.js	/^  constructor(userId) {$/;"	m	class:KrakenFuturesAdapter
 constructor	src/adapters/KrakenFuturesAdapter.js	/^  constructor(userId) {$/;"	m	class:Position
 constructor	src/adapters/KrakenFuturesAdapter.js	/^  constructor(userId) {$/;"	m	class:PositionRouter
+constructor	src/adapters/PoloniexAdapter.js	/^  constructor(trade) {$/;"	m	class:Order
 constructor	src/adapters/PoloniexAdapter.js	/^  constructor(userId) {$/;"	m	class:PoloniexAdapter
+constructor	src/adapters/PoloniexAdapter.js	/^  constructor(userId) {$/;"	m	class:Position
+constructor	src/adapters/PoloniexAdapter.js	/^  constructor(userId) {$/;"	m	class:PositionRouter
 constructor	src/clients/BinanceClient.js	/^  constructor(key, secret) {$/;"	m	class:BinanceClient
 constructor	src/clients/CoinbaseClient.js	/^  constructor(key, secret) {$/;"	m	class:CoinbaseClient
 constructor	src/clients/FtxClient.js	/^  constructor(key, secret) {$/;"	m	class:FtxClient
 constructor	src/clients/GeminiClient.js	/^  constructor(key, secret) {$/;"	m	class:GeminiClient
 constructor	src/clients/KrakenClient.js	/^  constructor(key, secret) {$/;"	m	class:KrakenClient
 constructor	src/clients/KrakenFuturesClient.js	/^  constructor(key, secret) {$/;"	m	class:KrakenFuturesClient
-constructor	src/ohlc/btc.js	/^	constructor(ticker) {$/;"	m	class:DatePriceMap
-constructor	src/ohlc/data-price-map.js	/^	constructor(ticker) {$/;"	m	class:DatePriceMap
-constructor	src/ohlcv/data-price-map.js	/^	constructor(ticker) {$/;"	m	class:DatePriceMap
 constructor	src/ohlcv/date-price-map.js	/^	constructor(ticker) {$/;"	m	class:DatePriceMap
 constructor	src/resources/GdaxAdapter.js	/^  constructor(trade, userId) {$/;"	m	class:GdaxOrder
-constructor	src/resources/PoloniexAdapter.js	/^  constructor(userId) {$/;"	m	class:PoloniexAdapter
+constructor	src/utils/Map.js	/^  constructor() {$/;"	m	class:Map
 constructor	src/utils/rawOrder.js	/^  constructor(trade, userId) {$/;"	m	class:RawOrder
+contains	src/utils/Map.js	/^  contains(key) {$/;"	m	class:Map
 content-disposition	package-lock.json	/^        "content-disposition": "0.5.3",$/;"	s	object:dependencies.express.requires
 content-disposition	package-lock.json	/^    "content-disposition": {$/;"	o	object:dependencies
 content-type	package-lock.json	/^        "content-type": "~1.0.4",$/;"	s	object:dependencies.body-parser.requires
@@ -1561,7 +1577,6 @@ dev	package-lock.json	/^      "dev": true$/;"	b	object:dependencies.for-in
 dev	package-lock.json	/^      "dev": true$/;"	b	object:dependencies.forever-agent
 dev	package-lock.json	/^      "dev": true$/;"	b	object:dependencies.fs.realpath
 dev	package-lock.json	/^      "dev": true$/;"	b	object:dependencies.function-bind
-dev	package-lock.json	/^      "dev": true$/;"	b	object:dependencies.functional-red-black-tree
 dev	package-lock.json	/^      "dev": true$/;"	b	object:dependencies.gensync
 dev	package-lock.json	/^      "dev": true$/;"	b	object:dependencies.get-caller-file
 dev	package-lock.json	/^      "dev": true$/;"	b	object:dependencies.get-package-type
@@ -2208,6 +2223,8 @@ finalhandler	package-lock.json	/^        "finalhandler": "~1.1.2",$/;"	s	object:
 finalhandler	package-lock.json	/^    "finalhandler": {$/;"	o	object:dependencies
 finalize	src/adapters/FtxAdapter.js	/^  finalize(position) {$/;"	m	class:PositionRouter
 finalize	src/adapters/KrakenFuturesAdapter.js	/^  finalize(position) {$/;"	m	class:PositionRouter
+finalize	src/adapters/PoloniexAdapter.js	/^  finalize(order) {$/;"	m	class:Position
+finalize	src/adapters/PoloniexAdapter.js	/^  finalize(pair) {$/;"	m	class:PositionRouter
 find-cache-dir	package-lock.json	/^        "find-cache-dir": "^3.3.1",$/;"	s	object:dependencies.babel-loader.requires
 find-cache-dir	package-lock.json	/^    "find-cache-dir": {$/;"	o	object:dependencies
 find-up	package-lock.json	/^        "find-up": "^4.0.0"$/;"	s	object:dependencies.pkg-dir.requires
@@ -2245,8 +2262,10 @@ fsevents	package-lock.json	/^        "fsevents": "^2.1.2",$/;"	s	object:dependen
 fsevents	package-lock.json	/^    "fsevents": {$/;"	o	object:dependencies
 function-bind	package-lock.json	/^        "function-bind": "^1.1.1"$/;"	s	object:dependencies.has.requires
 function-bind	package-lock.json	/^    "function-bind": {$/;"	o	object:dependencies
+functional-red-black-tree	dist/bundle.js	/^\/***\/ "functional-red-black-tree":$/;"	p	class:__webpack_modules__
 functional-red-black-tree	package-lock.json	/^        "functional-red-black-tree": "^1.0.1",$/;"	s	object:dependencies.eslint.requires
 functional-red-black-tree	package-lock.json	/^    "functional-red-black-tree": {$/;"	o	object:dependencies
+functional-red-black-tree	package.json	/^    "functional-red-black-tree": "^1.0.1",$/;"	s	object:dependencies
 generateAuthHeaders	src/clients/FtxClient.js	/^  generateAuthHeaders(path) {$/;"	m	class:FtxClient
 gensync	package-lock.json	/^        "gensync": "^1.0.0-beta.2",$/;"	s	object:dependencies.@babel/core.requires
 gensync	package-lock.json	/^    "gensync": {$/;"	o	object:dependencies
@@ -2268,19 +2287,17 @@ get-value	package-lock.json	/^    "get-value": {$/;"	o	object:dependencies
 getAll	src/utils/crud.js	/^var getAll = model => async (req, res) => {$/;"	v
 getBorrowHistory	src/clients/FtxClient.js	/^  async getBorrowHistory() {$/;"	m	class:FtxClient
 getById	src/utils/crud.js	/^var getById = model => async (req, res) => {$/;"	v
+getCurrent	src/adapters/PoloniexAdapter.js	/^  getCurrent(pair) {$/;"	m	class:PositionRouter
 getFills	src/clients/FtxClient.js	/^  async getFills() {$/;"	m	class:FtxClient
 getFundingPayments	src/clients/FtxClient.js	/^  async getFundingPayments(startTime = 0, endTime = Date.now(), market = null) {$/;"	m	class:FtxClient
 getHistoricalPrices	src/clients/FtxClient.js	/^  async getHistoricalPrices(marketName, dateTime) {$/;"	m	class:FtxClient
-getKeyValuePairsArray	src/ohlc/data-price-map.js	/^	getKeyValuePairsArray() {$/;"	m	class:DatePriceMap
-getKeyValuePairsArray	src/ohlcv/data-price-map.js	/^	getKeyValuePairsArray() {$/;"	m	class:DatePriceMap
 getKeyValuePairsArray	src/ohlcv/date-price-map.js	/^	getKeyValuePairsArray() {$/;"	m	class:DatePriceMap
+getKeyValuePairsArray	src/utils/Map.js	/^	getKeyValuePairsArray() {$/;"	m	class:Map
 getOne	src/utils/crud.js	/^var getOne = model => async (req, res) => {$/;"	v
 getOrderHistory	src/clients/FtxClient.js	/^  async getOrderHistory() {$/;"	m	class:FtxClient
 getPositions	src/clients/FtxClient.js	/^  getPositions() {$/;"	m	class:FtxClient
-getValue	src/ohlc/btc.js	/^	getValue(key) {$/;"	m	class:DatePriceMap
-getValue	src/ohlc/data-price-map.js	/^	getValue(key) {$/;"	m	class:DatePriceMap
-getValue	src/ohlcv/data-price-map.js	/^	getValue(key) {$/;"	m	class:DatePriceMap
 getValue	src/ohlcv/date-price-map.js	/^	getValue(key) {$/;"	m	class:DatePriceMap
+getValue	src/utils/Map.js	/^  getValue(key) {$/;"	m	class:Map
 getpass	package-lock.json	/^        "getpass": "^0.1.1",$/;"	s	object:dependencies.sshpk.requires
 getpass	package-lock.json	/^    "getpass": {$/;"	o	object:dependencies
 glob	package-lock.json	/^        "glob": "^7.1.1",$/;"	s	object:dependencies.jest-config.requires
@@ -2325,15 +2342,12 @@ graceful-fs	package-lock.json	/^    "graceful-fs": {$/;"	o	object:dependencies
 growly	package-lock.json	/^        "growly": "^1.3.0",$/;"	s	object:dependencies.node-notifier.requires
 growly	package-lock.json	/^    "growly": {$/;"	o	object:dependencies
 handleBasisTrade	src/adapters/KrakenFuturesAdapter.js	/^  handleBasisTrade(line) {$/;"	m	class:Position
-handleExchangeTrade	src/adapters/PoloniexAdapter.js	/^  handleExchangeTrade(line) {$/;"	m	class:PoloniexAdapter
-handleExchangeTrade	src/resources/PoloniexAdapter.js	/^  function handleExchangeTrade(line) {$/;"	f	function:PoloniexAdapter.processCsvData
+handleExchangeOrder	src/adapters/PoloniexAdapter.js	/^  handleExchangeOrder(order) {$/;"	m	class:PoloniexAdapter
 handleFundingTrade	src/adapters/KrakenFuturesAdapter.js	/^  handleFundingTrade(line) {$/;"	m	class:Position
 handleLine	src/adapters/KrakenFuturesAdapter.js	/^  handleLine(line) {$/;"	m	class:Position
-handleMarginTrade	src/adapters/PoloniexAdapter.js	/^  handleMarginTrade(line) {}$/;"	m	class:PoloniexAdapter
-handleMarginTrade	src/resources/PoloniexAdapter.js	/^  function handleMarginTrade(line) {};$/;"	f	function:PoloniexAdapter.processCsvData
+handleMarginOrder	src/adapters/PoloniexAdapter.js	/^  handleMarginOrder(order) {$/;"	m	class:PoloniexAdapter
 handleOrder	src/adapters/FtxAdapter.js	/^  handleOrder(order) {$/;"	m	class:Position
-handleSettleMentTrade	src/adapters/PoloniexAdapter.js	/^  handleSettleMentTrade(line) {}$/;"	m	class:PoloniexAdapter
-handleSettleMentTrade	src/resources/PoloniexAdapter.js	/^  function handleSettleMentTrade(line) {};$/;"	f	function:PoloniexAdapter.processCsvData
+handleOrder	src/adapters/PoloniexAdapter.js	/^  handleOrder(order) {$/;"	m	class:Position
 har-schema	package-lock.json	/^        "har-schema": "^2.0.0"$/;"	s	object:dependencies.har-validator.requires
 har-schema	package-lock.json	/^    "har-schema": {$/;"	o	object:dependencies
 har-validator	package-lock.json	/^        "har-validator": "~5.1.3",$/;"	s	object:dependencies.request.requires
@@ -2442,10 +2456,9 @@ inherits	package-lock.json	/^        "inherits": "2.0.3",$/;"	s	object:dependenc
 inherits	package-lock.json	/^        "inherits": "~2.0.3",$/;"	s	object:dependencies.readable-stream.requires
 inherits	package-lock.json	/^    "inherits": {$/;"	o	object:dependencies
 initializeOrdersData	src/resources/__tests__/leveraged-position.spec.js	/^function initializeOrdersData() {$/;"	f
-insert	src/ohlc/btc.js	/^	insert(key, value) {$/;"	m	class:DatePriceMap
-insert	src/ohlc/data-price-map.js	/^	insert(key, value) {$/;"	m	class:DatePriceMap
-insert	src/ohlcv/data-price-map.js	/^	insert(key, value) {$/;"	m	class:DatePriceMap
 insert	src/ohlcv/date-price-map.js	/^	insert(key, value) {$/;"	m	class:DatePriceMap
+insert	src/utils/Map.js	/^  insert(key, value) {$/;"	m	class:Map
+integrate	src/adapters/PoloniexAdapter.js	/^  integrate(trade) {$/;"	m	class:Order
 integrity	package-lock.json	/^              "integrity": "sha1-8GVWEJaj8dou9GJy+BXIQNh+DIk=",$/;"	s	object:dependencies.unset-value.dependencies.has-value.dependencies.isobject
 integrity	package-lock.json	/^              "integrity": "sha1-MeohpzS6ubuw8yRm2JOupR5KPGQ=",$/;"	s	object:dependencies.has-values.dependencies.is-number.dependencies.kind-of
 integrity	package-lock.json	/^              "integrity": "sha1-MeohpzS6ubuw8yRm2JOupR5KPGQ=",$/;"	s	object:dependencies.sane.dependencies.is-number.dependencies.kind-of
@@ -2788,7 +2801,7 @@ integrity	package-lock.json	/^      "integrity": "sha1-Fhx9rBd2Wf2YEfQ3cfqZOBR4Y
 integrity	package-lock.json	/^      "integrity": "sha1-G2HAViGQqN\/2rjuyzwIAyhMLhtQ=",$/;"	s	object:dependencies.escape-string-regexp
 integrity	package-lock.json	/^      "integrity": "sha1-G2gcIf+EAzyCZUMJBolCDRhxUdw=",$/;"	s	object:dependencies.caseless
 integrity	package-lock.json	/^      "integrity": "sha1-GLKB2lhbHFxR3vJMkw7SmgvmsXc=",$/;"	s	object:dependencies.has-value
-integrity	package-lock.json	/^      "integrity": "sha1-GwqzvVU7Kg1jmdKcDj6gslIHgyc=",$/;"	s	object:dependencies.functional-red-black-tree
+integrity	package-lock.json	/^      "integrity": "sha1-GwqzvVU7Kg1jmdKcDj6gslIHgyc="$/;"	s	object:dependencies.functional-red-black-tree
 integrity	package-lock.json	/^      "integrity": "sha1-HADHQ7QzzQpOgHWPe2SldEDZ\/wA=",$/;"	s	object:dependencies.lines-and-columns
 integrity	package-lock.json	/^      "integrity": "sha1-I2QN17QtAEM5ERQIIOXPRA5SHdE=",$/;"	s	object:dependencies.tmpl
 integrity	package-lock.json	/^      "integrity": "sha1-IPEzZIGwg811M3mSoWlxqi2QaUc=",$/;"	s	object:dependencies.on-finished
@@ -2929,6 +2942,7 @@ integrity	package-lock.json	/^      "integrity": "sha512-6L285Sgu9gphrcpDXINvm0M
 integrity	package-lock.json	/^      "integrity": "sha512-6Pesp1w0DEX1N550i\/uGV\/TqucVL4AM\/pgThFSN\/Qq9si1\/DF9aIHs1BxD8V\/QU/;"	s	object:dependencies.bl
 integrity	package-lock.json	/^      "integrity": "sha512-6VPD0Pc1lpTqw0aKoeRTMiB+kWhAoT24PA+ksWSBrFtl5SIRVpZlwN3NNPQjehA2E\/91/;"	s	object:dependencies.@babel/plugin-syntax-optional-catch-binding
 integrity	package-lock.json	/^      "integrity": "sha512-6\/JUQv0ELQ1igjGDzHkXbVDRxkfA57Zw7PfiupdLFJYrgFqY5ZP8xxbpp2lU3EPwYx89/;"	s	object:dependencies.webpack-merge
+integrity	package-lock.json	/^      "integrity": "sha512-6dNZu0Ki+gyV0eBsFKJhYr+MdQYAzFUGlBMNj3GNrmHxmz1lfRa24CjFObPXtjcetlOv5/;"	s	object:dependencies.papaparse
 integrity	package-lock.json	/^      "integrity": "sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2P/;"	s	object:dependencies.normalize-path
 integrity	package-lock.json	/^      "integrity": "sha512-6fPc+R4ihwqP6N\/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS\//;"	s	object:dependencies.strip-json-comments
 integrity	package-lock.json	/^      "integrity": "sha512-6m+9Z3Gv9wN0WFVasqjCL\/06+EFCMTqDEUl\/b87HYK2rAPTyfz4ZIuSlPhY51PIQRWx/;"	s	object:dependencies.jest-diff
@@ -3029,7 +3043,6 @@ integrity	package-lock.json	/^      "integrity": "sha512-KmfKL3b6G+RXvP8N1vr3Tq1
 integrity	package-lock.json	/^      "integrity": "sha512-KoK9ErH1MBlCPxV0VANkXW2\/dw4vlbGDrFgz8bmUsBGYkFRcbRwMh6cIJubdPrkxRwuG/;"	s	object:dependencies.@babel/plugin-syntax-optional-chaining
 integrity	package-lock.json	/^      "integrity": "sha512-L28STB170nwWS63UjtlEOE3dldQApaJXZkOI1uMFfzf3rRuPegHaHesyee+YxQ+W6SvRD/;"	s	object:dependencies.camelcase
 integrity	package-lock.json	/^      "integrity": "sha512-L3hKV5R\/p5o81R7O02IGnwpDmkp6E982XhtbuwSe3O4qOtMMMtodicASA1Cny2U+aCXc/;"	s	object:dependencies.arr-flatten
-integrity	package-lock.json	/^      "integrity": "sha512-Lb7jN\/4bTpiuGPrYy4tkKoUS8sTki8zacB5ke1p5zolhcSE4TlWgrlsxjrDTbG\/dFVh/;"	s	object:dependencies.papaparse
 integrity	package-lock.json	/^      "integrity": "sha512-Ls8\/VBwH577+pw7Ku1QkUWIyRRNHpYlts7+qSqBBFCW3I8QteB9DxfcZ5YJpOwH6Ihe\//;"	s	object:dependencies.@babel/helper-module-transforms
 integrity	package-lock.json	/^      "integrity": "sha512-LwZy+p3SFs1Pytd\/jYct4wpv49HiYCqd9Rlc5ZVdk0V+8Yzv6jR5Blk3TRmPL1ft69Tx/;"	s	object:dependencies.pump
 integrity	package-lock.json	/^      "integrity": "sha512-LwaxwyZ72Lk7vZINtNNrywX0ZuLyStrdDtabefZKAY5ZGJhVtgdznluResxNmPitE0SAO/;"	s	object:dependencies.glob
@@ -3469,8 +3482,10 @@ is-wsl	package-lock.json	/^        "is-wsl": "^2.2.0",$/;"	s	object:dependencies
 is-wsl	package-lock.json	/^    "is-wsl": {$/;"	o	object:dependencies
 isComplete	src/adapters/FtxAdapter.js	/^  isComplete() {$/;"	m	class:Position
 isComplete	src/adapters/KrakenFuturesAdapter.js	/^  isComplete() {$/;"	m	class:Position
+isComplete	src/adapters/PoloniexAdapter.js	/^  isComplete() {$/;"	m	class:Position
 isEmpty	src/adapters/FtxAdapter.js	/^  isEmpty() {$/;"	m	class:Position
 isEmpty	src/adapters/KrakenFuturesAdapter.js	/^  isEmpty() {$/;"	m	class:Position
+isEmpty	src/adapters/PoloniexAdapter.js	/^  isEmpty() {$/;"	m	class:Position
 isSplit	src/adapters/FtxAdapter.js	/^      isSplit: true$/;"	p	class:Order.split.orderRight
 isSplit	src/adapters/FtxAdapter.js	/^      isSplit: true,$/;"	p	class:Order.split.orderLeft
 isarray	package-lock.json	/^                "isarray": "1.0.0"$/;"	s	object:dependencies.unset-value.dependencies.has-value.dependencies.isobject.requires
@@ -3724,8 +3739,6 @@ license	package.json	/^  "license": "ISC",$/;"	s
 lines-and-columns	package-lock.json	/^        "lines-and-columns": "^1.1.6"$/;"	s	object:dependencies.parse-json.requires
 lines-and-columns	package-lock.json	/^    "lines-and-columns": {$/;"	o	object:dependencies
 linesToTrades	src/resources/GdaxAdapter.js	/^function linesToTrades(lines) {$/;"	f
-load	src/ohlc/data-price-map.js	/^	load(filePath) {$/;"	m	class:DatePriceMap
-load	src/ohlcv/data-price-map.js	/^	load(filePath) {$/;"	m	class:DatePriceMap
 load	src/ohlcv/date-price-map.js	/^	load(filePath) {$/;"	m	class:DatePriceMap
 loader-runner	package-lock.json	/^        "loader-runner": "^4.2.0",$/;"	s	object:dependencies.webpack.requires
 loader-runner	package-lock.json	/^    "loader-runner": {$/;"	o	object:dependencies
@@ -3880,6 +3893,7 @@ nwsapi	package-lock.json	/^        "nwsapi": "^2.2.0",$/;"	s	object:dependencies
 nwsapi	package-lock.json	/^    "nwsapi": {$/;"	o	object:dependencies
 oauth-sign	package-lock.json	/^        "oauth-sign": "~0.9.0",$/;"	s	object:dependencies.request.requires
 oauth-sign	package-lock.json	/^    "oauth-sign": {$/;"	o	object:dependencies
+obj	src/adapters/PoloniexAdapter.js	/^        var obj = {$/;"	c	class:PoloniexAdapter.ordersToCsv
 object-copy	package-lock.json	/^        "object-copy": "^0.1.0"$/;"	s	object:dependencies.static-extend.requires
 object-copy	package-lock.json	/^    "object-copy": {$/;"	o	object:dependencies
 object-visit	package-lock.json	/^        "object-visit": "^1.0.0"$/;"	s	object:dependencies.collection-visit.requires
@@ -3922,9 +3936,11 @@ order1	src/resources/__tests__/leveraged-position.spec.js	/^				order1: {$/;"	c	
 order2	src/resources/__tests__/leveraged-position.spec.js	/^				order2: {$/;"	c	class:initializeOrdersData.validPosition1
 orderId	src/adapters/FtxAdapter.js	/^      orderId: this.orderId,$/;"	p	class:Order.split.orderLeft
 orderId	src/adapters/FtxAdapter.js	/^      orderId: this.orderId,$/;"	p	class:Order.split.orderRight
+orderInvalidates	src/adapters/PoloniexAdapter.js	/^  orderInvalidates(order) {$/;"	m	class:Position
 orderLeft	src/adapters/FtxAdapter.js	/^    var orderLeft = {$/;"	c	class:Order.split
 orderRight	src/adapters/FtxAdapter.js	/^    var orderRight = {$/;"	c	class:Order.split
 orderSchema	src/resources/order/order.model.js	/^var orderSchema = new Schema({$/;"	v
+ordersToCsv	src/adapters/PoloniexAdapter.js	/^  ordersToCsv(orders) {$/;"	m	class:PoloniexAdapter
 p-each-series	package-lock.json	/^        "p-each-series": "^2.1.0",$/;"	s	object:dependencies.@jest/core.requires
 p-each-series	package-lock.json	/^    "p-each-series": {$/;"	o	object:dependencies
 p-finally	package-lock.json	/^        "p-finally": "^1.0.0",$/;"	s	object:dependencies.execa.requires
@@ -3939,7 +3955,7 @@ p-try	package-lock.json	/^        "p-try": "^2.0.0"$/;"	s	object:dependencies.p-
 p-try	package-lock.json	/^    "p-try": {$/;"	o	object:dependencies
 papaparse	dist/bundle.js	/^\/***\/ "papaparse":$/;"	p	class:__webpack_modules__
 papaparse	package-lock.json	/^    "papaparse": {$/;"	o	object:dependencies
-papaparse	package.json	/^    "papaparse": "^5.3.0",$/;"	s	object:devDependencies
+papaparse	package.json	/^    "papaparse": "^5.3.2",$/;"	s	object:devDependencies
 parent-module	package-lock.json	/^        "parent-module": "^1.0.0",$/;"	s	object:dependencies.import-fresh.requires
 parent-module	package-lock.json	/^    "parent-module": {$/;"	o	object:dependencies
 parse-json	package-lock.json	/^        "parse-json": "^5.0.0",$/;"	s	object:dependencies.read-pkg.requires
@@ -4017,6 +4033,7 @@ price	src/resources/GdaxAdapter.js	/^        price: price,$/;"	p	class:linesToTr
 price	src/resources/__tests__/leveraged-position.spec.js	/^						'price': 10000,$/;"	p	class:initializeOrdersData.validPosition1.order1
 price	src/resources/__tests__/leveraged-position.spec.js	/^						'price': 20000,$/;"	p	class:initializeOrdersData.validPosition1.order2
 print	src/adapters/FtxAdapter.js	/^  print() {$/;"	m	class:Position
+printMarginOrders	src/adapters/PoloniexAdapter.js	/^  printMarginOrders(orders) {$/;"	m	class:PoloniexAdapter
 process-nextick-args	package-lock.json	/^        "process-nextick-args": "~2.0.0",$/;"	s	object:dependencies.readable-stream.requires
 process-nextick-args	package-lock.json	/^    "process-nextick-args": {$/;"	o	object:dependencies
 processApiData	src/adapters/BinanceAdapter.js	/^  async processApiData(userClient) {} $/;"	m	class:BinanceAdapter
@@ -4033,9 +4050,6 @@ processCsvData	src/adapters/GeminiAdapter.js	/^  processCsvData() {}$/;"	m	class
 processCsvData	src/adapters/KrakenAdapter.js	/^  processCsvData() {}$/;"	m	class:KrakenAdapter
 processCsvData	src/adapters/KrakenFuturesAdapter.js	/^  processCsvData(lines) {$/;"	m	class:KrakenFuturesAdapter
 processCsvData	src/adapters/PoloniexAdapter.js	/^  processCsvData(lines) {$/;"	m	class:PoloniexAdapter
-processCsvData	src/resources/PoloniexAdapter.js	/^  async processCsvData(lines) {$/;"	m	class:PoloniexAdapter
-processLine	src/ohlc/data-price-map.js	/^		function processLine(classObj, line) {$/;"	f	function:DatePriceMap.load
-processLine	src/ohlcv/data-price-map.js	/^		function processLine(classObj, line) {$/;"	f	function:DatePriceMap.load
 processLine	src/ohlcv/date-price-map.js	/^		function processLine(classObj, line) {$/;"	f	function:DatePriceMap.load
 progress	package-lock.json	/^        "progress": "^2.0.0",$/;"	s	object:dependencies.eslint.requires
 progress	package-lock.json	/^    "progress": {$/;"	o	object:dependencies
@@ -4101,6 +4115,7 @@ regexp-clone	package-lock.json	/^        "regexp-clone": "^1.0.0",$/;"	s	object:
 regexp-clone	package-lock.json	/^    "regexp-clone": {$/;"	o	object:dependencies
 regexpp	package-lock.json	/^        "regexpp": "^3.1.0",$/;"	s	object:dependencies.eslint.requires
 regexpp	package-lock.json	/^    "regexpp": {$/;"	o	object:dependencies
+remove	src/utils/Map.js	/^  remove(key) {$/;"	m	class:Map
 remove-trailing-separator	package-lock.json	/^            "remove-trailing-separator": "^1.0.1"$/;"	s	object:dependencies.sane.dependencies.normalize-path.requires
 remove-trailing-separator	package-lock.json	/^    "remove-trailing-separator": {$/;"	o	object:dependencies
 removed	src/utils/crud.js	/^    let removed = await model.deleteMany({});$/;"	v
@@ -5380,7 +5395,7 @@ resolved	package-lock.json	/^      "resolved": "https:\/\/registry.npmjs.org\/p-
 resolved	package-lock.json	/^      "resolved": "https:\/\/registry.npmjs.org\/p-limit\/-\/p-limit-2.3.0.tgz",$/;"	s	object:dependencies.p-limit
 resolved	package-lock.json	/^      "resolved": "https:\/\/registry.npmjs.org\/p-locate\/-\/p-locate-4.1.0.tgz",$/;"	s	object:dependencies.p-locate
 resolved	package-lock.json	/^      "resolved": "https:\/\/registry.npmjs.org\/p-try\/-\/p-try-2.2.0.tgz",$/;"	s	object:dependencies.p-try
-resolved	package-lock.json	/^      "resolved": "https:\/\/registry.npmjs.org\/papaparse\/-\/papaparse-5.3.0.tgz",$/;"	s	object:dependencies.papaparse
+resolved	package-lock.json	/^      "resolved": "https:\/\/registry.npmjs.org\/papaparse\/-\/papaparse-5.3.2.tgz",$/;"	s	object:dependencies.papaparse
 resolved	package-lock.json	/^      "resolved": "https:\/\/registry.npmjs.org\/parent-module\/-\/parent-module-1.0.1.tgz",$/;"	s	object:dependencies.parent-module
 resolved	package-lock.json	/^      "resolved": "https:\/\/registry.npmjs.org\/parse-json\/-\/parse-json-5.2.0.tgz",$/;"	s	object:dependencies.parse-json
 resolved	package-lock.json	/^      "resolved": "https:\/\/registry.npmjs.org\/parse5\/-\/parse5-6.0.1.tgz",$/;"	s	object:dependencies.parse5
@@ -5974,7 +5989,6 @@ unpipe	package-lock.json	/^        "unpipe": "~1.0.0"$/;"	s	object:dependencies.
 unpipe	package-lock.json	/^    "unpipe": {$/;"	o	object:dependencies
 unset-value	package-lock.json	/^        "unset-value": "^1.0.0"$/;"	s	object:dependencies.cache-base.requires
 unset-value	package-lock.json	/^    "unset-value": {$/;"	o	object:dependencies
-update	src/ohlc/btc.js	/^	async update() {$/;"	m	class:DatePriceMap
 updateSettings	src/resources/user/user.model.js	/^userSchema.methods.updateSettings = async function(settings) {$/;"	c	class:userSchema.methods
 uri-js	package-lock.json	/^            "uri-js": "^4.2.2"$/;"	s	object:dependencies.table.dependencies.ajv.requires
 uri-js	package-lock.json	/^        "uri-js": "^4.2.2"$/;"	s	object:dependencies.ajv.requires
@@ -6834,9 +6848,9 @@ version	package-lock.json	/^      "version": "5.2.0",$/;"	s	object:dependencies.
 version	package-lock.json	/^      "version": "5.2.0",$/;"	s	object:dependencies.read-pkg
 version	package-lock.json	/^      "version": "5.2.2",$/;"	s	object:dependencies.big.js
 version	package-lock.json	/^      "version": "5.24.4",$/;"	s	object:dependencies.webpack
-version	package-lock.json	/^      "version": "5.3.0",$/;"	s	object:dependencies.papaparse
 version	package-lock.json	/^      "version": "5.3.1",$/;"	s	object:dependencies.acorn-jsx
 version	package-lock.json	/^      "version": "5.3.1",$/;"	s	object:dependencies.camelcase
+version	package-lock.json	/^      "version": "5.3.2",$/;"	s	object:dependencies.papaparse
 version	package-lock.json	/^      "version": "5.5.0",$/;"	s	object:dependencies.supports-color
 version	package-lock.json	/^      "version": "5.6.0",$/;"	s	object:dependencies.terser
 version	package-lock.json	/^      "version": "5.7.0",$/;"	s	object:dependencies.enhanced-resolve

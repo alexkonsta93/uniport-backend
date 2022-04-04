@@ -91,7 +91,7 @@ class Position {
     this.dateClose = null;
     this.base = null;
     this.quote = null;
-    this.exchange = 'kraken futures';
+    this.exchange = 'Kraken Futures';
     this.type = 'future'
   }
 
