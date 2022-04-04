@@ -1,6 +1,7 @@
 import createRBTree from 'functional-red-black-tree';
 import Papa from 'papaparse';
 import fs from 'fs';
+import moment from 'moment';
 
 export default class DatePriceMap {
 
@@ -14,15 +15,20 @@ export default class DatePriceMap {
 	}
 
 	getValue(key) {
-		const iter = this._tree.find(key);
-		return iter.value;
+		const iter = this._tree.get(key);
+		return iter.node.value;
+	}
+
+	getValueLE(key) {
+		const iter = this._tree.le(key);
+		return iter.node.value;
 	}
 
 	load(filePath) {
 		function processLine(classObj, line) {
-			const datetime = new Date(line.timestamp);
+			const datetime = moment.utc(line.timestamp);
 			const price = Number(line.open);
-			classObj.insert(datetime, price);
+			classObj.insert(datetime.unix(), price);
 		}
 
 		try {

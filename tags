@@ -702,6 +702,7 @@ buffer-from	package-lock.json	/^        "buffer-from": "^1.0.0",$/;"	s	object:de
 buffer-from	package-lock.json	/^    "buffer-from": {$/;"	o	object:dependencies
 bugs	package.json	/^  "bugs": {$/;"	o
 buildAmount	src/adapters/PoloniexAdapter.js	/^  buildAmount(line) {$/;"	m	class:PoloniexAdapter
+buildCompensationTrade	src/adapters/PoloniexAdapter.js	/^  buildCompensationTrade(order, pnl) {$/;"	m	class:Position
 buildOrders	src/adapters/FtxAdapter.js	/^  async buildOrders(trades) {$/;"	m	class:FtxAdapter
 buildOrders	src/adapters/PoloniexAdapter.js	/^  buildOrders(lines) {$/;"	m	class:PoloniexAdapter
 buildPair	src/adapters/PoloniexAdapter.js	/^  buildPair(line) {$/;"	m	class:PoloniexAdapter
@@ -2298,6 +2299,7 @@ getOrderHistory	src/clients/FtxClient.js	/^  async getOrderHistory() {$/;"	m	cla
 getPositions	src/clients/FtxClient.js	/^  getPositions() {$/;"	m	class:FtxClient
 getValue	src/ohlcv/date-price-map.js	/^	getValue(key) {$/;"	m	class:DatePriceMap
 getValue	src/utils/Map.js	/^  getValue(key) {$/;"	m	class:Map
+getValueLE	src/ohlcv/date-price-map.js	/^	getValueLE(key) {$/;"	m	class:DatePriceMap
 getpass	package-lock.json	/^        "getpass": "^0.1.1",$/;"	s	object:dependencies.sshpk.requires
 getpass	package-lock.json	/^    "getpass": {$/;"	o	object:dependencies
 glob	package-lock.json	/^        "glob": "^7.1.1",$/;"	s	object:dependencies.jest-config.requires

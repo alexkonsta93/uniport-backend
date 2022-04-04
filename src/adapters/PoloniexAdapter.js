@@ -29,16 +29,6 @@ export default class PoloniexAdapter {
     lines = lines.reverse();
     this.orders = this.buildOrders(lines);
 
-    /*
-    for (let i = 0; i < this.orders.length; i++) {
-      const order = this.orders[i];
-      if (order.type === 'spot') {
-        this.handleExchangeOrder(order);
-      } else {
-        i += this.handleMarginOrder(order);
-      }
-    }
-    */
     for (let order of this.orders) {
       if (order.type === 'spot') {
         this.handleExchangeOrder(order);
@@ -46,21 +36,13 @@ export default class PoloniexAdapter {
         this.handleMarginOrder(order);
       }
     }
-    //console.log(this.orders);
     //this.printMarginOrders(this.marginOrders);
     console.log(this.positions);
-    /*
-    for (let position of this.positions) {
-      console.log(position);
-    }
-    */
-    //console.log(this.positionRouter.map);
   }
 
   printMarginOrders(orders) {
     const csv = this.ordersToCsv(orders);
-    console.log(csv);
-    fs.writeFile('../margin-orders.csv', csv, err => {
+    fs.writeFile('./margin-orders.csv', csv, { flag: 'w' }, err => {
         if (err) throw err;
     });
   }
@@ -112,25 +94,10 @@ export default class PoloniexAdapter {
    * @return -1 if i in loop should decrease to repeat order; 0 otherwise
    */
   handleMarginOrder(order) {
-    //console.log(order);
+    //this.marginOrders.push(order);
     const pair = `${order.base}${order.quote}`;
     let currentPosition = this.positionRouter.getCurrent(pair);
 
-    /*
-    if (currentPosition.orderInvalidates(order)) {
-      this.positions.push(currentPosition);
-      this.positionRouter.finalize(pair);
-      return -1;
-    } else if (currentPosition.isComplete(order)) {
-      this.positions.push(currentPosition);
-      this.positionRouter.finalize(pair);
-      return 0;
-    } else {
-      currentPosition.handleOrder(order);
-      return 0;
-    }
-    */
-  
     currentPosition.handleOrder(order);
     // If complete
     if (currentPosition.isComplete()) {
@@ -156,22 +123,12 @@ export default class PoloniexAdapter {
     trade.exchange = 'Poloniex';
 
     const pair = this.buildPair(line);
-    //const pair = line['Market'].split('/');
     trade.base = pair[0];
     trade.quote = pair[1];
 
     trade.price = this.buildPrice(line);
-    //trade.price = parseFloat(line['Price']);
 
     trade.amount = this.buildAmount(line);
-    /*
-    const amount = parseFloat(line['Amount']);
-    if (line['Type'] === 'Buy') {
-      trade.amount = amount;
-    } else {
-      trade.amount = -amount;
-    }
-    */
 
     trade.orderId = line['Order Number'];
 
@@ -182,19 +139,15 @@ export default class PoloniexAdapter {
     let price = trade.price;
     if (trade.quote !== 'USD') {
       const dateTime = moment.utc(trade.dateTime);
-      dateTime.set('hour', 0);
-      dateTime.set('minute', 0);
-      dateTime.set('second', 0);
-      dateTime.set('millisecond', 0);
 
       switch (trade.quote) {
         case 'ETH': {
-          const ethPrice = this.ethHistory.getValue(dateTime.format());
+          const ethPrice = this.ethHistory.getValueLE(dateTime.unix());
           price = price * ethPrice;
           break;
         }
         case 'BTC': {
-          const btcPrice = this.btcHistory.getValue(dateTime.format());
+          const btcPrice = this.btcHistory.getValueLE(dateTime.unix());
           price = price * btcPrice;
           break;
         }
@@ -362,7 +315,7 @@ class Position {
     this.basisTrades.push(order);
     
     // Finalize when complete
-    if (this.isComplete(order)) {
+    if (this.isComplete()) {
       this.finalize(order);
     }
   }
@@ -375,19 +328,57 @@ class Position {
     let pnl = 0.0; 
     let fees = 0.0;
     for (let order of this.basisTrades) {
-      pnl += (order.amount * order.usdPrice);
+      pnl += (order.amount * order.price);
       fees += fees;
     }
-    /*
-    if (this.basisTrades[0].amount > 0) {
-      pnl = -pnl;
-    }
-    */
-    //this.pnl = pnl - fees;
-    this.pnl = -pnl;
+    this.pnl = -pnl - fees;
 
-    //
+    this.buildCompensationTrade(order, this.pnl);
   }
+
+  buildCompensationTrade(order, pnl) {
+    const compensation = {}
+
+    if (Math.abs(this.outstanding) > 1) {
+      // If negative pnl
+      compensation.dateTime =  order.dateTime;
+      compensation.price = order.usdPrice;
+      compensation.usdPrice = order.usdPrice;
+      compensation.base = order.base;
+      compensation.quote = 'USD';
+      compensation.userId = order.userId;
+      compensation.type = 'spot';
+      compensation.fee = 0.0;
+      compensation.feeCurrency = 'USD';
+      compensation.exchange = 'Poloniex';
+      if (this.basisTrades[0] > 0) {
+        // If long
+        compensation.amount = -this.outstanding;
+      } else {
+        // If short
+        compensation.amount = this.outstanding;
+      }
+      this.pnl -= Math.abs(this.outstanding * order.price);
+      this.pnl = this.pnl * order.usdPrice
+    } else {
+      // If positive pnl
+      compensation.dateTime = order.dateTime;
+      compensation.price = order.usdPrice/order.price;
+      compensation.usdPrice = order.usdPrice/order.price;
+      compensation.base = order.quote;
+      compensation.quote = 'USD';
+      compensation.userId = order.userId;
+      compensation.type = 'spot';
+      compensation.fee = 0.0;
+      compensation.feeCurrency = 'USD';
+      compensation.exchange = 'Poloniex';
+      this.pnl = this.pnl * order.usdPrice;
+      compensation.amount = this.pnl/(order.usdPrice/order.price);
+    }
+
+    this.compensationTrades.push(compensation);
+  }
+
 }
 
 class Order {
