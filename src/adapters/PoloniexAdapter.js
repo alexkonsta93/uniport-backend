@@ -25,9 +25,9 @@ export default class PoloniexAdapter {
   processCsvData(lines) {
     // Reverse for chronological order
     lines = lines.reverse();
-    this.orders = this.buildOrders(lines);
+    const orders = this.buildOrders(lines);
 
-    for (let order of this.orders) {
+    for (let order of orders) {
       if (order.type === 'spot') {
         this.handleExchangeOrder(order);
       } else {
@@ -259,7 +259,6 @@ class Position {
     this.type = 'margin'
     
     this.max = 0.0;
-    //this.adapter = adapter;
   }
 
   /**
@@ -289,7 +288,7 @@ class Position {
   }
 
   /*
-   * Checks if initiated with margin trades
+   * Checks if positiona has been initiateded
    *
    * @return boolean
    */

@@ -24,6 +24,7 @@ import BinanceAdapter from '../../adapters/BinanceAdapter';
 import GeminiAdapter from '../../adapters/GeminiAdapter';
 import GdaxAdapter from '../../adapters/GdaxAdapter';
 import PoloniexAdapter from '../../adapters/PoloniexAdapter';
+import BitfinexAdapter from '../../adapters/BitfinexAdapter';
 
 var router = crudRouter(User);
 
@@ -202,8 +203,11 @@ function selectAdapter(exchange, userId) {
     case 'Poloniex':
       adapter = new PoloniexAdapter(userId);
       break;
+    case 'Bitfinex':
+      adapter = new BitfinexAdapter(userId);
+      break;
     default:
-      throw new Error('exchange not recognized');
+      throw new Error('Exchange not recognized');
   }
   return adapter
 }
