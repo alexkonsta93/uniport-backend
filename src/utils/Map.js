@@ -1,18 +1,25 @@
 import createRBTree from "functional-red-black-tree";
 
 export default class Map {
-  constructor() {
+  constructor(doubles = true) {
     this._tree = createRBTree();
+    this.doubles = doubles;
   }
 
   insert(key, value) {
+    if (!this.doubles && this.contains(key)) return;
     this._tree = this._tree.insert(key, value);
   }
 
   getValue(key) {
 		const iter = this._tree.find(key);
-		return iter.value;
+		return iter.node.value;
   }
+
+	getValueGE(key) {
+		const iter = this._tree.ge(key);
+		return iter.node.value;
+	}
 
   remove(key) {
     this._tree = this._tree.remove(key);

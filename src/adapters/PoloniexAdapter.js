@@ -35,10 +35,13 @@ export default class PoloniexAdapter {
       }
     }
     //this.printMarginOrders(this.marginOrders);
+    console.log(this.positions);
+    /*
     return {
       'spotOrders': this.spotOrders,
       'positions': this.positions
     };
+    */
   }
 
   printMarginOrders(orders) {
