@@ -15,7 +15,6 @@ var orderSchema = new Schema({
     type: String,
     enum: exchanges,
     required: true,
-    lowercase: true
   },
   orderId: {
     type: String,
@@ -69,7 +68,7 @@ var orderSchema = new Schema({
   },
   isSplit: {
     type: Boolean,
-    required: true
+    default: false
   },
   comments: {
     type: String,
@@ -89,7 +88,7 @@ orderSchema.index({
   dateTime: 1,
   type: 1,
   exchange: 1, 
-  exchangeOrderId: 1, 
+  orderId: 1, 
   quote: 1, 
   base: 1
 }, { unique: true });

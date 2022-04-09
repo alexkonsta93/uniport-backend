@@ -3,6 +3,10 @@ import moment from 'moment';
 import Map from '../utils/Map';
 import Papa from 'papaparse';
 import fs from 'fs';
+import OrderModel from '../resources/order/order.model';
+import PositionModel from '../resources/position/position.model';
+import ExchangeAccountant from './ExchangeAccountant';
+import SortedMap from '../utils/SortedMap';
 
 export default class PoloniexAdapter {
   constructor(userId) {
@@ -15,6 +19,8 @@ export default class PoloniexAdapter {
     this.marginOrders = [];
     this.positions = [];
     this.positionRouter = new PositionRouter(userId);
+    this.accountant = new ExchangeAccountant();
+    this.actions = new SortedMap();
   }
 
   /*
@@ -29,19 +35,81 @@ export default class PoloniexAdapter {
 
     for (let order of orders) {
       if (order.type === 'spot') {
-        this.handleExchangeOrder(order);
+        this.spotOrders.push(order);
       } else {
+        this.marginOrders.push(order);
         this.handleMarginOrder(order);
       }
     }
     //this.printMarginOrders(this.marginOrders);
-    console.log(this.positions);
-    /*
+    //console.log(this.positions);
     return {
-      'spotOrders': this.spotOrders,
+      'orders': this.spotOrders,
       'positions': this.positions
     };
-    */
+  }
+
+  processLocalData() {
+    // Trades file
+    let lines = this.readTradesFile();
+    lines = lines.reverse();
+    const orders = this.buildOrders(lines);
+
+    for (let order of orders) {
+      if (order.type === 'spot') {
+        this.spotOrders.push(order);
+        this.actions.insert(order.dateTime, order);
+        //this.accountant.handleTrade(order);
+      } else {
+        this.handleMarginOrder(order);
+      }
+    }
+
+    // Deposits file
+    lines = this.readDepositsFile();
+    lines = lines.reverse();
+    let transfers = this.buildDeposits(lines);
+    for (let transfer of transfers) {
+      this.actions.insert(transfer.dateTime, transfer);
+      //this.accountant.handleTransfer(transfer);
+    }
+
+
+    // Withdrawals file
+    lines = this.readWithdrawalsFile();
+    lines = lines.reverse();
+    transfers = this.buildWithdrawals(lines);
+    for (let transfer of transfers) {
+      //this.accountant.handleTransfer(transfer);
+      this.actions.insert(transfer.dateTime, transfer);
+    }
+
+    for (let action of this.actions.getValues()) {
+      console.log(action.format());
+      if (action.dateOpen) {
+        this.accountant.handlePosition(action);
+      } else if (action.price) {
+        this.accountant.handleTrade(action);
+      } else {
+        this.accountant.handleTransfer(action);
+      }
+      console.log(this.accountant.getAccounts());
+    }
+  }
+
+  readTradesFile() {
+    const file = "/home/alexandros/Projects/uniport/uniport-backend/src/adapters/Poloniex/trades-2022-04-02T11_51_46-04_00.csv";
+    return this.readFile(file);
+  }
+
+  readDepositsFile() {
+    const file = "/home/alexandros/Projects/uniport/uniport-backend/src/adapters/Poloniex/deposits-2022-04-02T11_52_00-04_00.csv";
+    return this.readFile(file);
+  }
+
+  readWithdrawalsFile() {
+    const file = "/home/alexandros/Projects/uniport/uniport-backend/src/adapters/Poloniex/withdrawals-2022-04-02T11_51_55-04_00.csv";
+    return this.readFile(file);
   }
 
   printMarginOrders(orders) {
@@ -69,12 +137,38 @@ export default class PoloniexAdapter {
       })
   }
 
+  readFile(file) {
+    const lines = [];
+    try {
+      const data = fs.readFileSync(file, 'utf-8');
+			Papa.parse(data, {
+				header: true,
+				complete: (results) => {
+          results.data.forEach(line => {
+            lines.push(line);
+          });
+				},
+				error: (error) => {
+					console.log(error);
+				},
+				skipEmptyLines: true
+			});
+		} catch (err) {
+			console.log(err);
+		}
+
+		return lines;
+  }
+
   buildOrders(lines) {
     const orders = [];
     let trade = this.buildTrade(lines.shift());
     let currentOrder = new Order(trade);
 
     for (let line of lines) {
+      if (line['Category'] === 'Settlement') {
+        continue;
+      }
       trade = this.buildTrade(line);
       if (trade.orderId !== currentOrder.orderId) {
         orders.push(currentOrder);
@@ -88,9 +182,58 @@ export default class PoloniexAdapter {
     return orders;
   }
 
-  handleExchangeOrder(order) {
-    this.spotOrders.push(order);
+  buildDeposits(lines) {
+    const transfers = [];
+
+    for (let line of lines) {
+      if (line['Status'] !== 'COMPLETE') {
+        continue;
+      }
+      const transfer = {};
+      transfer.dateTime = new Date(line['Date']);
+      transfer.currency = line['Currency'];
+      transfer.amount = parseFloat(line['Amount']);
+      transfer.format = function() {
+        return {
+          action: 'Transfer',
+          dateTime: this.dateTime,
+          currency: this.currency,
+          amount: this.amount
+        };
+      }
+      transfers.push(transfer);
+    }
+
+    return transfers;
   }
+
+  buildWithdrawals(lines) {
+    const transfers = [];
+
+    for (let line of lines) {
+      let status = line['Status'];
+      status = status.split(' ')[0];
+      if (status !== 'COMPLETE:') {
+        continue;
+      }
+      const transfer = {};
+      transfer.dateTime = new Date(line['Date']);
+      transfer.currency = line['Currency'];
+      transfer.amount = -parseFloat(line['Amount']);
+      transfer.format = function() {
+        return {
+          action: 'Transfer',
+          dateTime: this.dateTime,
+          currency: this.currency,
+          amount: this.amount
+        };
+      }
+      transfers.push(transfer);
+    }
+
+    return transfers;
+  }
+
 
   /* Logic that handles a margin order
    *
@@ -106,7 +249,10 @@ export default class PoloniexAdapter {
     // If complete
     if (currentPosition.isComplete()) {
       this.positions.push(currentPosition);
+      this.actions.insert(currentPosition.dateClose, currentPosition);
+      //this.accountant.handlePosition(currentPosition);
       this.positionRouter.finalize(pair);
+      
     }
 
   }
@@ -203,12 +349,46 @@ export default class PoloniexAdapter {
         type = 'margin';
         break;
       case 'Settlement':
-        type = 'spot';
+        type = 'settlement';
         break;
       default:
         throw Error("Can't recognize Poloniex line");
     }
     return type;
+  }
+  
+  async createDbEntries() {
+    // Orders
+    const orderDocs = await OrderModel.insertMany(this.spotOrders);
+
+    // Positions
+    for (let position of this.positions) {
+      // basis trades
+      let basisTradeIds = [];
+      for (let order of position.basisTrades) {
+        order = new OrderModel(order);
+        const doc = await order.save();
+        basisTradeIds.push(doc.id);
+      }
+      position.basisTradeIds = basisTradeIds;
+      delete position.basisTrades;
+
+      // compensation trades
+      let compensationTradeIds = [];
+      for (let order of position.compensationTrades) {
+        order = new OrderModel(order);
+        const doc = await order.save();
+        compensationTradeIds.push(doc.id);
+      }
+      position.compensationTradeIds = compensationTradeIds;
+      delete position.compensationTrades;
+    }
+
+    const positionDocs = await PositionModel.insertMany(this.positions);
+    return {
+      orders: orderDocs,
+      position: positionDocs
+    }
   }
 
 }
@@ -221,12 +401,9 @@ class PositionRouter {
 
   getCurrent(pair) {
     const key = pair;
-    //console.log(this.map.getKeyValuePairsArray());
     if (this.map.contains(key)) {
-      //console.log('here1');
       return this.map.getValue(key);
     } else {
-      //console.log('here2');
       const position = new Position(this.userId);
       this.map.insert(key, position);
       return position;
@@ -262,6 +439,18 @@ class Position {
     this.type = 'margin'
     
     this.max = 0.0;
+  }
+
+  format() {
+    return {
+      action: 'Position',
+      dateOpen: this.dateOpen,
+      dateClose: this.dateClose,
+      base: this.base,
+      quote: this.quote,
+      pnl: this.pnl,
+      compensationTrades: this.compensationTrades
+    }
   }
 
   /**
@@ -357,7 +546,8 @@ class Position {
       compensation.feeCurrency = 'USD';
       compensation.exchange = 'Poloniex';
       compensation.amount = this.pnl / order.usdPrice;
-    } else {
+      compensation.tradeId = null;
+    } else if (this.pnl && this.qute !== 'USD'){
       // If positive pnl
       compensation.dateTime = order.dateTime;
       compensation.price = order.usdPrice/order.price;
@@ -370,6 +560,9 @@ class Position {
       compensation.feeCurrency = 'USD';
       compensation.exchange = 'Poloniex';
       compensation.amount = this.pnl/(order.usdPrice/order.price);
+      compensation.tradeId = null;
+    } else {
+      return;
     }
 
     this.compensationTrades.push(compensation);
@@ -392,11 +585,24 @@ class Order {
     this.type = trade.type;
     this.fee = trade.fee;
     this.feeCurrency = trade.feeCurrency;
+    this.trades = [trade];
   } 
+
+  format() {
+    return {
+      action: 'Order',
+      dateTime: this.dateTime,
+      base: this.base,
+      quote: this.quote,
+      amount: this.amount,
+      price: this.price
+    };
+  }
 
   integrate(trade) {
     this.price = (this.price*this.amount + trade.price*trade.amount)/(this.amount + trade.amount);
     this.amount = this.amount + trade.amount;
     this.fee = this.fee + trade.fee;
+    this.trades.push(trade);
   }
 }

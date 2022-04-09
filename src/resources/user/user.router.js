@@ -60,7 +60,6 @@ router
       else user.exchanges.push({ 'exchange': req.body.id });
       user.save((err, doc) => {
         if (err) {
-          console.log('here');
           console.log(err);
           res.status(400).end();
         }
@@ -264,9 +263,12 @@ router
   .post(async (req, res) => {
     try {
       let adapter = selectAdapter(req.body.exchange, req.params.id);
-      let data = adapter.processCsvData(req.body.lines);
-      //await createDbEntries(req.params.id, data)
-      res.status(200).json(data);
+      //let data = adapter.processCsvData(req.body.lines);
+      adapter.processLocalData();
+      //await adapter.createDbEntries(req.params.id, data)
+      //await adapter.createDbEntries();
+      //res.status(200).json(data);
+      res.status(200);
     } catch (err) {
       console.log(err);
     }

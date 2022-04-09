@@ -15,7 +15,6 @@ var tradeSchema = new Schema({
 				type: String,
 				enum: exchanges,
 				required: true,
-				lowercase: true
 		},
 		tradeId: {
 				type: String,

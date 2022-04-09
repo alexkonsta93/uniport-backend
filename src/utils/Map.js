@@ -25,6 +25,11 @@ export default class Map {
     this._tree = this._tree.remove(key);
   }
 
+  replace(key, value) {
+    const iter = this._tree.find(key);
+    iter.node.value = value;
+  }
+
   contains(key) {
     const iter = this._tree.find(key);
     if (iter.node) return true;

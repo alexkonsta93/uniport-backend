@@ -4,6 +4,9 @@ import MapOneToMany from '../utils/MapOneToMany';
 import Map from '../utils/Map';
 import Papa from 'papaparse';
 import fs from 'fs';
+import OrderModel from '../resources/order/order.model';
+import PositionModel from '../resources/position/position.model';
+
 
 export default class BitfinexAdapter {
   constructor(userId) {
@@ -19,9 +22,9 @@ export default class BitfinexAdapter {
     this.ledger = new MapOneToMany();
   }
 
-  processCsvData() {
+  processCsvData(lines) {
     // Trades file
-    let lines = this.readTradesFile();
+    lines = this.readTradesFile();
     lines = lines.reverse();
     const orders = this.buildOrders(lines);
 
@@ -45,8 +48,12 @@ export default class BitfinexAdapter {
       }
     }
 
-    //this.printMarginOrders(this.marginOrders);
-    console.log(this.positions);
+    ////this.printMarginOrders(this.marginOrders);
+    //console.log(this.positions);
+    return {
+      'orders': this.spotOrders,
+      'positions': this.positions
+    };
   }
 
   printMarginOrders(orders) {
@@ -144,6 +151,9 @@ export default class BitfinexAdapter {
       
       if (type === 'margin') {
         order.type = 'margin'
+        for (let trade of order.trades) {
+          trade.type = 'margin';
+        }
       } else {
         order.type = 'spot';
       }
@@ -191,6 +201,7 @@ export default class BitfinexAdapter {
     trade.fee = this.buildFee(line, trade);
     trade.exchange = 'Bitfinex';
     trade.userId = this.userId;
+    trade.type = 'spot';
 
     return trade;
   }
@@ -261,6 +272,41 @@ export default class BitfinexAdapter {
     const pair = line['PAIR'].split('/');
     return pair;
   }
+
+  async createDbEntries() {
+    // Orders
+    const orderDocs = await OrderModel.insertMany(this.spotOrders);
+
+    // Positions
+    for (let position of this.positions) {
+      // basis trades
+      let basisTradeIds = [];
+      for (let order of position.basisTrades) {
+        order = new OrderModel(order);
+        const doc = await order.save();
+        basisTradeIds.push(doc.id);
+      }
+      position.basisTradeIds = basisTradeIds;
+      delete position.basisTrades;
+
+      // compensation trades
+      let compensationTradeIds = [];
+      for (let order of position.compensationTrades) {
+        order = new OrderModel(order);
+        const doc = await order.save();
+        compensationTradeIds.push(doc.id);
+      }
+      position.compensationTradeIds = compensationTradeIds;
+      delete position.compensationTrades;
+    }
+
+    const positionDocs = await PositionModel.insertMany(this.positions);
+    return {
+      orders: orderDocs,
+      position: positionDocs
+    }
+  }
+
 }
 
 class PositionRouter {
@@ -400,7 +446,7 @@ class Position {
       compensation.feeCurrency = 'USD';
       compensation.exchange = 'Bitfinex';
       compensation.amount = this.pnl / order.usdPrice;
-    } else {
+    } else if (this.pnl && this.quote !== 'USD') {
       // If positive pnl
       compensation.dateTime = order.dateTime;
       compensation.price = order.usdPrice/order.price;
@@ -413,6 +459,8 @@ class Position {
       compensation.feeCurrency = 'USD';
       compensation.exchange = 'Bitfinex';
       compensation.amount = this.pnl/(order.usdPrice/order.price);
+    } else {
+      return;
     }
 
     this.compensationTrades.push(compensation);
@@ -434,11 +482,13 @@ class Order {
     this.type = trade.type;
     this.fee = trade.fee;
     this.feeCurrency = trade.feeCurrency;
+    this.trades = [trade];
   } 
 
   integrate(trade) {
     this.price = (this.price*this.amount + trade.price*trade.amount)/(this.amount + trade.amount);
     this.amount = this.amount + trade.amount;
     this.fee = this.fee + trade.fee;
+    this.trades.push(trade);
   }
 }
