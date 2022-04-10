@@ -59,11 +59,14 @@ export default class PoloniexAdapter {
       if (order.type === 'spot') {
         this.spotOrders.push(order);
         this.actions.insert(order.dateTime, order);
-        //this.accountant.handleTrade(order);
       } else {
         this.handleMarginOrder(order);
       }
     }
+
+    // Deposits less withdrawals
+    let ethDLW = 0.0;
+    let btcDLW = 0.0;
 
     // Deposits file
     lines = this.readDepositsFile();
@@ -71,33 +74,54 @@ export default class PoloniexAdapter {
     let transfers = this.buildDeposits(lines);
     for (let transfer of transfers) {
       this.actions.insert(transfer.dateTime, transfer);
-      //this.accountant.handleTransfer(transfer);
+      if (transfer.currency === 'ETH') {
+        ethDLW += transfer.amount;
+      }
+      if (transfer.currency === 'BTC') {
+        btcDLW += transfer.amount;
+      }
     }
-
 
     // Withdrawals file
     lines = this.readWithdrawalsFile();
     lines = lines.reverse();
     transfers = this.buildWithdrawals(lines);
     for (let transfer of transfers) {
-      //this.accountant.handleTransfer(transfer);
       this.actions.insert(transfer.dateTime, transfer);
+      if (transfer.currency === 'ETH') {
+        ethDLW += transfer.amount;
+      }
+      if (transfer.currency === 'BTC') {
+        btcDLW += transfer.amount;
+      }
     }
 
     for (let action of this.actions.getValues()) {
-      console.log(action.format());
+      //console.log(action.format());
       if (action.dateOpen) {
         // If position
         this.accountant.handlePosition(action);
       } else if (action.price) {
         // If order
         this.accountant.handleTrade(action);
+        if (action.base === 'ETH') {
+          ethDLW += action.amount;
+        }
+        if (action.base === 'BTC') {
+          btcDLW += action.amount;
+        }
       } else {
         // If transfer
         this.accountant.handleTransfer(action);
       }
-      console.log(this.accountant.getBalances());
+      //console.log(this.accountant.getBalances());
     }
+    //console.log('eth', ethDLW);
+    //console.log('btc', btcDLW);
+    return {
+      'orders': this.spotOrders,
+      'positions': this.positions
+    };
   }
 
   readTradesFile() {
@@ -378,11 +402,19 @@ export default class PoloniexAdapter {
 
       // compensation trades
       let compensationTradeIds = [];
+      if (position.compensationTrades.length > 0) {
+        let order = position.compensationTrades[0];
+        order = new OrderModel(order);
+        const doc = await order.save();
+        compensationTradeIds.push(doc.id);
+      }
+      /*
       for (let order of position.compensationTrades) {
         order = new OrderModel(order);
         const doc = await order.save();
         compensationTradeIds.push(doc.id);
       }
+      */
       position.compensationTradeIds = compensationTradeIds;
       delete position.compensationTrades;
     }
@@ -588,7 +620,6 @@ class Position {
   }
 
   flipCompensation() {
-    console.log('here');
     const main = this.compensationTrades[0];
     const alternative = this.compensationTrades[1];
     this.compensationTrades = [alternative, main];

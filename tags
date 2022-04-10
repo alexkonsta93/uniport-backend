@@ -12,6 +12,7 @@
 ./src/adapters/BinanceAdapter.js	dist/bundle.js	/^\/***\/ ".\/src\/adapters\/BinanceAdapter.js":$/;"	p	class:__webpack_modules__
 ./src/adapters/BitfinexAdapter.js	dist/bundle.js	/^\/***\/ ".\/src\/adapters\/BitfinexAdapter.js":$/;"	p	class:__webpack_modules__
 ./src/adapters/CoinbaseAdapter.js	dist/bundle.js	/^\/***\/ ".\/src\/adapters\/CoinbaseAdapter.js":$/;"	p	class:__webpack_modules__
+./src/adapters/ExchangeAccountant.js	dist/bundle.js	/^\/***\/ ".\/src\/adapters\/ExchangeAccountant.js":$/;"	p	class:__webpack_modules__
 ./src/adapters/FtxAdapter.js	dist/bundle.js	/^\/***\/ ".\/src\/adapters\/FtxAdapter.js":$/;"	p	class:__webpack_modules__
 ./src/adapters/GdaxAdapter.js	dist/bundle.js	/^\/***\/ ".\/src\/adapters\/GdaxAdapter.js":$/;"	p	class:__webpack_modules__
 ./src/adapters/GeminiAdapter.js	dist/bundle.js	/^\/***\/ ".\/src\/adapters\/GeminiAdapter.js":$/;"	p	class:__webpack_modules__
@@ -41,6 +42,7 @@
 ./src/router.js	dist/bundle.js	/^\/***\/ ".\/src\/router.js":$/;"	p	class:__webpack_modules__
 ./src/utils/Map.js	dist/bundle.js	/^\/***\/ ".\/src\/utils\/Map.js":$/;"	p	class:__webpack_modules__
 ./src/utils/MapOneToMany.js	dist/bundle.js	/^\/***\/ ".\/src\/utils\/MapOneToMany.js":$/;"	p	class:__webpack_modules__
+./src/utils/SortedMap.js	dist/bundle.js	/^\/***\/ ".\/src\/utils\/SortedMap.js":$/;"	p	class:__webpack_modules__
 ./src/utils/crud.js	dist/bundle.js	/^\/***\/ ".\/src\/utils\/crud.js":$/;"	p	class:__webpack_modules__
 ./src/utils/crudRouter.js	dist/bundle.js	/^\/***\/ ".\/src\/utils\/crudRouter.js":$/;"	p	class:__webpack_modules__
 0	package.json	/^      "babel-plugin-transform-es2015-modules-commonjs"$/;"	s	array:babel.plugins
@@ -417,7 +419,6 @@ Date	src/adapters/BitfinexAdapter.js	/^          'Date': order.dateTime,$/;"	p	c
 Date	src/adapters/PoloniexAdapter.js	/^          'Date': order.dateTime,$/;"	p	class:PoloniexAdapter.ordersToCsv.obj
 DatePriceMap	src/ohlcv/date-price-map.js	/^export default class DatePriceMap {$/;"	c
 Exchange	src/resources/exchange/exchange.model.js	/^var Exchange = new mongoose.model('Exchange', exchangeSchema);$/;"	v
-ExchangeAccountant	src/adapters/ExchangeAccount.js	/^export default class ExchangeAccountant {$/;"	c
 ExchangeAccountant	src/adapters/ExchangeAccountant.js	/^export default class ExchangeAccountant {$/;"	c
 FtxAdapter	src/adapters/FtxAdapter.js	/^export default class FtxAdapter {$/;"	c
 FtxClient	src/clients/FtxClient.js	/^export default class FtxClient {$/;"	c
@@ -734,6 +735,7 @@ buildPrice	src/adapters/PoloniexAdapter.js	/^  buildPrice(line) {$/;"	m	class:Po
 buildTrade	src/adapters/BitfinexAdapter.js	/^  buildTrade(line) {$/;"	m	class:BitfinexAdapter
 buildTrade	src/adapters/PoloniexAdapter.js	/^  buildTrade(line) {$/;"	m	class:PoloniexAdapter
 buildTradeId	src/adapters/BitfinexAdapter.js	/^  buildTradeId(line) {$/;"	m	class:BitfinexAdapter
+buildTransfers	src/adapters/BitfinexAdapter.js	/^  buildTransfers(lines) {$/;"	m	class:BitfinexAdapter
 buildType	src/adapters/PoloniexAdapter.js	/^  buildType(line) {$/;"	m	class:PoloniexAdapter
 buildUsdPrice	src/adapters/BitfinexAdapter.js	/^  buildUsdPrice(trade) {$/;"	m	class:BitfinexAdapter
 buildWithdrawals	src/adapters/PoloniexAdapter.js	/^  buildWithdrawals(lines) {$/;"	m	class:PoloniexAdapter
@@ -957,7 +959,6 @@ constructor	src/adapters/BitfinexAdapter.js	/^  constructor(userId) {$/;"	m	clas
 constructor	src/adapters/BitfinexAdapter.js	/^  constructor(userId) {$/;"	m	class:Position
 constructor	src/adapters/BitfinexAdapter.js	/^  constructor(userId) {$/;"	m	class:PositionRouter
 constructor	src/adapters/CoinbaseAdapter.js	/^  constructor(userId) {$/;"	m	class:CoinbaseAdapter
-constructor	src/adapters/ExchangeAccount.js	/^  constructor() {$/;"	m	class:ExchangeAccountant
 constructor	src/adapters/ExchangeAccountant.js	/^  constructor() {$/;"	m	class:ExchangeAccountant
 constructor	src/adapters/FtxAdapter.js	/^  constructor(trade, userId) {$/;"	m	class:Order
 constructor	src/adapters/FtxAdapter.js	/^  constructor(userId) {$/;"	m	class:FtxAdapter
@@ -2279,6 +2280,7 @@ flat-cache	package-lock.json	/^        "flat-cache": "^3.0.4"$/;"	s	object:depen
 flat-cache	package-lock.json	/^    "flat-cache": {$/;"	o	object:dependencies
 flatted	package-lock.json	/^        "flatted": "^3.1.0",$/;"	s	object:dependencies.flat-cache.requires
 flatted	package-lock.json	/^    "flatted": {$/;"	o	object:dependencies
+flipCompensation	src/adapters/BitfinexAdapter.js	/^  flipCompensation() {$/;"	m	class:Position
 flipCompensation	src/adapters/PoloniexAdapter.js	/^  flipCompensation() {$/;"	m	class:Position
 follow-redirects	package-lock.json	/^        "follow-redirects": "^1.10.0"$/;"	s	object:dependencies.axios.requires
 follow-redirects	package-lock.json	/^    "follow-redirects": {$/;"	o	object:dependencies
@@ -2288,6 +2290,9 @@ forever-agent	package-lock.json	/^        "forever-agent": "~0.6.1",$/;"	s	objec
 forever-agent	package-lock.json	/^    "forever-agent": {$/;"	o	object:dependencies
 form-data	package-lock.json	/^        "form-data": "~2.3.2",$/;"	s	object:dependencies.request.requires
 form-data	package-lock.json	/^    "form-data": {$/;"	o	object:dependencies
+format	src/adapters/BitfinexAdapter.js	/^      transfer.format = function() {$/;"	f	function:transfer
+format	src/adapters/BitfinexAdapter.js	/^  format() {$/;"	m	class:Order
+format	src/adapters/BitfinexAdapter.js	/^  format() {$/;"	m	class:Position
 format	src/adapters/PoloniexAdapter.js	/^      transfer.format = function() {$/;"	f	function:transfer
 format	src/adapters/PoloniexAdapter.js	/^  format() {$/;"	m	class:Order
 format	src/adapters/PoloniexAdapter.js	/^  format() {$/;"	m	class:Position
@@ -2329,7 +2334,6 @@ get-value	package-lock.json	/^        "get-value": "^2.0.6",$/;"	s	object:depend
 get-value	package-lock.json	/^        "get-value": "^2.0.6",$/;"	s	object:dependencies.has-value.requires
 get-value	package-lock.json	/^        "get-value": "^2.0.6",$/;"	s	object:dependencies.union-value.requires
 get-value	package-lock.json	/^    "get-value": {$/;"	o	object:dependencies
-getAccounts	src/adapters/ExchangeAccount.js	/^  getAccounts() {$/;"	m	class:ExchangeAccountant
 getAll	src/utils/crud.js	/^var getAll = model => async (req, res) => {$/;"	v
 getBalance	src/adapters/ExchangeAccountant.js	/^  getBalance(currency) {$/;"	m	class:ExchangeAccountant
 getBalances	src/adapters/ExchangeAccountant.js	/^  getBalances() {$/;"	m	class:ExchangeAccountant
@@ -2404,11 +2408,8 @@ handleMarginOrder	src/adapters/PoloniexAdapter.js	/^  handleMarginOrder(order) {
 handleOrder	src/adapters/BitfinexAdapter.js	/^  handleOrder(order) {$/;"	m	class:Position
 handleOrder	src/adapters/FtxAdapter.js	/^  handleOrder(order) {$/;"	m	class:Position
 handleOrder	src/adapters/PoloniexAdapter.js	/^  handleOrder(order) {$/;"	m	class:Position
-handlePosition	src/adapters/ExchangeAccount.js	/^  handlePosition(position) {$/;"	m	class:ExchangeAccountant
 handlePosition	src/adapters/ExchangeAccountant.js	/^  handlePosition(position) {$/;"	m	class:ExchangeAccountant
-handleTrade	src/adapters/ExchangeAccount.js	/^  handleTrade(trade) {$/;"	m	class:ExchangeAccountant
 handleTrade	src/adapters/ExchangeAccountant.js	/^  handleTrade(trade) {$/;"	m	class:ExchangeAccountant
-handleTransfer	src/adapters/ExchangeAccount.js	/^  handleTransfer(transfer) {$/;"	m	class:ExchangeAccountant
 handleTransfer	src/adapters/ExchangeAccountant.js	/^  handleTransfer(transfer) {$/;"	m	class:ExchangeAccountant
 har-schema	package-lock.json	/^        "har-schema": "^2.0.0"$/;"	s	object:dependencies.har-validator.requires
 har-schema	package-lock.json	/^    "har-schema": {$/;"	o	object:dependencies
@@ -4123,6 +4124,7 @@ processCsvData	src/adapters/KrakenAdapter.js	/^  processCsvData() {}$/;"	m	class
 processCsvData	src/adapters/KrakenFuturesAdapter.js	/^  processCsvData(lines) {$/;"	m	class:KrakenFuturesAdapter
 processCsvData	src/adapters/PoloniexAdapter.js	/^  processCsvData(lines) {$/;"	m	class:PoloniexAdapter
 processLine	src/ohlcv/date-price-map.js	/^		function processLine(classObj, line) {$/;"	f	function:DatePriceMap.load
+processLocalData	src/adapters/BitfinexAdapter.js	/^  processLocalData() {$/;"	m	class:BitfinexAdapter
 processLocalData	src/adapters/PoloniexAdapter.js	/^  processLocalData() {$/;"	m	class:PoloniexAdapter
 progress	package-lock.json	/^        "progress": "^2.0.0",$/;"	s	object:dependencies.eslint.requires
 progress	package-lock.json	/^    "progress": {$/;"	o	object:dependencies
@@ -4175,6 +4177,7 @@ readDepositsFile	src/adapters/PoloniexAdapter.js	/^  readDepositsFile() {$/;"	m	
 readFile	src/adapters/BitfinexAdapter.js	/^  readFile(file) {$/;"	m	class:BitfinexAdapter
 readFile	src/adapters/PoloniexAdapter.js	/^  readFile(file) {$/;"	m	class:PoloniexAdapter
 readLedgerFile	src/adapters/BitfinexAdapter.js	/^  readLedgerFile() {$/;"	m	class:BitfinexAdapter
+readMovementsFile	src/adapters/BitfinexAdapter.js	/^  readMovementsFile() {$/;"	m	class:BitfinexAdapter
 readTradesFile	src/adapters/BitfinexAdapter.js	/^  readTradesFile() {$/;"	m	class:BitfinexAdapter
 readTradesFile	src/adapters/PoloniexAdapter.js	/^  readTradesFile() {$/;"	m	class:PoloniexAdapter
 readWithdrawalsFile	src/adapters/PoloniexAdapter.js	/^  readWithdrawalsFile() {$/;"	m	class:PoloniexAdapter
@@ -6070,7 +6073,6 @@ unpipe	package-lock.json	/^        "unpipe": "~1.0.0"$/;"	s	object:dependencies.
 unpipe	package-lock.json	/^    "unpipe": {$/;"	o	object:dependencies
 unset-value	package-lock.json	/^        "unset-value": "^1.0.0"$/;"	s	object:dependencies.cache-base.requires
 unset-value	package-lock.json	/^    "unset-value": {$/;"	o	object:dependencies
-updateCurrency	src/adapters/ExchangeAccount.js	/^  updateCurrency(currency, amount) {$/;"	m	class:ExchangeAccountant
 updateCurrency	src/adapters/ExchangeAccountant.js	/^  updateCurrency(currency, amount) {$/;"	m	class:ExchangeAccountant
 updateSettings	src/resources/user/user.model.js	/^userSchema.methods.updateSettings = async function(settings) {$/;"	c	class:userSchema.methods
 uri-js	package-lock.json	/^            "uri-js": "^4.2.2"$/;"	s	object:dependencies.table.dependencies.ajv.requires

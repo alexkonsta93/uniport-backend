@@ -8,14 +8,34 @@ export default class ExchangeAccountant {
 
   handlePosition(position) {
     if (position.compensationTrades.length === 0) {
-      // WIll always be positive because always profitable pnl
+      // Will always be positive because always profitable pnl
       this.updateCurrency('USD', position.pnl);
+      this.compensationTrades = [];
+      return;
+    } else if (position.compensationTrades.length === 1) {
+      //const mainCompensation = position.compensationTrades[0];
+      const remainingBalance = this.getBalance('USD');
+      if (position.pnl < 0 && remainingBalance < 0) {
+        this.updateCurrency('USD', position.pnl);  
+        this.compensationTrades = [];
+        return;
+      }
     } else {
-      // Check if main compensation trade needs to be flipped
       const mainCompensation = position.compensationTrades[0];
       const remainingBalance = this.getBalance(mainCompensation.base);
-      if (mainCompensation.amount > remainingBalance) {
-        position.flipCompensation();
+      // Check if main compensation trade needs to be flipped in negative pnl scenario
+      if (position.pnl < 0) {
+        if (mainCompensation.base === 'ETH' && remainingBalance > 3000) {
+          position.flipCompensation();
+        }
+        /*
+        if (remainingBalance < 0 || Math.abs(mainCompensation.amount) > Math.abs(remainingBalance)) {
+          position.flipCompensation();
+        } 
+        */
+        if (remainingBalance < 0) {
+          position.flipCompensation();
+        }
       }
       const trade = position.compensationTrades[0];
       this.updateCurrency(trade.base, trade.amount);

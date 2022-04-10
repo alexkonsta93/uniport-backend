@@ -6,6 +6,8 @@ import Papa from 'papaparse';
 import fs from 'fs';
 import OrderModel from '../resources/order/order.model';
 import PositionModel from '../resources/position/position.model';
+import ExchangeAccountant from './ExchangeAccountant';
+import SortedMap from '../utils/SortedMap';
 
 
 export default class BitfinexAdapter {
@@ -20,6 +22,8 @@ export default class BitfinexAdapter {
     this.positions = [];
     this.positionRouter = new PositionRouter(userId);
     this.ledger = new MapOneToMany();
+    this.accountant = new ExchangeAccountant();
+    this.actions = new SortedMap();
   }
 
   processCsvData(lines) {
@@ -50,6 +54,78 @@ export default class BitfinexAdapter {
 
     ////this.printMarginOrders(this.marginOrders);
     //console.log(this.positions);
+    return {
+      'orders': this.spotOrders,
+      'positions': this.positions
+    };
+  }
+
+  processLocalData() {
+    // Ledger file
+    let lines = this.readLedgerFile();
+    lines = lines.reverse();
+    for (let line of lines) {
+      const date = this.buildDate(line);
+      this.ledger.insert(date, line);
+    }
+
+    // Trades file
+    lines = this.readTradesFile();
+    lines = lines.reverse();
+    const orders = this.buildOrders(lines);
+
+    this.categorizeOrders(orders);
+    for (let order of orders) {
+      if (order.type === 'spot') {
+        this.spotOrders.push(order);
+        this.actions.insert(order.dateTime, order);
+      } else {
+        this.handleMarginOrder(order);
+      }
+    }
+
+    // Deposits less withdrawals
+    let ethDLW = 0.0;
+    let btcDLW = 0.0;
+
+    // Movements file
+    lines = this.readMovementsFile();
+    lines = lines.reverse();
+    const transfers = this.buildTransfers(lines);
+    for (let transfer of transfers) {
+      this.actions.insert(transfer.dateTime, transfer); 
+      if (transfer.currency === 'ETH') {
+        ethDLW += transfer.amount;
+      }
+      if (transfer.currency === 'BTC') {
+        btcDLW += transfer.amount;
+      }
+    } 
+    
+    //console.log(this.actions.getValues());
+    for (let action of this.actions.getValues()) {
+      //console.log(action.format());
+      if (action.dateOpen) {
+        // If position
+        this.accountant.handlePosition(action);
+      } else if (action.price) {
+        // If order
+        this.accountant.handleTrade(action);
+        if (action.base === 'ETH') {
+          ethDLW += action.amount;
+        }
+        if (action.base === 'BTC') {
+          btcDLW += action.amount;
+        }
+      } else {
+        // If transfer
+        this.accountant.handleTransfer(action);
+      }
+      //console.log(this.accountant.getBalances());
+    }
+    
+    //console.log('eth', ethDLW);
+    //console.log('btc', btcDLW);
     return {
       'orders': this.spotOrders,
       'positions': this.positions
@@ -93,19 +169,25 @@ export default class BitfinexAdapter {
     // If complete
     if (currentPosition.isComplete()) {
       this.positions.push(currentPosition);
+      this.actions.insert(currentPosition.dateClose, currentPosition);
       this.positionRouter.finalize(pair); 
     }
 
   }
 
   readTradesFile() {
-    const tradesFile = "/home/alexandros/Projects/uniport/uniport-backend/src/adapters/alexkonsta93_trades_FROM_Sat-Mar-21-2015_TO_Mon-Apr-04-2022_ON_2022-04-04T21-19-14.701Z.csv";
+    const tradesFile = "/home/alexandros/Projects/uniport/uniport-backend/src/adapters/Bitfinex/alexkonsta93_trades_FROM_Sat-Mar-21-2015_TO_Mon-Apr-04-2022_ON_2022-04-04T21-19-14.701Z.csv";
     return this.readFile(tradesFile);
   }
 
   readLedgerFile() {
-    const ledgerFile = "/home/alexandros/Projects/uniport/uniport-backend/src/adapters/alexkonsta93_ledgers_FROM_Sat-Mar-21-2015_TO_Mon-Apr-04-2022_ON_2022-04-04T21-20-36.448Z.csv";
+    const ledgerFile = "/home/alexandros/Projects/uniport/uniport-backend/src/adapters/Bitfinex/alexkonsta93_ledgers_FROM_Sat-Mar-21-2015_TO_Mon-Apr-04-2022_ON_2022-04-04T21-20-36.448Z.csv";
     return this.readFile(ledgerFile);
+  }
+
+  readMovementsFile() {
+    const movementsFile = "/home/alexandros/Projects/uniport/uniport-backend/src/adapters/Bitfinex/alexkonsta93_movements_FROM_Sat-Mar-21-2015_TO_Mon-Apr-04-2022_ON_2022-04-04T21-20-41.578Z.csv";
+    return this.readFile(movementsFile);
   }
 
   readFile(file) {
@@ -131,13 +213,33 @@ export default class BitfinexAdapter {
 		return lines;
   }
 
+  buildTransfers(lines) {
+    const transfers = [];
+
+    for (let line of lines) {
+      if (line['STATUS'] !== 'COMPLETED') {
+        continue;
+      }
+      const transfer = {};
+      transfer.dateTime = this.buildDate(line);
+      transfer.currency = line['CURRENCY'];
+      transfer.amount = this.buildAmount(line);
+      transfer.format = function() {
+        return {
+          action: 'Transfer',
+          dateTime: this.dateTime,
+          amount: this.amount
+        };
+      }
+      transfers.push(transfer);
+    }
+
+    return transfers;
+  }
+
   categorizeOrders(orders) {
     for (let order of orders) {
       const lines = this.ledger.getValuesListGE(order.dateTime);
-      if (order.orderId === 2100806182) {
-        //console.log('here');
-        //console.log(lines); 
-      }
       let type = '';
       // Find "Trade" record and set type
       for (let line of lines) {
@@ -357,6 +459,18 @@ class Position {
     this.max = 0.0;
   }
 
+  format() {
+    return {
+      action: 'Position',
+      dateOpen: this.dateOpen,
+      dateClose: this.dateClose,
+      base: this.base,
+      quote: this.quote,
+      pnl: this.pnl,
+      compensationTrades: this.compensationTrades
+    }
+  }
+
   /*
    * Checks if positiona has been initiateded
    *
@@ -431,39 +545,66 @@ class Position {
   }
 
   buildCompensationTrade(order) {
-    const compensation = {}
+    const main = {};
+    let alternative = null;
 
     if (this.pnl < 0) {
       // If negative pnl
-      compensation.dateTime =  order.dateTime;
-      compensation.price = order.usdPrice;
-      compensation.usdPrice = order.usdPrice;
-      compensation.base = order.base;
-      compensation.quote = 'USD';
-      compensation.userId = order.userId;
-      compensation.type = 'spot';
-      compensation.fee = 0.0;
-      compensation.feeCurrency = 'USD';
-      compensation.exchange = 'Bitfinex';
-      compensation.amount = this.pnl / order.usdPrice;
+      main.dateTime =  order.dateTime;
+      main.price = order.usdPrice;
+      main.usdPrice = order.usdPrice;
+      main.base = order.base;
+      main.quote = 'USD';
+      main.userId = order.userId;
+      main.type = 'spot';
+      main.fee = 0.0;
+      main.feeCurrency = 'USD';
+      main.exchange = 'Bitfinex';
+      main.amount = this.pnl / order.usdPrice;
+      main.tradeId = null;
+
+      if (this.quote !== 'USD') {
+        alternative = {};
+        alternative.price =  order.usdPrice / order.price;
+        alternative.base = order.quote;
+        alternative.amount = this.pnl / (order.usdPrice / order.price);
+        alternative.usdPrice = order.usdPrice / order.price
+        alternative.dateTime =  order.dateTime;
+        alternative.quote = 'USD';
+        alternative.userId = order.userId;
+        alternative.type = 'spot';
+        alternative.fee = 0.0;
+        alternative.feeCurrency = 'USD';
+        alternative.exchange = 'Bitfinex';
+        alternative.tradeId = null;
+      }
     } else if (this.pnl && this.quote !== 'USD') {
       // If positive pnl
-      compensation.dateTime = order.dateTime;
-      compensation.price = order.usdPrice/order.price;
-      compensation.usdPrice = order.usdPrice/order.price;
-      compensation.base = order.quote;
-      compensation.quote = 'USD';
-      compensation.userId = order.userId;
-      compensation.type = 'spot';
-      compensation.fee = 0.0;
-      compensation.feeCurrency = 'USD';
-      compensation.exchange = 'Bitfinex';
-      compensation.amount = this.pnl/(order.usdPrice/order.price);
+      main.dateTime = order.dateTime;
+      main.price = order.usdPrice/order.price;
+      main.usdPrice = order.usdPrice/order.price;
+      main.base = order.quote;
+      main.quote = 'USD';
+      main.userId = order.userId;
+      main.type = 'spot';
+      main.fee = 0.0;
+      main.feeCurrency = 'USD';
+      main.exchange = 'Bitfinex';
+      main.amount = this.pnl/(order.usdPrice/order.price);
     } else {
       return;
     }
 
-    this.compensationTrades.push(compensation);
+    this.compensationTrades.push(main);
+    if (alternative) {
+      this.compensationTrades.push(alternative);
+    }
+  }
+
+  flipCompensation() {
+    const main = this.compensationTrades[0];
+    const alternative = this.compensationTrades[1];
+    this.compensationTrades = [alternative, main];
   }
 }
 
@@ -484,6 +625,17 @@ class Order {
     this.feeCurrency = trade.feeCurrency;
     this.trades = [trade];
   } 
+
+  format() {
+    return {
+      action: 'Order',
+      dateTime: this.dateTime,
+      base: this.base,
+      quote: this.quote,
+      amount: this.amount,
+      price: this.price
+    };
+  }
 
   integrate(trade) {
     this.price = (this.price*this.amount + trade.price*trade.amount)/(this.amount + trade.amount);
