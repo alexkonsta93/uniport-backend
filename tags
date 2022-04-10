@@ -2279,6 +2279,7 @@ flat-cache	package-lock.json	/^        "flat-cache": "^3.0.4"$/;"	s	object:depen
 flat-cache	package-lock.json	/^    "flat-cache": {$/;"	o	object:dependencies
 flatted	package-lock.json	/^        "flatted": "^3.1.0",$/;"	s	object:dependencies.flat-cache.requires
 flatted	package-lock.json	/^    "flatted": {$/;"	o	object:dependencies
+flipCompensation	src/adapters/PoloniexAdapter.js	/^  flipCompensation() {$/;"	m	class:Position
 follow-redirects	package-lock.json	/^        "follow-redirects": "^1.10.0"$/;"	s	object:dependencies.axios.requires
 follow-redirects	package-lock.json	/^    "follow-redirects": {$/;"	o	object:dependencies
 for-in	package-lock.json	/^        "for-in": "^1.0.2",$/;"	s	object:dependencies.mixin-deep.requires
@@ -2329,8 +2330,9 @@ get-value	package-lock.json	/^        "get-value": "^2.0.6",$/;"	s	object:depend
 get-value	package-lock.json	/^        "get-value": "^2.0.6",$/;"	s	object:dependencies.union-value.requires
 get-value	package-lock.json	/^    "get-value": {$/;"	o	object:dependencies
 getAccounts	src/adapters/ExchangeAccount.js	/^  getAccounts() {$/;"	m	class:ExchangeAccountant
-getAccounts	src/adapters/ExchangeAccountant.js	/^  getAccounts() {$/;"	m	class:ExchangeAccountant
 getAll	src/utils/crud.js	/^var getAll = model => async (req, res) => {$/;"	v
+getBalance	src/adapters/ExchangeAccountant.js	/^  getBalance(currency) {$/;"	m	class:ExchangeAccountant
+getBalances	src/adapters/ExchangeAccountant.js	/^  getBalances() {$/;"	m	class:ExchangeAccountant
 getBorrowHistory	src/clients/FtxClient.js	/^  async getBorrowHistory() {$/;"	m	class:FtxClient
 getById	src/utils/crud.js	/^var getById = model => async (req, res) => {$/;"	v
 getCurrent	src/adapters/BitfinexAdapter.js	/^  getCurrent(pair) {$/;"	m	class:PositionRouter

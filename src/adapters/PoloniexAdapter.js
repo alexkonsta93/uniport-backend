@@ -18,8 +18,8 @@ export default class PoloniexAdapter {
     this.spotOrders = [];
     this.marginOrders = [];
     this.positions = [];
-    this.positionRouter = new PositionRouter(userId);
     this.accountant = new ExchangeAccountant();
+    this.positionRouter = new PositionRouter(userId);
     this.actions = new SortedMap();
   }
 
@@ -87,13 +87,16 @@ export default class PoloniexAdapter {
     for (let action of this.actions.getValues()) {
       console.log(action.format());
       if (action.dateOpen) {
+        // If position
         this.accountant.handlePosition(action);
       } else if (action.price) {
+        // If order
         this.accountant.handleTrade(action);
       } else {
+        // If transfer
         this.accountant.handleTransfer(action);
       }
-      console.log(this.accountant.getAccounts());
+      console.log(this.accountant.getBalances());
     }
   }
 
@@ -241,7 +244,7 @@ export default class PoloniexAdapter {
    * @return -1 if i in loop should decrease to repeat order; 0 otherwise
    */
   handleMarginOrder(order) {
-    //this.marginOrders.push(order);
+    this.marginOrders.push(order);
     const pair = `${order.base}${order.quote}`;
     let currentPosition = this.positionRouter.getCurrent(pair);
 
@@ -531,41 +534,64 @@ class Position {
   }
 
   buildCompensationTrade(order) {
-    const compensation = {}
+    const main = {};
+    const alternative = {};
 
     if (this.pnl < 0) {
       // If negative pnl
-      compensation.dateTime =  order.dateTime;
-      compensation.price = order.usdPrice;
-      compensation.usdPrice = order.usdPrice;
-      compensation.base = order.base;
-      compensation.quote = 'USD';
-      compensation.userId = order.userId;
-      compensation.type = 'spot';
-      compensation.fee = 0.0;
-      compensation.feeCurrency = 'USD';
-      compensation.exchange = 'Poloniex';
-      compensation.amount = this.pnl / order.usdPrice;
-      compensation.tradeId = null;
-    } else if (this.pnl && this.qute !== 'USD'){
+      main.price = order.usdPrice;
+      main.base = order.base;
+      main.amount = this.pnl / order.usdPrice;
+      main.usdPrice = order.usdPrice;
+      main.dateTime =  order.dateTime;
+      main.quote = 'USD';
+      main.userId = order.userId;
+      main.type = 'spot';
+      main.fee = 0.0;
+      main.feeCurrency = 'USD';
+      main.exchange = 'Poloniex';
+      main.tradeId = null;
+
+      alternative.price =  order.usdPrice / order.price;
+      alternative.base = order.quote;
+      alternative.amount = this.pnl / (order.usdPrice / order.price);
+      alternative.usdPrice = order.usdPrice / order.price
+      alternative.dateTime =  order.dateTime;
+      alternative.quote = 'USD';
+      alternative.userId = order.userId;
+      alternative.type = 'spot';
+      alternative.fee = 0.0;
+      alternative.feeCurrency = 'USD';
+      alternative.exchange = 'Poloniex';
+      alternative.tradeId = null;
+    } else if (this.pnl > 0 && this.quote !== 'USD'){
       // If positive pnl
-      compensation.dateTime = order.dateTime;
-      compensation.price = order.usdPrice/order.price;
-      compensation.usdPrice = order.usdPrice/order.price;
-      compensation.base = order.quote;
-      compensation.quote = 'USD';
-      compensation.userId = order.userId;
-      compensation.type = 'spot';
-      compensation.fee = 0.0;
-      compensation.feeCurrency = 'USD';
-      compensation.exchange = 'Poloniex';
-      compensation.amount = this.pnl/(order.usdPrice/order.price);
-      compensation.tradeId = null;
+      main.dateTime = order.dateTime;
+      main.price = order.usdPrice/order.price;
+      main.usdPrice = order.usdPrice/order.price;
+      main.base = order.quote;
+      main.quote = 'USD';
+      main.userId = order.userId;
+      main.type = 'spot';
+      main.fee = 0.0;
+      main.feeCurrency = 'USD';
+      main.exchange = 'Poloniex';
+      main.amount = this.pnl/(order.usdPrice/order.price);
+      main.tradeId = null;
     } else {
       return;
     }
 
-    this.compensationTrades.push(compensation);
+    // Handle collater reduction type
+    this.compensationTrades.push(main);
+    this.compensationTrades.push(alternative);
+  }
+
+  flipCompensation() {
+    console.log('here');
+    const main = this.compensationTrades[0];
+    const alternative = this.compensationTrades[1];
+    this.compensationTrades = [alternative, main];
   }
 
 }
