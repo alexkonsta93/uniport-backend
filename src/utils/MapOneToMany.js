@@ -48,4 +48,8 @@ export default class MapOneToMany {
     }
     return []
   }
+
+  getValuesListGELE(minKey, maxKey) {
+    const iter = this._tree.doVisit(minKey, maxKey);
+  }
 }

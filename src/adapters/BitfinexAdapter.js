@@ -104,7 +104,7 @@ export default class BitfinexAdapter {
     
     //console.log(this.actions.getValues());
     for (let action of this.actions.getValues()) {
-      //console.log(action.format());
+      console.log(action.format());
       if (action.dateOpen) {
         // If position
         this.accountant.handlePosition(action);
@@ -121,11 +121,11 @@ export default class BitfinexAdapter {
         // If transfer
         this.accountant.handleTransfer(action);
       }
-      //console.log(this.accountant.getBalances());
+      console.log(this.accountant.getBalances());
     }
     
-    //console.log('eth', ethDLW);
-    //console.log('btc', btcDLW);
+    console.log('eth', ethDLW);
+    console.log('btc', btcDLW);
     return {
       'orders': this.spotOrders,
       'positions': this.positions

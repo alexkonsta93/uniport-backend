@@ -718,6 +718,7 @@ buffer-from	package-lock.json	/^    "buffer-from": {$/;"	o	object:dependencies
 bugs	package.json	/^  "bugs": {$/;"	o
 buildAmount	src/adapters/BitfinexAdapter.js	/^  buildAmount(line) {$/;"	m	class:BitfinexAdapter
 buildAmount	src/adapters/PoloniexAdapter.js	/^  buildAmount(line) {$/;"	m	class:PoloniexAdapter
+buildBorrows	src/adapters/PoloniexAdapter.js	/^  buildBorrows(lines) {$/;"	m	class:PoloniexAdapter
 buildCompensationTrade	src/adapters/BitfinexAdapter.js	/^  buildCompensationTrade(order) {$/;"	m	class:Position
 buildCompensationTrade	src/adapters/PoloniexAdapter.js	/^  buildCompensationTrade(order) {$/;"	m	class:Position
 buildDate	src/adapters/BitfinexAdapter.js	/^  buildDate(line) {$/;"	m	class:BitfinexAdapter
@@ -2344,6 +2345,7 @@ getCurrent	src/adapters/PoloniexAdapter.js	/^  getCurrent(pair) {$/;"	m	class:Po
 getFills	src/clients/FtxClient.js	/^  async getFills() {$/;"	m	class:FtxClient
 getFundingPayments	src/clients/FtxClient.js	/^  async getFundingPayments(startTime = 0, endTime = Date.now(), market = null) {$/;"	m	class:FtxClient
 getHistoricalPrices	src/clients/FtxClient.js	/^  async getHistoricalPrices(marketName, dateTime) {$/;"	m	class:FtxClient
+getIteratorBegin	src/utils/MapOneToMany.js	/^  getIteratorBegin() {$/;"	m	class:MapOneToMany
 getKeyValuePairsArray	src/ohlcv/date-price-map.js	/^	getKeyValuePairsArray() {$/;"	m	class:DatePriceMap
 getKeyValuePairsArray	src/utils/Map.js	/^	getKeyValuePairsArray() {$/;"	m	class:Map
 getKeyValuePairsArray	src/utils/MapOneToMany.js	/^  getKeyValuePairsArray() {$/;"	m	class:MapOneToMany
@@ -4177,6 +4179,7 @@ readDepositsFile	src/adapters/PoloniexAdapter.js	/^  readDepositsFile() {$/;"	m	
 readFile	src/adapters/BitfinexAdapter.js	/^  readFile(file) {$/;"	m	class:BitfinexAdapter
 readFile	src/adapters/PoloniexAdapter.js	/^  readFile(file) {$/;"	m	class:PoloniexAdapter
 readLedgerFile	src/adapters/BitfinexAdapter.js	/^  readLedgerFile() {$/;"	m	class:BitfinexAdapter
+readMarginBorrowingFile	src/adapters/PoloniexAdapter.js	/^  readMarginBorrowingFile() {$/;"	m	class:PoloniexAdapter
 readMovementsFile	src/adapters/BitfinexAdapter.js	/^  readMovementsFile() {$/;"	m	class:BitfinexAdapter
 readTradesFile	src/adapters/BitfinexAdapter.js	/^  readTradesFile() {$/;"	m	class:BitfinexAdapter
 readTradesFile	src/adapters/PoloniexAdapter.js	/^  readTradesFile() {$/;"	m	class:PoloniexAdapter

@@ -7,6 +7,7 @@ import OrderModel from '../resources/order/order.model';
 import PositionModel from '../resources/position/position.model';
 import ExchangeAccountant from './ExchangeAccountant';
 import SortedMap from '../utils/SortedMap';
+import MapOneToMany from '../utils/MapOneToMany';
 
 export default class PoloniexAdapter {
   constructor(userId) {
@@ -50,6 +51,7 @@ export default class PoloniexAdapter {
   }
 
   processLocalData() {
+    
     // Trades file
     let lines = this.readTradesFile();
     lines = lines.reverse();
@@ -62,6 +64,15 @@ export default class PoloniexAdapter {
       } else {
         this.handleMarginOrder(order);
       }
+    }
+
+    // Margin funding
+    lines = this.readMarginBorrowingFile();
+    lines = lines.reverse();
+    const borrows = this.buildBorrows(lines);
+    //console.log(borrows.getKeyValuePairsArray());
+    for (let position of this.positions) {
+      const funding = borows.
     }
 
     // Deposits less withdrawals
@@ -118,10 +129,12 @@ export default class PoloniexAdapter {
     }
     //console.log('eth', ethDLW);
     //console.log('btc', btcDLW);
+    /*
     return {
       'orders': this.spotOrders,
       'positions': this.positions
     };
+    */
   }
 
   readTradesFile() {
@@ -136,6 +149,11 @@ export default class PoloniexAdapter {
 
   readWithdrawalsFile() {
     const file = "/home/alexandros/Projects/uniport/uniport-backend/src/adapters/Poloniex/withdrawals-2022-04-02T11_51_55-04_00.csv";
+    return this.readFile(file);
+  }
+
+  readMarginBorrowingFile() {
+    const file = "/home/alexandros/Projects/uniport/uniport-backend/src/adapters/Poloniex/marginBorrowing-2022-04-02T11_47_35-04_00.csv";
     return this.readFile(file);
   }
 
@@ -207,6 +225,21 @@ export default class PoloniexAdapter {
     orders.push(currentOrder);
 
     return orders;
+  }
+
+  buildBorrows(lines) {
+    const borrows = new MapOneToMany(); // Date close -> Line
+    
+    for (let line of lines) {
+      const borrow = {};
+      borrow.dateTime = line['Close']; 
+      borrow.currency = line['Currency'];
+      borrow.amount = parseFloat(line['Amount']);
+      borrow.fee = parseFloat(line['TotalFee']);
+      borrows.insert(borrow.dateTime, borrow);
+    }
+
+    return borrows;
   }
 
   buildDeposits(lines) {
