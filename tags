@@ -724,6 +724,7 @@ buildCompensationTrade	src/adapters/PoloniexAdapter.js	/^  buildCompensationTrad
 buildDate	src/adapters/BitfinexAdapter.js	/^  buildDate(line) {$/;"	m	class:BitfinexAdapter
 buildDeposits	src/adapters/PoloniexAdapter.js	/^  buildDeposits(lines) {$/;"	m	class:PoloniexAdapter
 buildFee	src/adapters/BitfinexAdapter.js	/^  buildFee(line, trade) {$/;"	m	class:BitfinexAdapter
+buildFee	src/adapters/PoloniexAdapter.js	/^  buildFee(line, trade) {$/;"	m	class:PoloniexAdapter
 buildOrderId	src/adapters/BitfinexAdapter.js	/^  buildOrderId(line) {$/;"	m	class:BitfinexAdapter
 buildOrders	src/adapters/BitfinexAdapter.js	/^  buildOrders(lines) {$/;"	m	class:BitfinexAdapter
 buildOrders	src/adapters/FtxAdapter.js	/^  async buildOrders(trades) {$/;"	m	class:FtxAdapter
@@ -1001,6 +1002,7 @@ convert-source-map	package-lock.json	/^        "convert-source-map": "^1.4.0",$/
 convert-source-map	package-lock.json	/^        "convert-source-map": "^1.6.0",$/;"	s	object:dependencies.v8-to-istanbul.requires
 convert-source-map	package-lock.json	/^        "convert-source-map": "^1.7.0",$/;"	s	object:dependencies.@babel/core.requires
 convert-source-map	package-lock.json	/^    "convert-source-map": {$/;"	o	object:dependencies
+convertToArray	src/router.js	/^function convertToArray(trade) {$/;"	f
 cookie	package-lock.json	/^        "cookie": "0.4.0",$/;"	s	object:dependencies.express.requires
 cookie	package-lock.json	/^    "cookie": {$/;"	o	object:dependencies
 cookie-signature	package-lock.json	/^        "cookie-signature": "1.0.6",$/;"	s	object:dependencies.express.requires
@@ -2345,7 +2347,6 @@ getCurrent	src/adapters/PoloniexAdapter.js	/^  getCurrent(pair) {$/;"	m	class:Po
 getFills	src/clients/FtxClient.js	/^  async getFills() {$/;"	m	class:FtxClient
 getFundingPayments	src/clients/FtxClient.js	/^  async getFundingPayments(startTime = 0, endTime = Date.now(), market = null) {$/;"	m	class:FtxClient
 getHistoricalPrices	src/clients/FtxClient.js	/^  async getHistoricalPrices(marketName, dateTime) {$/;"	m	class:FtxClient
-getIteratorBegin	src/utils/MapOneToMany.js	/^  getIteratorBegin() {$/;"	m	class:MapOneToMany
 getKeyValuePairsArray	src/ohlcv/date-price-map.js	/^	getKeyValuePairsArray() {$/;"	m	class:DatePriceMap
 getKeyValuePairsArray	src/utils/Map.js	/^	getKeyValuePairsArray() {$/;"	m	class:Map
 getKeyValuePairsArray	src/utils/MapOneToMany.js	/^  getKeyValuePairsArray() {$/;"	m	class:MapOneToMany
@@ -2359,6 +2360,7 @@ getValueLE	src/ohlcv/date-price-map.js	/^	getValueLE(key) {$/;"	m	class:DatePric
 getValues	src/utils/SortedMap.js	/^  getValues() {$/;"	m	class:SortedMap
 getValuesList	src/utils/MapOneToMany.js	/^  getValuesList(key) {$/;"	m	class:MapOneToMany
 getValuesListGE	src/utils/MapOneToMany.js	/^  getValuesListGE(key) {$/;"	m	class:MapOneToMany
+getValuesListGELE	src/utils/MapOneToMany.js	/^  getValuesListGELE(minKey, maxKey) {$/;"	m	class:MapOneToMany
 getpass	package-lock.json	/^        "getpass": "^0.1.1",$/;"	s	object:dependencies.sshpk.requires
 getpass	package-lock.json	/^    "getpass": {$/;"	o	object:dependencies
 glob	package-lock.json	/^        "glob": "^7.1.1",$/;"	s	object:dependencies.jest-config.requires
@@ -4075,6 +4077,7 @@ pkg-dir	package-lock.json	/^    "pkg-dir": {$/;"	o	object:dependencies
 plugins	package.json	/^    "plugins": [$/;"	a	object:babel
 positionSchema	src/resources/position/position.model.js	/^const positionSchema = new Schema({		$/;"	C
 positionsToCsv	src/router.js	/^function positionsToCsv(positions) {$/;"	f
+positionsToCsvDetailed	src/router.js	/^function positionsToCsvDetailed(positions) {$/;"	f
 posix-character-classes	package-lock.json	/^        "posix-character-classes": "^0.1.0",$/;"	s	object:dependencies.expand-brackets.requires
 posix-character-classes	package-lock.json	/^    "posix-character-classes": {$/;"	o	object:dependencies
 prelude-ls	package-lock.json	/^            "prelude-ls": "~1.1.2"$/;"	s	object:dependencies.escodegen.dependencies.type-check.requires

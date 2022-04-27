@@ -66,15 +66,6 @@ export default class PoloniexAdapter {
       }
     }
 
-    // Margin funding
-    lines = this.readMarginBorrowingFile();
-    lines = lines.reverse();
-    const borrows = this.buildBorrows(lines);
-    //console.log(borrows.getKeyValuePairsArray());
-    for (let position of this.positions) {
-      const funding = borows.
-    }
-
     // Deposits less withdrawals
     let ethDLW = 0.0;
     let btcDLW = 0.0;
@@ -108,7 +99,7 @@ export default class PoloniexAdapter {
     }
 
     for (let action of this.actions.getValues()) {
-      //console.log(action.format());
+      console.log(action.format());
       if (action.dateOpen) {
         // If position
         this.accountant.handlePosition(action);
@@ -125,7 +116,7 @@ export default class PoloniexAdapter {
         // If transfer
         this.accountant.handleTransfer(action);
       }
-      //console.log(this.accountant.getBalances());
+      console.log(this.accountant.getBalances());
     }
     //console.log('eth', ethDLW);
     //console.log('btc', btcDLW);
@@ -368,16 +359,27 @@ export default class PoloniexAdapter {
     }
     trade.usdPrice = price;
 
-    let fee = parseFloat(line['Fee Total']) * trade.usdPrice;
-    const feeCurrency = line['Fee Currency'];
-    if (feeCurrency === trade.quote) {
-      fee = fee / price
-    }
-    trade.fee = fee;
     trade.feeCurrency = 'USD';
+    trade.fee = this.buildFee(line, trade);
 
     return trade;
 
+  }
+
+  buildFee(line, trade) {
+    const fee = parseFloat(line['Fee Total']);
+    const feeCurrency = line['Fee Currency'];
+
+    switch (feeCurrency) {
+      case 'USD':
+        return fee;
+      case trade.quote:
+        return (fee * trade.usdPrice / trade.price);
+      case trade.base:
+        return (fee * trade.usdPrice);
+      default:
+        return 0.0;
+    }
   }
 
   buildAmount(line) {
@@ -491,16 +493,15 @@ class Position {
     this.basisTrades = [];
     this.basisFee = 0.0;
     this.fundingFee = 0.0;
-    this.pnl = 0.0;
+    this.grossPnl = 0.0;
+    this.netPnl = 0.0;
     this.outstanding = 0.0;
     this.basisFeeCurrency = 'USD';
     this.fundingTrades = [];
     this.compensationTrades = [];
     this.outstanding = 0.0; // Absolute number
-    this.openPrice = 0.0;
-    this.closePrice = 0.0;
-    this.dateOpen = null;
-    this.dateClose = null;
+    this.priceOpen = null;
+    this.priceClose = null;
     this.base = null;
     this.quote = null;
     this.exchange = 'Poloniex';
@@ -573,6 +574,7 @@ class Position {
     }
 
     this.basisTrades.push(order);
+    this.basisFee += this.basisFee + order.fee;
     
     // Finalize when complete
     if (this.isComplete()) {
@@ -583,17 +585,16 @@ class Position {
   finalize(order) {
     // dateClose
     this.dateClose = order.dateTime;
-    
+
     // pnl, fees
     let pnl = 0.0; 
-    let fees = 0.0;
     for (let order of this.basisTrades) {
       pnl += (order.amount * order.price);
-      fees += fees;
     }
     pnl = -pnl;
     pnl -= Math.abs(this.outstanding * order.price);
-    this.pnl = pnl * order.usdPrice / order.price - fees;
+    this.grossPnl = pnl * order.usdPrice / order.price;
+    this.netPnl = this.grossPnl - this.basisFee;
 
     this.buildCompensationTrade(order);
   }

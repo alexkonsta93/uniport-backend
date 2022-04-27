@@ -383,13 +383,31 @@ router
         positions = await Position.find({
           userId: req.params.id,
           exchange: req.query.exchange
-        });
+        })
+        .populate({ 
+          path: 'basisTradeIds',
+          model: 'Order'
+        })
+        .populate({ 
+          path: 'compensationTradeIds',
+          model: 'Order'
+        })
+        .exec();
       }
       else {
         // All positions
         positions = await Position.find({
           userId: req.params.id
-        });
+        })
+        .populate({ 
+          path: 'basisTradeIds',
+          model: 'Order'
+        })
+        .populate({ 
+          path: 'compensationTradeIds',
+          model: 'Order'
+        })
+        .exec();
       }
       res.status(200).json(positions);
     } catch (err) {

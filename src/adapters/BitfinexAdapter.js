@@ -441,14 +441,15 @@ class Position {
     this.basisTrades = [];
     this.basisFee = 0.0;
     this.fundingFee = 0.0;
-    this.pnl = 0.0;
+    this.grossPnl = 0.0;
+    this.netPnl = 0.0;
     this.outstanding = 0.0;
     this.basisFeeCurrency = 'USD';
     this.fundingTrades = [];
     this.compensationTrades = [];
     this.outstanding = 0.0; // Absolute number
-    this.openPrice = 0.0;
-    this.closePrice = 0.0;
+    this.priceOpen = 0.0;
+    this.priceClose = 0.0;
     this.dateOpen = null;
     this.dateClose = null;
     this.base = null;
@@ -519,6 +520,7 @@ class Position {
     }
 
     this.basisTrades.push(order);
+    this.basisFee += this.basisFee + order.fee;
     
     // Finalize when complete
     if (this.isComplete()) {
@@ -532,14 +534,13 @@ class Position {
     
     // pnl, fees
     let pnl = 0.0; 
-    let fees = 0.0;
     for (let order of this.basisTrades) {
       pnl += (order.amount * order.price);
-      fees += fees;
     }
     pnl = -pnl;
     pnl -= Math.abs(this.outstanding * order.price);
-    this.pnl = pnl * order.usdPrice / order.price - fees;
+    this.grossPnl = pnl * order.usdPrice / order.price - fees;
+    this.netPnl = this.grossPnl - this.basisFee;
 
     this.buildCompensationTrade(order);
   }

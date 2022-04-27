@@ -72,7 +72,7 @@ app.get('/print-positions', async (req, res, next) => {
 		try {
         const userId = '62015b3eec19272ccca25765';
         const positions = await axios.get('http://localhost:3000/api/user/' + userId + '/positions');
-				const csv = positionsToCsv(positions.data);
+				const csv = positionsToCsvDetailed(positions.data);
 				fs.writeFile('../positions.csv', csv, err => {
 						if (err) throw err;
 				});
@@ -112,6 +112,19 @@ function converToObj(item) {
 				'Date': item.dateTime
 
 		}
+}
+
+function convertToArray(trade) {
+	return [
+		trade.dateTime,
+		trade.base,
+		trade.quote,
+		trade.amount,
+		trade.price,
+		trade.fee,
+		trade.feeCurrency,
+		trade.usdPrice,
+	]
 }
 
 function tradesToCsv(trades) {
@@ -157,6 +170,51 @@ function positionsToCsv(positions) {
 		return Papa.unparse(ret, {
 				header: true
 		})
+}
+
+function positionsToCsvDetailed(positions) {
+	var ret = [];
+	for (let position of positions) {
+		ret.push([
+			'Exchange',
+			'Date Open',
+			'Date Close',
+			'Base',
+			'Quote',
+			'Basis Fee',
+			'Basis Fee Currency',
+			'Funding Fee',
+			'Funding Fee Currency',
+			'Gross PNL',
+			'Net PNL'
+		]);
+		ret.push([
+			position.exchange,
+			position.dateOpen,
+			position.dateClose,
+			position.base,
+			position.quote,
+			position.basisFee,
+			position.basisFeeCurrency,
+			position.fundingFee,
+			position.fundingFeeCurrency,
+			position.grossPnl,
+			position.netPnl,
+		]);
+		ret.push(['Datetime', 'Base', 'Quote', 'Amount', 'Price', 'Fee', 'Fee Currency', 'Price USD']);
+		ret.push(['Basis']);
+		for (let trade of position.basisTradeIds) {
+			ret.push(convertToArray(trade))
+		}
+		ret.push(['Settlement']);
+		for (let trade of position.compensationTradeIds) {
+			ret.push(convertToArray(trade))
+		}
+		ret.push([]);
+	}
+	return Papa.unparse(ret, {
+			header: false
+	});
 }
 
 app.listen(3000, () => {

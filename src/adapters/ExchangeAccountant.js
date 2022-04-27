@@ -10,14 +10,14 @@ export default class ExchangeAccountant {
     //console.log('position', position);
     if (position.compensationTrades.length === 0) {
       // Will always be positive because always profitable pnl
-      this.updateCurrency('USD', position.pnl);
+      this.updateCurrency('USD', position.netPnl);
       position.compensationTrades = [];
     } else if (position.compensationTrades.length === 1) {
       const remainingUSD = this.getBalance('USD');
-      if (position.pnl < 0){
-        if (remainingUSD > -position.pnl) {
+      if (position.netPnl < 0){
+        if (remainingUSD > -position.netPnl) {
           console.log('here0.1');
-          this.updateCurrency('USD', position.pnl);
+          this.updateCurrency('USD', position.netPnl);
           position.compensationTrades = [];
         } else {
           console.log('here0.2');
@@ -33,8 +33,8 @@ export default class ExchangeAccountant {
       const remainingUSD = this.getBalance('USD');
       // Check if main compensation trade needs to be flipped in negative pnl scenario
       if (remainingUSD > 1) {
-        if (remainingUSD > -position.pnl) {
-          this.updateCurrency('USD', position.pnl);
+        if (remainingUSD > -position.netPnl) {
+          this.updateCurrency('USD', position.netPnl);
           position.compensationTrades = [];
         } else {
           this.updateCurrency('USD', remainingUSD);
@@ -67,7 +67,7 @@ export default class ExchangeAccountant {
       const main = position.compensationTrades[0]; 
       const alt = position.compensationTrades[1];
       const remainingMain = this.getBalance(main.base);
-      if (remainingMain < -position.pnl/main.usdPrice) {
+      if (remainingMain < -position.netPnl/main.usdPrice) {
         console.log('here1');
         main.amount = -remainingMain;
         this.updateCurrency(main.base, main.amount);

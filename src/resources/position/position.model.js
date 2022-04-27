@@ -27,17 +27,19 @@ const positionSchema = new Schema({
     type: Date,
     required: true,
   },
-  pnl: {
+  grossPnl: {
+    type: Number,
+    required: true
+  },
+  netPnl: {
     type: Number,
     required: true
   },
   openPrice: {
     type: Number,
-    required: true
   },
   closePrice: {
     type: Number,
-    required: true
   },
   fundingFee: {
     type: Number,
@@ -60,10 +62,12 @@ const positionSchema = new Schema({
   },
   basisTradeIds: {
     type: [mongoose.Schema.Types.ObjectId],
-    required: true
+    required: true,
+    ref: 'Order'
   },
   compensationTradeIds: {
     type: [mongoose.Schema.Types.ObjectId],
+    ref: 'Order'
   },
   base: {
     type: String,
@@ -96,11 +100,11 @@ const positionSchema = new Schema({
 /***Index***/
 positionSchema.index({ 
   userId: 1,
-  exchange: 1, 
   dateClose: 1,
   dateOpen: 1,
   quote: 1, 
-  base: 1
+  base: 1,
+  exchange: 1, 
 }, { unique: true });
 
 /***Hooks***/
