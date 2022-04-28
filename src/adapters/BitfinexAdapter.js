@@ -520,7 +520,7 @@ class Position {
     }
 
     this.basisTrades.push(order);
-    this.basisFee += this.basisFee + order.fee;
+    this.basisFee += order.fee;
     
     // Finalize when complete
     if (this.isComplete()) {

@@ -420,6 +420,7 @@ Date	src/adapters/PoloniexAdapter.js	/^          'Date': order.dateTime,$/;"	p	c
 DatePriceMap	src/ohlcv/date-price-map.js	/^export default class DatePriceMap {$/;"	c
 Exchange	src/resources/exchange/exchange.model.js	/^var Exchange = new mongoose.model('Exchange', exchangeSchema);$/;"	v
 ExchangeAccountant	src/adapters/ExchangeAccountant.js	/^export default class ExchangeAccountant {$/;"	c
+Fee	src/adapters/PoloniexAdapter.js	/^          'Fee': order.fee,$/;"	p	class:PoloniexAdapter.ordersToCsv.obj
 FtxAdapter	src/adapters/FtxAdapter.js	/^export default class FtxAdapter {$/;"	c
 FtxClient	src/clients/FtxClient.js	/^export default class FtxClient {$/;"	c
 GdaxAdapter	src/adapters/GdaxAdapter.js	/^export default class GdaxAdapter {$/;"	c

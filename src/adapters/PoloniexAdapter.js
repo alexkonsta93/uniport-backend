@@ -35,7 +35,7 @@ export default class PoloniexAdapter {
     const orders = this.buildOrders(lines);
 
     for (let order of orders) {
-      if (order.type === 'spot') {
+      if (order.type === 'spot' || order.type == 'settlement') {
         this.spotOrders.push(order);
       } else {
         this.marginOrders.push(order);
@@ -58,7 +58,7 @@ export default class PoloniexAdapter {
     const orders = this.buildOrders(lines);
 
     for (let order of orders) {
-      if (order.type === 'spot') {
+      if (order.type === 'spot' || order.type == 'settlement') {
         this.spotOrders.push(order);
         this.actions.insert(order.dateTime, order);
       } else {
@@ -99,10 +99,10 @@ export default class PoloniexAdapter {
     }
 
     for (let action of this.actions.getValues()) {
-      console.log(action.format());
       if (action.dateOpen) {
         // If position
         this.accountant.handlePosition(action);
+        console.log(action.format());
       } else if (action.price) {
         // If order
         this.accountant.handleTrade(action);
@@ -120,6 +120,7 @@ export default class PoloniexAdapter {
     }
     //console.log('eth', ethDLW);
     //console.log('btc', btcDLW);
+    this.printMarginOrders(this.marginOrders);
     /*
     return {
       'orders': this.spotOrders,
@@ -164,6 +165,7 @@ export default class PoloniexAdapter {
           'Pair': order.base + order.quote,
           'Amount': order.amount,
           'Price': order.price,
+          'Fee': order.fee,
           'PriceUSD': order.usdPrice
         };
         ret.push(obj);
@@ -202,9 +204,11 @@ export default class PoloniexAdapter {
     let currentOrder = new Order(trade);
 
     for (let line of lines) {
+      /*
       if (line['Category'] === 'Settlement') {
         continue;
       }
+      */
       trade = this.buildTrade(line);
       if (trade.orderId !== currentOrder.orderId) {
         orders.push(currentOrder);
@@ -517,7 +521,8 @@ class Position {
       dateClose: this.dateClose,
       base: this.base,
       quote: this.quote,
-      pnl: this.pnl,
+      netPnl: this.netPnl,
+      fee: this.basisFee,
       compensationTrades: this.compensationTrades
     }
   }
@@ -574,7 +579,7 @@ class Position {
     }
 
     this.basisTrades.push(order);
-    this.basisFee += this.basisFee + order.fee;
+    this.basisFee += order.fee;
     
     // Finalize when complete
     if (this.isComplete()) {
@@ -599,6 +604,7 @@ class Position {
     this.buildCompensationTrade(order);
   }
 
+  /*
   buildCompensationTrade(order) {
     const main = {};
     const alternative = {};
@@ -651,6 +657,25 @@ class Position {
     // Handle collater reduction type
     this.compensationTrades.push(main);
     this.compensationTrades.push(alternative);
+  }
+  */
+  buildCompensationTrade(order) {
+    if (this.pnl > 0 && this.quote !== 'USD') {
+      this.compensationTrades.push({ 
+        'dateTime' : order.dateTime,
+        'price' : order.usdPrice/order.price,
+        'usdPrice' : order.usdPrice/order.price,
+        'base' : order.quote,
+        'quote' : 'USD',
+        'userId' : order.userId,
+        'type' : 'spot',
+        'fee' : 0.0,
+        'feeCurrency' : 'USD',
+        'exchange' : 'Poloniex',
+        'amount' : this.pnl/(order.usdPrice/order.price),
+        'tradeId' : null,
+      });
+    }
   }
 
   flipCompensation() {
