@@ -6,16 +6,36 @@ export default class ExchangeAccountant {
     this.map.insert('USD', 0);
   }
 
-  handlePosition(position) {
-    console.log('here');
-    if (position.compensationTrades.length === 0) {
-      this.updateCurrency('USD', position.netPnl);
-    } else {
-      for (let trade in position.compensationTrades) {
-        console.log(trade);
-        this.updateCurrency(trade.base, trade.amount);
+  handlePositionPoloniex(position) {
+    const main = position.compensationTrades[0]; 
+    const alt = position.compensationTrades[1];
+    if (alt.type && position.compensationTrades.length == 2) {
+      const main = position.compensationTrades[0]; 
+      const alt = position.compensationTrades[1];
+      const remainingMain = this.getBalance(main.base) * main.price;
+      const remainingAlt = this.getBalance(alt.base) * alt.price;
+      if (remainingMain > remainingAlt) {
+        console.log('here1');
+        this.updateCurrency(main.base, main.amount);
+        position.compensationTrades = [main];
+      } else {
+        console.log('here2');
+        this.updateCurrency(alt.base, alt.amount);
+        position.compensationTrades = [alt];
       }
+    } else {
+      this.updateCurrency(main.base, main.amount);
     }
+    /*
+    if (position.compensationTrades.length === 0) {
+      if (position.base === 'USD') {
+        this.updateCurrency('USD', position.netPnl);
+      }
+    } else {
+      let trade = position.compensationTrades[0];
+      this.updateCurrency(trade.base, trade.amount);
+    }
+    */
   }
 
   /*
@@ -78,8 +98,10 @@ export default class ExchangeAccountant {
     const base = trade.base;
     this.updateCurrency(base, trade.amount);
     
-    const quote = trade.quote;
-    this.updateCurrency(quote, -trade.amount * trade.price);
+    if (trade.type !== 'settlement') {
+      const quote = trade.quote;
+      this.updateCurrency(quote, -trade.amount * trade.price);
+    }
   }
 
   handleTransfer(transfer) {

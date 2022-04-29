@@ -2413,7 +2413,7 @@ handleMarginOrder	src/adapters/PoloniexAdapter.js	/^  handleMarginOrder(order) {
 handleOrder	src/adapters/BitfinexAdapter.js	/^  handleOrder(order) {$/;"	m	class:Position
 handleOrder	src/adapters/FtxAdapter.js	/^  handleOrder(order) {$/;"	m	class:Position
 handleOrder	src/adapters/PoloniexAdapter.js	/^  handleOrder(order) {$/;"	m	class:Position
-handlePosition	src/adapters/ExchangeAccountant.js	/^  handlePosition(position) {$/;"	m	class:ExchangeAccountant
+handlePositionPoloniex	src/adapters/ExchangeAccountant.js	/^  handlePositionPoloniex(position) {$/;"	m	class:ExchangeAccountant
 handleTrade	src/adapters/ExchangeAccountant.js	/^  handleTrade(trade) {$/;"	m	class:ExchangeAccountant
 handleTransfer	src/adapters/ExchangeAccountant.js	/^  handleTransfer(transfer) {$/;"	m	class:ExchangeAccountant
 har-schema	package-lock.json	/^        "har-schema": "^2.0.0"$/;"	s	object:dependencies.har-validator.requires

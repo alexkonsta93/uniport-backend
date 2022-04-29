@@ -65,6 +65,11 @@ export default class PoloniexAdapter {
         this.handleMarginOrder(order);
       }
     }
+    /*
+    for (let position of this.positions) {
+      console.log(position.format());
+    }
+    */
 
     // Deposits less withdrawals
     let ethDLW = 0.0;
@@ -99,10 +104,10 @@ export default class PoloniexAdapter {
     }
 
     for (let action of this.actions.getValues()) {
+      console.log(action.format());
       if (action.dateOpen) {
         // If position
-        this.accountant.handlePosition(action);
-        console.log(action.format());
+        this.accountant.handlePositionPoloniex(action);
       } else if (action.price) {
         // If order
         this.accountant.handleTrade(action);
@@ -120,7 +125,6 @@ export default class PoloniexAdapter {
     }
     //console.log('eth', ethDLW);
     //console.log('btc', btcDLW);
-    this.printMarginOrders(this.marginOrders);
     /*
     return {
       'orders': this.spotOrders,
@@ -280,7 +284,7 @@ export default class PoloniexAdapter {
           action: 'Transfer',
           dateTime: this.dateTime,
           currency: this.currency,
-          amount: this.amount
+          amount: -this.amount
         };
       }
       transfers.push(transfer);
@@ -604,16 +608,15 @@ class Position {
     this.buildCompensationTrade(order);
   }
 
-  /*
   buildCompensationTrade(order) {
     const main = {};
     const alternative = {};
 
-    if (this.pnl < 0) {
+    if (this.netPnl < 0) {
       // If negative pnl
       main.price = order.usdPrice;
       main.base = order.base;
-      main.amount = this.pnl / order.usdPrice;
+      main.amount = this.netPnl / order.usdPrice;
       main.usdPrice = order.usdPrice;
       main.dateTime =  order.dateTime;
       main.quote = 'USD';
@@ -626,7 +629,7 @@ class Position {
 
       alternative.price =  order.usdPrice / order.price;
       alternative.base = order.quote;
-      alternative.amount = this.pnl / (order.usdPrice / order.price);
+      alternative.amount = this.netPnl / (order.usdPrice / order.price);
       alternative.usdPrice = order.usdPrice / order.price
       alternative.dateTime =  order.dateTime;
       alternative.quote = 'USD';
@@ -636,7 +639,7 @@ class Position {
       alternative.feeCurrency = 'USD';
       alternative.exchange = 'Poloniex';
       alternative.tradeId = null;
-    } else if (this.pnl > 0 && this.quote !== 'USD'){
+    } else if (this.netPnl > 0 && this.quote !== 'USD'){
       // If positive pnl
       main.dateTime = order.dateTime;
       main.price = order.usdPrice/order.price;
@@ -648,8 +651,10 @@ class Position {
       main.fee = 0.0;
       main.feeCurrency = 'USD';
       main.exchange = 'Poloniex';
-      main.amount = this.pnl/(order.usdPrice/order.price);
+      main.amount = this.netPnl/(order.usdPrice/order.price);
       main.tradeId = null;
+
+      alternative.type = null;
     } else {
       return;
     }
@@ -658,9 +663,9 @@ class Position {
     this.compensationTrades.push(main);
     this.compensationTrades.push(alternative);
   }
-  */
+  /*
   buildCompensationTrade(order) {
-    if (this.pnl > 0 && this.quote !== 'USD') {
+    if (this.netPnl > 0 && this.quote !== 'USD') {
       this.compensationTrades.push({ 
         'dateTime' : order.dateTime,
         'price' : order.usdPrice/order.price,
@@ -672,11 +677,12 @@ class Position {
         'fee' : 0.0,
         'feeCurrency' : 'USD',
         'exchange' : 'Poloniex',
-        'amount' : this.pnl/(order.usdPrice/order.price),
+        'amount' : this.netPnl/(order.usdPrice/order.price),
         'tradeId' : null,
       });
     }
   }
+  */
 
   flipCompensation() {
     const main = this.compensationTrades[0];
@@ -711,7 +717,8 @@ class Order {
       base: this.base,
       quote: this.quote,
       amount: this.amount,
-      price: this.price
+      price: this.price,
+      type: this.type
     };
   }
 
