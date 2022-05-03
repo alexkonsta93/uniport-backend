@@ -30,4 +30,21 @@ export default class SortedMap {
     }
     return items;
   }
+
+  getValue(key) {
+		const iter = this._tree.find(key);
+		return iter.node.value;
+  }
+
+	getKeyValuePairsArray() {
+		const iter = this._tree.begin;
+		const pairs = [];
+		while(iter.valid) {
+			const key = iter.node.key;
+			const value = iter.node.value;
+			pairs.push([key, value]);
+			iter.next();
+		}	
+		return pairs;
+	}
 }

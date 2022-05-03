@@ -13,11 +13,19 @@ export default class Map {
 
   getValue(key) {
 		const iter = this._tree.find(key);
-		return iter.node.value;
+    if (iter.node !== null) {
+      return iter.node.value;
+    }
+    return null;
   }
 
 	getValueGE(key) {
 		const iter = this._tree.ge(key);
+		return iter.node.value;
+	}
+
+	getValueLE(key) {
+		const iter = this._tree.le(key);
 		return iter.node.value;
 	}
 

@@ -29,6 +29,16 @@ export default class ExchangeAccountant {
   handlePositionBitfinex(position) {
     const [usdTrade, baseTrade, quoteTrade] = [...position.compensationTrades];
 
+    if (position.netPnl > 0) {
+      if (position.quote === 'USD') {
+        this.updateCurrency('USD', usdTrade.amount);
+        position.compensationTrades = [usdTrade];
+      } else {
+        this.updateCurrency(quoteTrade.base, quoteTrade.amount);
+        position.compensationTrades = [quoteTrade];
+      }
+    }
+    /*
     if (position.netPnl < 0) {
       const usdBalance = this.getBalance('USD');
       const baseUsdBalance = this.getBalance(baseTrade.base) * baseTrade.price;
@@ -61,69 +71,14 @@ export default class ExchangeAccountant {
         position.compensationTrades = [quoteTrade];
       }
     }
+    */
   }
-
-  /*
-  handlePosition(position) {
-    //console.log('position', position);
-    if (position.compensationTrades.length === 0) {
-      // Will always be positive because always profitable pnl
-      this.updateCurrency('USD', position.netPnl);
-      position.compensationTrades = [];
-    } else if (position.compensationTrades.length === 1) {
-      const remainingUSD = this.getBalance('USD');
-      if (position.netPnl < 0){
-        if (remainingUSD > -position.netPnl) {
-          this.updateCurrency('USD', position.netPnl);
-          position.compensationTrades = [];
-        } else {
-          this.updateCurrency('USD', remainingUSD);
-          const trade = position.compensationTrades[0];
-          trade.amount -= remainingUSD/trade.usdPrice;
-        }
-      } 
-    } else {
-      const main = position.compensationTrades[0];
-      const alt = position.compensationTrades[1];
-      const remainingMain = this.getBalance(main.base);
-      const remainingUSD = this.getBalance('USD');
-      // Check if main compensation trade needs to be flipped in negative pnl scenario
-      if (remainingUSD > 1) {
-        if (remainingUSD > -position.netPnl) {
-          this.updateCurrency('USD', position.netPnl);
-          position.compensationTrades = [];
-        } else {
-          this.updateCurrency('USD', remainingUSD);
-          main.amount -= remainingUSD/main.usdPrice;
-          alt.amount -= remainingUSD/alt.usdPrice;
-        }
-      }
-    }
-    if (position.compensationTrades.length == 2) {
-      const main = position.compensationTrades[0]; 
-      const alt = position.compensationTrades[1];
-      const remainingMain = this.getBalance(main.base);
-      if (remainingMain < -position.netPnl/main.usdPrice) {
-        main.amount = -remainingMain;
-        this.updateCurrency(main.base, main.amount);
-        alt.amount = (alt.amount*alt.usdPrice + main.amount*main.usdPrice)/alt.usdPrice;
-        this.updateCurrency(alt.base, alt.amount);
-      } else {
-        position.compensationTrades = [main];
-        this.updateCurrency(main.base, main.amount);
-      }
-    } else if (position.compensationTrades.length == 1) {
-      const main = position.compensationTrades[0]; 
-      this.updateCurrency(main.base, main.amount);
-    }
-  }
-  */
 
   handleTrade(trade) {
     const base = trade.base;
     this.updateCurrency(base, trade.amount);
     
-    if (trade.type !== 'settlement') {
+    if (trade.type === 'spot') {
       const quote = trade.quote;
       this.updateCurrency(quote, -trade.amount * trade.price);
     }
