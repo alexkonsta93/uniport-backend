@@ -15,27 +15,52 @@ export default class ExchangeAccountant {
       const remainingMain = this.getBalance(main.base) * main.price;
       const remainingAlt = this.getBalance(alt.base) * alt.price;
       if (remainingMain > remainingAlt) {
-        console.log('here1');
         this.updateCurrency(main.base, main.amount);
         position.compensationTrades = [main];
       } else {
-        console.log('here2');
         this.updateCurrency(alt.base, alt.amount);
         position.compensationTrades = [alt];
       }
     } else {
       this.updateCurrency(main.base, main.amount);
     }
-    /*
-    if (position.compensationTrades.length === 0) {
-      if (position.base === 'USD') {
-        this.updateCurrency('USD', position.netPnl);
+  }
+
+  handlePositionBitfinex(position) {
+    const [usdTrade, baseTrade, quoteTrade] = [...position.compensationTrades];
+
+    if (position.netPnl < 0) {
+      const usdBalance = this.getBalance('USD');
+      const baseUsdBalance = this.getBalance(baseTrade.base) * baseTrade.price;
+      const quoteUsdBalance = this.getBalance(quoteTrade.base) * quoteTrade.price;
+
+      // Choose whichever has most remaining USD balance
+      if (usdBalance >= baseUsdBalance && usdBalance >= quoteUsdBalance) {
+        //console.log('here1');
+        // USD trade
+        this.updateCurrency('USD', usdTrade.amount);
+        position.compensationTrades = [usdTrade];
+      } else if (baseUsdBalance >= usdBalance && baseUsdBalance >= quoteUsdBalance) {
+        //console.log('here2');
+        // base trade
+        this.updateCurrency(baseTrade.base, baseTrade.amount);
+        position.compensationTrades = [baseTrade];
+      } else {
+        //console.log('here3');
+        // quote trade
+        this.updateCurrency(quoteTrade.base, quoteTrade.amount);
+        position.compensationTrades = [quoteTrade];
       }
+      
     } else {
-      let trade = position.compensationTrades[0];
-      this.updateCurrency(trade.base, trade.amount);
+      if (position.quote === 'USD') {
+        this.updateCurrency('USD', usdTrade.amount);
+        position.compensationTrades = [usdTrade];
+      } else {
+        this.updateCurrency(quoteTrade.base, quoteTrade.amount);
+        position.compensationTrades = [quoteTrade];
+      }
     }
-    */
   }
 
   /*

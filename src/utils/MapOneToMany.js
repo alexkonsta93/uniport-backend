@@ -41,6 +41,17 @@ export default class MapOneToMany {
     return []
   }
 
+  getAllValues() {
+    const iter = this._tree.begin;
+    const allValues = [];
+    while (iter.valid) {
+      const nodeValues = iter.node.value;
+      allValues.push(...nodeValues);
+      iter.next();
+    }
+    return allValues;
+  }
+
   getValuesListGE(key) {
     const iter = this._tree.ge(key);
     if (iter.valid) {

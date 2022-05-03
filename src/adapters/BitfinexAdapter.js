@@ -22,6 +22,7 @@ export default class BitfinexAdapter {
     this.positions = [];
     this.positionRouter = new PositionRouter(userId);
     this.ledger = new MapOneToMany();
+    this.ledger2 = new MapOneToMany();
     this.accountant = new ExchangeAccountant();
     this.actions = new SortedMap();
   }
@@ -64,6 +65,11 @@ export default class BitfinexAdapter {
     // Ledger file
     let lines = this.readLedgerFile();
     lines = lines.reverse();
+    this.readLedgerFile(lines);
+    this.processLedgerLines(lines);
+    for (let value of this.ledger2.getAllValues()) {
+      console.log(value);
+    }
     for (let line of lines) {
       const date = this.buildDate(line);
       this.ledger.insert(date, line);
@@ -107,7 +113,7 @@ export default class BitfinexAdapter {
       console.log(action.format());
       if (action.dateOpen) {
         // If position
-        this.accountant.handlePosition(action);
+        this.accountant.handlePositionBitfinex(action);
       } else if (action.price) {
         // If order
         this.accountant.handleTrade(action);
@@ -124,8 +130,8 @@ export default class BitfinexAdapter {
       console.log(this.accountant.getBalances());
     }
     
-    console.log('eth', ethDLW);
-    console.log('btc', btcDLW);
+    //console.log('eth', ethDLW);
+    //console.log('btc', btcDLW);
     return {
       'orders': this.spotOrders,
       'positions': this.positions
@@ -228,6 +234,7 @@ export default class BitfinexAdapter {
         return {
           action: 'Transfer',
           dateTime: this.dateTime,
+          currency: this.currency,
           amount: this.amount
         };
       }
@@ -279,6 +286,100 @@ export default class BitfinexAdapter {
     orders.push(currentOrder);
 
     return orders;
+  }
+
+  processLedgerLines(lines) {
+    for (let i = 0; i < lines.length - 1; i++) {
+      let line = lines[i];
+      //console.log(line);
+      const description = line['DESCRIPTION'].split(' ');
+      if (description[0] === 'Extraordinary') {
+        // Bitfinex hack
+        const order = { 
+          type: 'loss',
+          amount: this.buildAmount(line),
+          price: 1,
+          base: line['CURRENCY'],
+          quote: 'BFX',
+          dateTime: this.buildDate(line),
+          exchange: 'Bitfinex',
+          feeCurrency: 'USD', 
+          fee: 0,
+          tradeIds: null,
+          orderId: line['#'],
+          userId: this.userId,
+          usdPrice: 1,
+        };
+        i += 1; // Skip next line
+        this.ledger2.insert(order.dateTime, order);
+      } else if (line['WALLET'] === 'margin') {
+        if (description[0] === 'Settlement') {
+          const order = {
+            type: 'settlement',
+            amount: this.buildAmount(line),
+            base: line['CURRENCY'],
+            tradeIds: null,
+            orderId: line['#'],
+            dateTime: this.buildDate(line),
+            fee: 0,
+            feeCurrency: 'USD',
+            userId: this.userId,
+            price: 1,
+            usdPrice: 1,
+            quote: 'USD'
+          };
+          order.price = parseFloat(description[2]);
+          if (order.base !== 'USD') {
+            order.usdPrice = this.buildUsdPrice(order);
+          }
+          i += 1;
+          this.ledger2.insert(order.dateTime, order);
+        } else if ((description[1] === 'funding' && description[2] === 'cost') ||
+                   (description[2] === 'funding' && description[3] === 'cost')) {
+          const order = {
+            type: 'position funding',
+            amount: this.buildAmount(line),
+            quote: 'USD',
+            base: line['CURRENCY'],
+            tradeIds: null,
+            orderId: line['#'],
+            fee: 0,
+            feeCurrency: 'USD',
+            userId: this.userId,
+            dateTime: this.buildDate(line),
+            exchange: 'Bitfinex',
+            price : 1,
+            usdPrice : 1
+          };
+          if (order.base !== 'USD') {
+            order.price = this.buildUsdPrice(order);
+            order.usdPrice = order.price;
+          }
+          this.ledger2.insert(order.dateTime, order);
+        }
+
+      } else {
+        if (description[0] === 'BFX') {
+          const order = {
+            type: 'redemption',
+            amount: this.buildAmount(line),
+            price: 1,
+            base: 'BFX',
+            quote: 'USD',
+            dateTime: this.buildDate(line),
+            exchange: 'Bitfinex',
+            feeCurrency: 'USD',
+            fee: 0,
+            tradeIds: null,
+            orderId: line['#'],
+            usdPrice: 1,
+            userId: this.userId
+          };
+          i += 1; // Skip next line
+          this.ledger2.insert(order.dateTime, order);
+        }
+      }
+    }
   }
 
   /*
@@ -467,7 +568,8 @@ class Position {
       dateClose: this.dateClose,
       base: this.base,
       quote: this.quote,
-      pnl: this.pnl,
+      netPnl: this.netPnl,
+      fee: this.basisFee,
       compensationTrades: this.compensationTrades
     }
   }
@@ -539,17 +641,78 @@ class Position {
     }
     pnl = -pnl;
     pnl -= Math.abs(this.outstanding * order.price);
-    this.grossPnl = pnl * order.usdPrice / order.price - fees;
+    this.grossPnl = pnl * order.usdPrice / order.price;
     this.netPnl = this.grossPnl - this.basisFee;
 
     this.buildCompensationTrade(order);
   }
 
   buildCompensationTrade(order) {
-    const main = {};
-    let alternative = null;
+    /**
+     * For negative pnl, compensation trades array consists
+     * of 3 trades
+     *
+     * 1 - usd compensation trade
+     * 2 - base compensation trade
+     * 3 - quote compensation trade
+    */
+    const usdTrade = {
+      dateTime : order.dateTime,
+      price : 0,
+      usdPrice: 0,
+      base: 'USD',
+      quote: 'USD',
+      amount: this.netPnl,
+      exchange: this.exchange,
+      fee: 0.0,
+      feeCurrency : 'USD',
+      type: 'spot',
+      tradeId: null,
+      userId: this.userId
+    };
+    
+    const baseTrade = { ...usdTrade };
+    baseTrade.amount = this.netPnl / order.usdPrice;
+    baseTrade.base = order.base;
+    baseTrade.usdPrice = order.usdPrice;
+    baseTrade.price = order.usdPrice;
 
-    if (this.pnl < 0) {
+    const quoteTrade = { ...usdTrade };
+    quoteTrade.base = order.quote;
+    quoteTrade.amount = this.netPnl / (order.usdPrice / order.price);
+    quoteTrade.usdPrice = order.usdPrice / order.price;
+    quoteTrade.usdPrice = order.usdPrice / order.price;
+
+
+    /*
+    if (this.netPnl < 0) {
+      usdTrade = {
+        dateTime : order.dateTime,
+        price : 0,
+        usdPrice: 0,
+        base: 'USD',
+        quote: 'USD',
+        amount: order.netPnl,
+        exchange: order.exchange,
+        fee: 0.0;
+        feeCurrency = 'USD',
+        type: 'spot'
+        tradeId: null,
+        userId: order.userId
+      }
+      
+      baseTrade = { ...usdTrade };
+      baseTrade.amount = this.netPnl / order.usdPrice;
+      baseTrade.base = order.base;
+      baseTrade.usdPrice = order.usdPrice:
+      baseTrade.price = order.usdPrice;
+
+      quoteTrade = { ...usdTrade };
+      quoteTrade.base = order.quote;
+      quoteTrade.amount = this.netPnl / (order.usdPrice / order.price);
+      quoteTrade.usdPrice = order.usdPrice / order.price;
+      quoteTrade.usdPrice = order.usdPrice / order.price
+
       // If negative pnl
       main.dateTime =  order.dateTime;
       main.price = order.usdPrice;
@@ -561,14 +724,14 @@ class Position {
       main.fee = 0.0;
       main.feeCurrency = 'USD';
       main.exchange = 'Bitfinex';
-      main.amount = this.pnl / order.usdPrice;
+      main.amount = this.netPnl / order.usdPrice;
       main.tradeId = null;
 
       if (this.quote !== 'USD') {
         alternative = {};
         alternative.price =  order.usdPrice / order.price;
         alternative.base = order.quote;
-        alternative.amount = this.pnl / (order.usdPrice / order.price);
+        alternative.amount = this.netPnl / (order.usdPrice / order.price);
         alternative.usdPrice = order.usdPrice / order.price
         alternative.dateTime =  order.dateTime;
         alternative.quote = 'USD';
@@ -579,7 +742,8 @@ class Position {
         alternative.exchange = 'Bitfinex';
         alternative.tradeId = null;
       }
-    } else if (this.pnl && this.quote !== 'USD') {
+    } else if (this.netPnl && this.quote !== 'USD') {
+      quoteTrade = { ...usdTrade };
       // If positive pnl
       main.dateTime = order.dateTime;
       main.price = order.usdPrice/order.price;
@@ -591,15 +755,13 @@ class Position {
       main.fee = 0.0;
       main.feeCurrency = 'USD';
       main.exchange = 'Bitfinex';
-      main.amount = this.pnl/(order.usdPrice/order.price);
+      main.amount = this.netPnl/(order.usdPrice/order.price);
     } else {
       return;
     }
+  */
 
-    this.compensationTrades.push(main);
-    if (alternative) {
-      this.compensationTrades.push(alternative);
-    }
+    this.compensationTrades.push(usdTrade, baseTrade, quoteTrade);
   }
 
   flipCompensation() {
@@ -634,7 +796,8 @@ class Order {
       base: this.base,
       quote: this.quote,
       amount: this.amount,
-      price: this.price
+      price: this.price,
+      type: this.type
     };
   }
 

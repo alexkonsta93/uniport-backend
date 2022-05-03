@@ -72,7 +72,7 @@ app.get('/print-positions', async (req, res, next) => {
 		try {
         const userId = '62015b3eec19272ccca25765';
         const positions = await axios.get('http://localhost:3000/api/user/' + userId + '/positions');
-				const csv = positionsToCsvDetailed(positions.data);
+				const csv = positionsToCsv(positions.data);
 				fs.writeFile('../positions.csv', csv, err => {
 						if (err) throw err;
 				});
@@ -128,19 +128,22 @@ function convertToArray(trade) {
 }
 
 function tradesToCsv(trades) {
-		var ret = [];
-		
-		for (let trade of trades) {
-				if (
-			    trade.type === 'future-pnl' ||
-			    trade.type === 'spot'
-		    ) {
-						ret.push(converToObj(trade));
-				}
+	var ret = [];
+	
+	for (let trade of trades) {
+		if (trade.base === trade.quote) {
+			continue;
+		}	
+		if (
+			trade.type === 'future-pnl' ||
+			trade.type === 'spot'
+		) {
+				ret.push(converToObj(trade));
 		}
-		return Papa.unparse(ret, {
-				header: true
-		})
+	}
+	return Papa.unparse(ret, {
+		header: true
+	})
 }
 
 function positionsToCsv(positions) {
@@ -162,9 +165,8 @@ function positionsToCsv(positions) {
 						'Basis Fee Currency': position.basisFeeCurrency,
 						'Funding Fee': position.fundingFee,
 						'Funding Fee Currency':  position.fundingFeeCurrency,
-					  'Gross PNL': position.pnl,
-						'Net PNL': position.pnl - position.basisFee - fundingFeeUSD,
-					  'Collateral Type': position.collateralType
+					  'Gross PNL': position.grossPnl,
+						'Net PNL': position.netPnl,
 				})
 		}
 		return Papa.unparse(ret, {

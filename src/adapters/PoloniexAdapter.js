@@ -639,7 +639,7 @@ class Position {
       alternative.feeCurrency = 'USD';
       alternative.exchange = 'Poloniex';
       alternative.tradeId = null;
-    } else if (this.netPnl > 0 && this.quote !== 'USD'){
+    } else {
       // If positive pnl
       main.dateTime = order.dateTime;
       main.price = order.usdPrice/order.price;
@@ -655,9 +655,8 @@ class Position {
       main.tradeId = null;
 
       alternative.type = null;
-    } else {
-      return;
     }
+
 
     // Handle collater reduction type
     this.compensationTrades.push(main);

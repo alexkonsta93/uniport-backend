@@ -266,7 +266,9 @@ router
       //let data = adapter.processCsvData(req.body.lines);
       adapter.processLocalData();
       //await adapter.createDbEntries(req.params.id, data)
+      console.log('user.router here1');
       let data = await adapter.createDbEntries();
+      console.log('user.router here2');
       res.status(200).json(data);
       //res.status(200);
     } catch (err) {
