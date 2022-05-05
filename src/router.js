@@ -136,7 +136,8 @@ function tradesToCsv(trades) {
 		}	
 		if (
 			trade.type === 'future-pnl' ||
-			trade.type === 'spot'
+			trade.type === 'spot' ||
+			trade.type === 'settlement'
 		) {
 				ret.push(converToObj(trade));
 		}

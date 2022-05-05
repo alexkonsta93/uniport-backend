@@ -585,9 +585,11 @@ export default class BitfinexAdapter {
       // compensation trades
       let compensationTradeIds = [];
       for (let order of position.compensationTrades) {
-        order = new OrderModel(order);
-        const doc = await order.save();
-        compensationTradeIds.push(doc.id);
+        if (order.base !== 'USD') {
+          order = new OrderModel(order);
+          const doc = await order.save();
+          compensationTradeIds.push(doc.id);
+        }
       }
       position.compensationTradeIds = compensationTradeIds;
       delete position.compensationTrades;

@@ -249,7 +249,8 @@ export default class PoloniexAdapter {
         continue;
       }
       const transfer = {};
-      transfer.dateTime = new Date(line['Date']);
+      //transfer.dateTime = new Date(line['Date']);
+      transfer.dateTime = moment.utc(line['Date'], 'YYYY-MM-DD HH:mm:ss')
       transfer.currency = line['Currency'];
       transfer.amount = parseFloat(line['Amount']);
       transfer.format = function() {
@@ -276,7 +277,8 @@ export default class PoloniexAdapter {
         continue;
       }
       const transfer = {};
-      transfer.dateTime = new Date(line['Date']);
+      //transfer.dateTime = new Date(line['Date']);
+      transfer.dateTime = moment.utc(line['Date'], 'YYYY-MM-DD HH:mm:ss')
       transfer.currency = line['Currency'];
       transfer.amount = -parseFloat(line['Amount']);
       transfer.format = function() {
@@ -325,7 +327,8 @@ export default class PoloniexAdapter {
   buildTrade(line) {
     const trade = {};
 
-    trade.dateTime = new Date(line['Date']);
+    //trade.dateTime = new Date(line['Date']);
+    trade.dateTime = moment.utc(line['Date'], 'YYYY-MM-DD HH:mm:ss')
 
     trade.userId = this.userId;
     
@@ -447,17 +450,12 @@ export default class PoloniexAdapter {
       let compensationTradeIds = [];
       if (position.compensationTrades.length > 0) {
         let order = position.compensationTrades[0];
-        order = new OrderModel(order);
-        const doc = await order.save();
-        compensationTradeIds.push(doc.id);
+        if (order.base !== 'USD') {
+          order = new OrderModel(order);
+          const doc = await order.save();
+          compensationTradeIds.push(doc.id);
+        }
       }
-      /*
-      for (let order of position.compensationTrades) {
-        order = new OrderModel(order);
-        const doc = await order.save();
-        compensationTradeIds.push(doc.id);
-      }
-      */
       position.compensationTradeIds = compensationTradeIds;
       delete position.compensationTrades;
     }

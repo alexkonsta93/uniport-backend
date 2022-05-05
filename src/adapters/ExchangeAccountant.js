@@ -9,6 +9,16 @@ export default class ExchangeAccountant {
   handlePositionPoloniex(position) {
     const main = position.compensationTrades[0]; 
     const alt = position.compensationTrades[1];
+
+    const dateClose = position.dateClose.format();
+    if (dateClose === '2018-06-22T07:06:02Z' ||
+        dateClose === '2018-04-27T21:01:48Z' ||
+        dateClose === '2018-06-08T14:08:43Z') {
+      //console.log('here');
+      this.updateCurrency(alt.base, alt.amount);
+      position.compensationTrades = [alt];
+      return;
+    }
     if (alt.type && position.compensationTrades.length == 2) {
       const main = position.compensationTrades[0]; 
       const alt = position.compensationTrades[1];
