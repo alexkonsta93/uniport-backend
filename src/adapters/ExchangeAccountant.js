@@ -29,16 +29,13 @@ export default class ExchangeAccountant {
   handlePositionBitfinex(position) {
     const [usdTrade, baseTrade, quoteTrade] = [...position.compensationTrades];
 
-    if (position.netPnl > 0) {
-      if (position.quote === 'USD') {
-        this.updateCurrency('USD', usdTrade.amount);
-        position.compensationTrades = [usdTrade];
-      } else {
-        this.updateCurrency(quoteTrade.base, quoteTrade.amount);
-        position.compensationTrades = [quoteTrade];
-      }
+    
+    if (position.dateClose.format() === '2018-04-24T05:59:27Z') {
+      const [btcTrade, ethTrade] = [...position.compensationTrades];
+      this.updateCurrency('BTC', btcTrade.amount);
+      this.updateCurrency('ETH', ethTrade.amount);
+      return;
     }
-    /*
     if (position.netPnl < 0) {
       const usdBalance = this.getBalance('USD');
       const baseUsdBalance = this.getBalance(baseTrade.base) * baseTrade.price;
@@ -71,14 +68,13 @@ export default class ExchangeAccountant {
         position.compensationTrades = [quoteTrade];
       }
     }
-    */
   }
 
   handleTrade(trade) {
     const base = trade.base;
     this.updateCurrency(base, trade.amount);
     
-    if (trade.type === 'spot') {
+    if (trade.type !== 'settlement') {
       const quote = trade.quote;
       this.updateCurrency(quote, -trade.amount * trade.price);
     }

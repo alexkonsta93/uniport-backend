@@ -91,7 +91,9 @@ orderSchema.index({
   exchange: 1, 
   orderId: 1, 
   quote: 1, 
-  base: 1
+  base: 1,
+  price: 1,
+  amount: 1
 }, { unique: true });
 
 /***Statics***/

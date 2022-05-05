@@ -490,8 +490,12 @@ ajv-keywords	package-lock.json	/^            "ajv-keywords": "^3.5.2"$/;"	s	obje
 ajv-keywords	package-lock.json	/^            "ajv-keywords": "^3.5.2"$/;"	s	object:dependencies.webpack.dependencies.schema-utils.requires
 ajv-keywords	package-lock.json	/^        "ajv-keywords": "^3.5.2"$/;"	s	object:dependencies.schema-utils.requires
 ajv-keywords	package-lock.json	/^    "ajv-keywords": {$/;"	o	object:dependencies
+amount	src/adapters/BitfinexAdapter.js	/^            amount: -btcAmount*btcPrice,$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
+amount	src/adapters/BitfinexAdapter.js	/^            amount: -ethAmount*ethPrice,$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
 amount	src/adapters/BitfinexAdapter.js	/^            amount: this.buildAmount(line),$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
 amount	src/adapters/BitfinexAdapter.js	/^          amount: this.buildAmount(line),$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
+amount	src/adapters/BitfinexAdapter.js	/^        amount: -5.14,$/;"	p	class:Position.buildCompensationTrade.btcTrade
+amount	src/adapters/BitfinexAdapter.js	/^        amount: -72.1,$/;"	p	class:Position.buildCompensationTrade.ethTrade
 amount	src/adapters/BitfinexAdapter.js	/^      amount: this.netPnl,$/;"	p	class:Position.buildCompensationTrade.usdTrade
 amount	src/adapters/FtxAdapter.js	/^      amount: amount,$/;"	p	class:Order.split.orderLeft
 amount	src/adapters/FtxAdapter.js	/^      amount: this.amount - amount,$/;"	p	class:Order.split.orderRight
@@ -680,6 +684,8 @@ base	package-lock.json	/^    "base": {$/;"	o	object:dependencies
 base	src/adapters/BitfinexAdapter.js	/^            base: 'BFX',$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
 base	src/adapters/BitfinexAdapter.js	/^            base: line['CURRENCY'],$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
 base	src/adapters/BitfinexAdapter.js	/^          base: line['CURRENCY'],$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
+base	src/adapters/BitfinexAdapter.js	/^        base: 'BTC', $/;"	p	class:Position.buildCompensationTrade.btcTrade
+base	src/adapters/BitfinexAdapter.js	/^        base: 'ETH',$/;"	p	class:Position.buildCompensationTrade.ethTrade
 base	src/adapters/BitfinexAdapter.js	/^      base: 'USD',$/;"	p	class:Position.buildCompensationTrade.usdTrade
 base	src/adapters/FtxAdapter.js	/^      base: this.base,$/;"	p	class:Order.split.orderLeft
 base	src/adapters/FtxAdapter.js	/^      base: this.base,$/;"	p	class:Order.split.orderRight
@@ -721,6 +727,7 @@ bser	package-lock.json	/^    "bser": {$/;"	o	object:dependencies
 bson	package-lock.json	/^        "bson": "^1.1.4",$/;"	s	object:dependencies.mongodb.requires
 bson	package-lock.json	/^        "bson": "^1.1.4",$/;"	s	object:dependencies.mongoose.requires
 bson	package-lock.json	/^    "bson": {$/;"	o	object:dependencies
+btcTrade	src/adapters/BitfinexAdapter.js	/^      const btcTrade = {$/;"	c	class:Position.buildCompensationTrade
 buffer-from	package-lock.json	/^        "buffer-from": "^1.0.0",$/;"	s	object:dependencies.source-map-support.requires
 buffer-from	package-lock.json	/^    "buffer-from": {$/;"	o	object:dependencies
 bugs	package.json	/^  "bugs": {$/;"	o
@@ -1050,9 +1057,12 @@ dashdash	package-lock.json	/^        "dashdash": "^1.12.0",$/;"	s	object:depende
 dashdash	package-lock.json	/^    "dashdash": {$/;"	o	object:dependencies
 data-urls	package-lock.json	/^        "data-urls": "^2.0.0",$/;"	s	object:dependencies.jsdom.requires
 data-urls	package-lock.json	/^    "data-urls": {$/;"	o	object:dependencies
+dateTime	src/adapters/BitfinexAdapter.js	/^            dateTime: dateTime,$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
 dateTime	src/adapters/BitfinexAdapter.js	/^            dateTime: this.buildDate(line),$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
 dateTime	src/adapters/BitfinexAdapter.js	/^          dateTime: this.buildDate(line),$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
-dateTime	src/adapters/BitfinexAdapter.js	/^      dateTime : order.dateTime,$/;"	p	class:Position.buildCompensationTrade.usdTrade
+dateTime	src/adapters/BitfinexAdapter.js	/^        dateTime: order.dateTime,$/;"	p	class:Position.buildCompensationTrade.btcTrade
+dateTime	src/adapters/BitfinexAdapter.js	/^        dateTime: order.dateTime,$/;"	p	class:Position.buildCompensationTrade.ethTrade
+dateTime	src/adapters/BitfinexAdapter.js	/^      dateTime: order.dateTime,$/;"	p	class:Position.buildCompensationTrade.usdTrade
 dateTime	src/adapters/FtxAdapter.js	/^      dateTime: this.dateTime,$/;"	p	class:Order.split.orderLeft
 dateTime	src/adapters/FtxAdapter.js	/^      dateTime: this.dateTime,$/;"	p	class:Order.split.orderRight
 dateTime	src/adapters/KrakenFuturesAdapter.js	/^      dateTime: line.dateTime,$/;"	p	class:Position.createBasisTrade.trade
@@ -2164,10 +2174,13 @@ esutils	package-lock.json	/^    "esutils": {$/;"	o	object:dependencies
 etag	package-lock.json	/^        "etag": "~1.8.1",$/;"	s	object:dependencies.express.requires
 etag	package-lock.json	/^        "etag": "~1.8.1",$/;"	s	object:dependencies.send.requires
 etag	package-lock.json	/^    "etag": {$/;"	o	object:dependencies
+ethTrade	src/adapters/BitfinexAdapter.js	/^      const ethTrade = {$/;"	c	class:Position.buildCompensationTrade
 events	package-lock.json	/^        "events": "^3.2.0",$/;"	s	object:dependencies.webpack.requires
 events	package-lock.json	/^    "events": {$/;"	o	object:dependencies
 exchange	src/adapters/BitfinexAdapter.js	/^            exchange: 'Bitfinex',$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
 exchange	src/adapters/BitfinexAdapter.js	/^          exchange: 'Bitfinex',$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
+exchange	src/adapters/BitfinexAdapter.js	/^        exchange: order.exchange,$/;"	p	class:Position.buildCompensationTrade.btcTrade
+exchange	src/adapters/BitfinexAdapter.js	/^        exchange: order.exchange,$/;"	p	class:Position.buildCompensationTrade.ethTrade
 exchange	src/adapters/BitfinexAdapter.js	/^      exchange: this.exchange,$/;"	p	class:Position.buildCompensationTrade.usdTrade
 exchange	src/adapters/FtxAdapter.js	/^        exchange: 'ftx',$/;"	p	class:FtxAdapter.processApiData.trade
 exchange	src/adapters/FtxAdapter.js	/^      exchange: this.exchange,$/;"	p	class:Order.split.orderLeft
@@ -2258,6 +2271,8 @@ fb-watchman	package-lock.json	/^        "fb-watchman": "^2.0.0",$/;"	s	object:de
 fb-watchman	package-lock.json	/^    "fb-watchman": {$/;"	o	object:dependencies
 fee	src/adapters/BitfinexAdapter.js	/^            fee: 0,$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
 fee	src/adapters/BitfinexAdapter.js	/^          fee: 0,$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
+fee	src/adapters/BitfinexAdapter.js	/^        fee: 0.0,$/;"	p	class:Position.buildCompensationTrade.btcTrade
+fee	src/adapters/BitfinexAdapter.js	/^        fee: 0.0,$/;"	p	class:Position.buildCompensationTrade.ethTrade
 fee	src/adapters/BitfinexAdapter.js	/^      fee: 0.0,$/;"	p	class:Position.buildCompensationTrade.usdTrade
 fee	src/adapters/FtxAdapter.js	/^      fee: this.fee,$/;"	p	class:Order.split.orderLeft
 fee	src/adapters/FtxAdapter.js	/^      fee: this.fee,$/;"	p	class:Order.split.orderRight
@@ -2266,8 +2281,11 @@ fee	src/resources/GdaxAdapter.js	/^          fee: fee,$/;"	p	class:linesToTrades
 fee	src/resources/GdaxAdapter.js	/^        fee: fee,$/;"	p	class:linesToTrades.trade
 fee	src/resources/__tests__/leveraged-position.spec.js	/^						'fee': 100,$/;"	p	class:initializeOrdersData.validPosition1.order1
 fee	src/resources/__tests__/leveraged-position.spec.js	/^						'fee': 200,$/;"	p	class:initializeOrdersData.validPosition1.order2
+feeCurrency	src/adapters/BitfinexAdapter.js	/^            feeCurrency: 'USD', $/;"	p	class:BitfinexAdapter.processLedgerLines.trade
 feeCurrency	src/adapters/BitfinexAdapter.js	/^            feeCurrency: 'USD',$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
-feeCurrency	src/adapters/BitfinexAdapter.js	/^          feeCurrency: 'USD', $/;"	p	class:BitfinexAdapter.processLedgerLines.trade
+feeCurrency	src/adapters/BitfinexAdapter.js	/^          feeCurrency: 'USD',$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
+feeCurrency	src/adapters/BitfinexAdapter.js	/^        feeCurrency: 'USD',$/;"	p	class:Position.buildCompensationTrade.btcTrade
+feeCurrency	src/adapters/BitfinexAdapter.js	/^        feeCurrency: 'USD',$/;"	p	class:Position.buildCompensationTrade.ethTrade
 feeCurrency	src/adapters/BitfinexAdapter.js	/^      feeCurrency : 'USD',$/;"	p	class:Position.buildCompensationTrade.usdTrade
 feeCurrency	src/adapters/FtxAdapter.js	/^      feeCurrency: this.feeCurrency,$/;"	p	class:Order.split.orderLeft
 feeCurrency	src/adapters/FtxAdapter.js	/^      feeCurrency: this.feeCurrency,$/;"	p	class:Order.split.orderRight
@@ -4128,8 +4146,12 @@ pretty-format	package-lock.json	/^        "pretty-format": "^26.6.2",$/;"	s	obje
 pretty-format	package-lock.json	/^    "pretty-format": {$/;"	o	object:dependencies
 price	src/adapters/BitfinexAdapter.js	/^            price : 1,$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
 price	src/adapters/BitfinexAdapter.js	/^            price: 1,$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
+price	src/adapters/BitfinexAdapter.js	/^            price: 1\/btcPrice,$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
+price	src/adapters/BitfinexAdapter.js	/^            price: 1\/ethPrice,$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
 price	src/adapters/BitfinexAdapter.js	/^          price: 1,$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
-price	src/adapters/BitfinexAdapter.js	/^      price : 0,$/;"	p	class:Position.buildCompensationTrade.usdTrade
+price	src/adapters/BitfinexAdapter.js	/^        price: 640.0,$/;"	p	class:Position.buildCompensationTrade.ethTrade
+price	src/adapters/BitfinexAdapter.js	/^        price: order.price,$/;"	p	class:Position.buildCompensationTrade.btcTrade
+price	src/adapters/BitfinexAdapter.js	/^      price: 1,$/;"	p	class:Position.buildCompensationTrade.usdTrade
 price	src/adapters/FtxAdapter.js	/^      price: this.price,$/;"	p	class:Order.split.orderLeft
 price	src/adapters/FtxAdapter.js	/^      price: this.price,$/;"	p	class:Order.split.orderRight
 price	src/adapters/KrakenFuturesAdapter.js	/^      price: parseFloat(line['trade price']),$/;"	p	class:Position.createCompensationTrade.trade
@@ -4191,7 +4213,9 @@ qs	package-lock.json	/^    "qs": {$/;"	o	object:dependencies
 quote	src/adapters/BitfinexAdapter.js	/^            quote: 'USD'$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
 quote	src/adapters/BitfinexAdapter.js	/^            quote: 'USD',$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
 quote	src/adapters/BitfinexAdapter.js	/^            quote: line['CURRENCY'],$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
-quote	src/adapters/BitfinexAdapter.js	/^          quote: 'BFX',$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
+quote	src/adapters/BitfinexAdapter.js	/^          quote: 'USD',$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
+quote	src/adapters/BitfinexAdapter.js	/^        quote: 'USD',$/;"	p	class:Position.buildCompensationTrade.btcTrade
+quote	src/adapters/BitfinexAdapter.js	/^        quote: 'USD',$/;"	p	class:Position.buildCompensationTrade.ethTrade
 quote	src/adapters/BitfinexAdapter.js	/^      quote: 'USD',$/;"	p	class:Position.buildCompensationTrade.usdTrade
 quote	src/adapters/FtxAdapter.js	/^      quote: this.quote,$/;"	p	class:Order.split.orderLeft
 quote	src/adapters/FtxAdapter.js	/^      quote: this.quote,$/;"	p	class:Order.split.orderRight
@@ -6055,7 +6079,8 @@ tough-cookie	package-lock.json	/^    "tough-cookie": {$/;"	o	object:dependencies
 tr46	package-lock.json	/^        "tr46": "^2.0.2",$/;"	s	object:dependencies.whatwg-url.requires
 tr46	package-lock.json	/^    "tr46": {$/;"	o	object:dependencies
 trade	src/adapters/BitfinexAdapter.js	/^          const trade = {$/;"	c	class:BitfinexAdapter.processLedgerLines
-trade	src/adapters/BitfinexAdapter.js	/^        const trade = { $/;"	c	class:BitfinexAdapter.processLedgerLines
+trade	src/adapters/BitfinexAdapter.js	/^          trade = { $/;"	c	class:BitfinexAdapter.processLedgerLines
+trade	src/adapters/BitfinexAdapter.js	/^        const trade = {$/;"	c	class:BitfinexAdapter.processLedgerLines
 trade	src/adapters/FtxAdapter.js	/^      let trade = { $/;"	c	class:FtxAdapter.processApiData
 trade	src/adapters/KrakenFuturesAdapter.js	/^    const trade = {$/;"	c	class:Position.createBasisTrade
 trade	src/adapters/KrakenFuturesAdapter.js	/^    var trade = {$/;"	c	class:Position.createCompensationTrade
@@ -6063,6 +6088,8 @@ trade	src/adapters/KrakenFuturesAdapter.js	/^    var trade = {$/;"	c	class:Posit
 trade	src/resources/GdaxAdapter.js	/^          let trade = {$/;"	c	class:linesToTrades
 trade	src/resources/GdaxAdapter.js	/^        let trade = {$/;"	c	class:linesToTrades
 trade	src/resources/GdaxAdapter.js	/^      var trade = {$/;"	c	class:linesToTrades
+tradeId	src/adapters/BitfinexAdapter.js	/^        tradeId: null,$/;"	p	class:Position.buildCompensationTrade.btcTrade
+tradeId	src/adapters/BitfinexAdapter.js	/^        tradeId: null,$/;"	p	class:Position.buildCompensationTrade.ethTrade
 tradeId	src/adapters/BitfinexAdapter.js	/^      tradeId: null,$/;"	p	class:Position.buildCompensationTrade.usdTrade
 tradeId	src/adapters/KrakenFuturesAdapter.js	/^      tradeId: line.uid,$/;"	p	class:Position.createBasisTrade.trade
 tradeIds	src/adapters/BitfinexAdapter.js	/^            tradeIds: null,$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
@@ -6083,11 +6110,14 @@ tweetnacl	package-lock.json	/^        "tweetnacl": "^0.14.3"$/;"	s	object:depend
 tweetnacl	package-lock.json	/^        "tweetnacl": "~0.14.0"$/;"	s	object:dependencies.sshpk.requires
 tweetnacl	package-lock.json	/^    "tweetnacl": {$/;"	o	object:dependencies
 type	package.json	/^    "type": "git",$/;"	s	object:repository
+type	src/adapters/BitfinexAdapter.js	/^            type: 'loss',$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
 type	src/adapters/BitfinexAdapter.js	/^            type: 'position funding',$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
 type	src/adapters/BitfinexAdapter.js	/^            type: 'redemption',$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
 type	src/adapters/BitfinexAdapter.js	/^            type: 'settlement',$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
-type	src/adapters/BitfinexAdapter.js	/^          type: 'loss',$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
-type	src/adapters/BitfinexAdapter.js	/^      type: 'spot',$/;"	p	class:Position.buildCompensationTrade.usdTrade
+type	src/adapters/BitfinexAdapter.js	/^          type: 'position close',$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
+type	src/adapters/BitfinexAdapter.js	/^        type: 'settlement',$/;"	p	class:Position.buildCompensationTrade.btcTrade
+type	src/adapters/BitfinexAdapter.js	/^        type: 'settlement',$/;"	p	class:Position.buildCompensationTrade.ethTrade
+type	src/adapters/BitfinexAdapter.js	/^      type: 'settlement',$/;"	p	class:Position.buildCompensationTrade.usdTrade
 type	src/adapters/FtxAdapter.js	/^      type: this.type,$/;"	p	class:Order.split.orderLeft
 type	src/adapters/FtxAdapter.js	/^      type: this.type,$/;"	p	class:Order.split.orderRight
 type	src/adapters/KrakenFuturesAdapter.js	/^      type: 'future-basis',$/;"	p	class:Position.createBasisTrade.trade
@@ -6139,14 +6169,20 @@ url	package.json	/^    "url": "git+https:\/\/github.com\/alexkonsta93\/uniport-b
 url	package.json	/^    "url": "https:\/\/github.com\/alexkonsta93\/uniport-backend.git"$/;"	s	object:bugs
 usdPrice	src/adapters/BitfinexAdapter.js	/^            usdPrice : 1$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
 usdPrice	src/adapters/BitfinexAdapter.js	/^            usdPrice: 1,$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
-usdPrice	src/adapters/BitfinexAdapter.js	/^          usdPrice: 1,$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
-usdPrice	src/adapters/BitfinexAdapter.js	/^      usdPrice: 0,$/;"	p	class:Position.buildCompensationTrade.usdTrade
+usdPrice	src/adapters/BitfinexAdapter.js	/^            usdPrice: btcPrice,$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
+usdPrice	src/adapters/BitfinexAdapter.js	/^            usdPrice: ethPrice,$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
+usdPrice	src/adapters/BitfinexAdapter.js	/^          usdPrice: 1$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
+usdPrice	src/adapters/BitfinexAdapter.js	/^        usdPrice: 640.0,$/;"	p	class:Position.buildCompensationTrade.ethTrade
+usdPrice	src/adapters/BitfinexAdapter.js	/^        usdPrice: order.price,$/;"	p	class:Position.buildCompensationTrade.btcTrade
+usdPrice	src/adapters/BitfinexAdapter.js	/^      usdPrice: 1,$/;"	p	class:Position.buildCompensationTrade.usdTrade
 usdTrade	src/adapters/BitfinexAdapter.js	/^    const usdTrade = {$/;"	c	class:Position.buildCompensationTrade
 use	package-lock.json	/^        "use": "^3.1.0"$/;"	s	object:dependencies.snapdragon.requires
 use	package-lock.json	/^    "use": {$/;"	o	object:dependencies
 userId	src/adapters/BitfinexAdapter.js	/^            userId: this.userId$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
 userId	src/adapters/BitfinexAdapter.js	/^            userId: this.userId,$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
 userId	src/adapters/BitfinexAdapter.js	/^          userId: this.userId,$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
+userId	src/adapters/BitfinexAdapter.js	/^        userId: this.userId$/;"	p	class:Position.buildCompensationTrade.btcTrade
+userId	src/adapters/BitfinexAdapter.js	/^        userId: this.userId$/;"	p	class:Position.buildCompensationTrade.ethTrade
 userId	src/adapters/BitfinexAdapter.js	/^      userId: this.userId$/;"	p	class:Position.buildCompensationTrade.usdTrade
 userId	src/adapters/FtxAdapter.js	/^        userId: this.userId,$/;"	p	class:FtxAdapter.processApiData.trade
 userId	src/adapters/FtxAdapter.js	/^      userId: this.userId,$/;"	p	class:Order.split.orderLeft

@@ -24,7 +24,8 @@ export default class BitfinexAdapter {
     this.ledger = new MapOneToMany();
     this.ledger2 = new MapOneToMany();
     this.accountant = new ExchangeAccountant();
-    this.actions = new SortedMap();
+    this.actions = new MapOneToMany();
+    this.positionCloses = [];
   }
 
   processCsvData(lines) {
@@ -81,7 +82,7 @@ export default class BitfinexAdapter {
     for (let order of orders) {
       if (order.type === 'spot') {
         this.spotOrders.push(order);
-        this.actions.insert(order.dateTime, order);
+        this.actions.insert(order.dateTime.format(), order);
       } else {
         this.handleMarginOrder(order);
       }
@@ -90,8 +91,8 @@ export default class BitfinexAdapter {
     // Process ledger trades
     const dateToPositionsMap = new Map();
     for (let position of this.positions) {
-      const dateOpen = this.stripTime(position.dateOpen);
-      const dateClose = this.stripTime(position.dateClose);
+      const dateOpen = this.stripTime(moment(position.dateOpen));
+      const dateClose = this.stripTime(moment(position.dateClose));
       let date = dateOpen;
       while (date <= dateClose) {
         dateToPositionsMap.insert(date.format(), position);
@@ -100,7 +101,7 @@ export default class BitfinexAdapter {
     }
     for (let order of this.ledger2.getAllValues()) {
       if (order.type === 'position funding') {
-        let dateTimeStripped = this.stripTime(order.dateTime);
+        let dateTimeStripped = this.stripTime(moment(order.dateTime));
         let position = dateToPositionsMap.getValue(dateTimeStripped.format());
         if (position === null) {
           dateTimeStripped = dateTimeStripped.subtract(1, 'days');
@@ -118,33 +119,26 @@ export default class BitfinexAdapter {
           position.fundingFee -= order.amount * order.price;
         }
       } else {
-        if (this.type === 'settlement') {
-          this.spotOrders.push(order);
+        if (order.type === 'settlement') {
+          //this.spotOrders.push(order);
+          continue;
+        } else if (order.type === 'position close') {
+          this.positionCloses.push(order);
+          continue;
         }
-        this.actions.insert(order);
+        this.actions.insert(order.dateTime.format(), order);
       }
     }
-
-    // Deposits less withdrawals
-    let ethDLW = 0.0;
-    let btcDLW = 0.0;
 
     // Movements file
     lines = this.readMovementsFile();
     lines = lines.reverse();
     const transfers = this.buildTransfers(lines);
     for (let transfer of transfers) {
-      this.actions.insert(transfer.dateTime, transfer); 
-      if (transfer.currency === 'ETH') {
-        ethDLW += transfer.amount;
-      }
-      if (transfer.currency === 'BTC') {
-        btcDLW += transfer.amount;
-      }
+      this.actions.insert(transfer.dateTime.format(), transfer); 
     } 
-    
     //console.log(this.actions.getValues());
-    for (let action of this.actions.getValues()) {
+    for (let action of this.actions.getAllValues()) {
       console.log(action.format());
       if (action.dateOpen) {
         // If position
@@ -153,12 +147,6 @@ export default class BitfinexAdapter {
       } else if (action.price) {
         // If order
         this.accountant.handleTrade(action);
-        if (action.base === 'ETH') {
-          ethDLW += action.amount;
-        }
-        if (action.base === 'BTC') {
-          btcDLW += action.amount;
-        }
       } else {
         // If transfer
         this.accountant.handleTransfer(action);
@@ -166,8 +154,6 @@ export default class BitfinexAdapter {
       console.log(this.accountant.getBalances());
     }
     
-    //console.log('eth', ethDLW);
-    //console.log('btc', btcDLW);
     return {
       'orders': this.spotOrders,
       'positions': this.positions
@@ -218,7 +204,7 @@ export default class BitfinexAdapter {
     // If complete
     if (currentPosition.isComplete()) {
       this.positions.push(currentPosition);
-      this.actions.insert(currentPosition.dateClose, currentPosition);
+      this.actions.insert(currentPosition.dateClose.format(), currentPosition);
       this.positionRouter.finalize(pair); 
     }
 
@@ -338,21 +324,46 @@ export default class BitfinexAdapter {
       const description = line['DESCRIPTION'].split(' ');
       if (description[0] === 'Extraordinary') {
         // Bitfinex hack
-        const trade = { 
-          type: 'loss',
-          amount: this.buildAmount(line),
-          price: 1,
-          base: line['CURRENCY'],
-          quote: 'BFX',
-          dateTime: this.buildDate(line),
-          exchange: 'Bitfinex',
-          feeCurrency: 'USD', 
-          fee: 0,
-          tradeIds: null,
-          orderId: line['#'],
-          userId: this.userId,
-          usdPrice: 1,
-        };
+        let trade = {};
+        if (line['CURRENCY'] === 'BTC') {
+          const dateTime = this.buildDate(line);
+          const btcAmount = this.buildAmount(line);
+          const btcPrice = this.btcHistory.getValueLE(dateTime.unix());
+          trade = { 
+            type: 'loss',
+            amount: -btcAmount*btcPrice,
+            price: 1/btcPrice,
+            quote: line['CURRENCY'],
+            base: 'BFX',
+            dateTime: dateTime,
+            exchange: 'Bitfinex',
+            feeCurrency: 'USD', 
+            fee: 0,
+            tradeIds: null,
+            orderId: line['#'],
+            userId: this.userId,
+            usdPrice: btcPrice,
+          };
+        } else {
+          const dateTime = this.buildDate(line);
+          const ethAmount = this.buildAmount(line);
+          const ethPrice = this.ethHistory.getValueLE(dateTime.unix());
+          trade = { 
+            type: 'loss',
+            amount: -ethAmount*ethPrice,
+            price: 1/ethPrice,
+            quote: line['CURRENCY'],
+            base: 'BFX',
+            dateTime: dateTime,
+            exchange: 'Bitfinex',
+            feeCurrency: 'USD', 
+            fee: 0,
+            tradeIds: null,
+            orderId: line['#'],
+            userId: this.userId,
+            usdPrice: ethPrice,
+          };
+        }
         const order = new Order(trade); 
         i += 1; // Skip next line
         this.ledger2.insert(order.dateTime, order);
@@ -365,6 +376,7 @@ export default class BitfinexAdapter {
             tradeIds: null,
             orderId: line['#'],
             dateTime: this.buildDate(line),
+            exchange: 'Bitfinex',
             fee: 0,
             feeCurrency: 'USD',
             userId: this.userId,
@@ -398,7 +410,7 @@ export default class BitfinexAdapter {
           };
           if (trade.base !== 'USD') {
             if (trade.base === 'ZRX') {
-              trade.price = 0.8
+              trade.price = 0.8;
             } else {
               trade.price = this.buildUsdPrice(trade);
             }
@@ -409,6 +421,32 @@ export default class BitfinexAdapter {
           this.ledger2.insert(order.dateTime, order);
         }
 
+      } else if (description[0] === 'Position' &&
+                 description[1] === 'closed') {
+        const trade = {
+          type: 'position close',
+          amount: this.buildAmount(line),
+          base: line['CURRENCY'],
+          quote: 'USD',
+          tradeIds: null,
+          orderId: line['#'],
+          fee: 0,
+          feeCurrency: 'USD',
+          userId: this.userId,
+          dateTime: this.buildDate(line),
+          exchange: 'Bitfinex',
+          price: 1,
+          usdPrice: 1
+        };
+        if (trade.base !== 'USD') {
+          if (trade.base === 'ZRX') {
+            trade.price = 0.8;
+          } else {
+            trade.price = this.buildUsdPrice(trade);
+          }
+          const order = new Order(trade);
+          this.ledger2.insert(order.dateTime, order);
+        }
       } else {
         if (description[0] === 'BFX') {
           const trade = {
@@ -554,7 +592,6 @@ export default class BitfinexAdapter {
       position.compensationTradeIds = compensationTradeIds;
       delete position.compensationTrades;
     }
-
     const positionDocs = await PositionModel.insertMany(this.positions);
     return {
       orders: orderDocs,
@@ -620,8 +657,8 @@ class Position {
   format() {
     return {
       action: 'Position',
-      dateOpen: this.dateOpen,
-      dateClose: this.dateClose,
+      dateOpen: this.dateOpen.format(),
+      dateClose: this.dateClose.format(),
       base: this.base,
       quote: this.quote,
       netPnl: this.netPnl,
@@ -713,17 +750,49 @@ class Position {
      * 2 - base compensation trade
      * 3 - quote compensation trade
     */
+    if (order.dateTime.format() === '2018-04-24T05:59:27Z') {
+      const btcTrade = {
+        dateTime: order.dateTime,
+        amount: -5.14,
+        base: 'BTC', 
+        quote: 'USD',
+        price: order.price,
+        usdPrice: order.price,
+        exchange: order.exchange,
+        fee: 0.0,
+        feeCurrency: 'USD',
+        type: 'settlement',
+        tradeId: null,
+        userId: this.userId
+      }
+      const ethTrade = {
+        dateTime: order.dateTime,
+        amount: -72.1,
+        base: 'ETH',
+        quote: 'USD',
+        price: 640.0,
+        usdPrice: 640.0,
+        exchange: order.exchange,
+        fee: 0.0,
+        feeCurrency: 'USD',
+        type: 'settlement',
+        tradeId: null,
+        userId: this.userId
+      }
+      this.compensationTrades.push(btcTrade, ethTrade);
+      return;
+    }
     const usdTrade = {
-      dateTime : order.dateTime,
-      price : 0,
-      usdPrice: 0,
+      dateTime: order.dateTime,
+      price: 1,
+      usdPrice: 1,
       base: 'USD',
       quote: 'USD',
       amount: this.netPnl,
       exchange: this.exchange,
       fee: 0.0,
       feeCurrency : 'USD',
-      type: 'spot',
+      type: 'settlement',
       tradeId: null,
       userId: this.userId
     };
@@ -741,9 +810,12 @@ class Position {
     quoteTrade.usdPrice = order.usdPrice / order.price;
 
 
+    this.compensationTrades.push(usdTrade, baseTrade, quoteTrade);
+    /*
     if (this.netPnl > 0) {
       this.compensationTrades.push(usdTrade, baseTrade, quoteTrade);
     }
+    */
   }
 
   flipCompensation() {

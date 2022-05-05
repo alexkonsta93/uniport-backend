@@ -105,6 +105,8 @@ positionSchema.index({
   quote: 1, 
   base: 1,
   exchange: 1, 
+  type : 1,
+  netPnl: 1
 }, { unique: true });
 
 /***Hooks***/
