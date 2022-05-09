@@ -3,7 +3,11 @@ import Map from '../utils/Map';
 export default class ExchangeAccountant {
   constructor() {
     this.map  = new Map();      
-    this.map.insert('USD', 0);
+    this.map.insert('USD', 0.0);
+    this.map.insert('BTC', 0.0);
+    this.map.insert('ETH', 0.0);
+    this.maxBtc = 77.19;
+    this.maxEth = 2059.44;
   }
 
   handlePositionPoloniex(position) {
@@ -11,6 +15,25 @@ export default class ExchangeAccountant {
     const alt = position.compensationTrades[1];
 
     const dateClose = position.dateClose.format();
+    /*
+    if (dateClose === '2017-12-07T11:33:15Z') {
+      console.log('here1');
+      main.amount = -this.getBalance(main.base);
+      this.updateCurrency(main.base, main.amount);
+      alt.amount = (alt.amount*alt.price - main.amount*main.price)/alt.price;
+      this.updateCurrency(alt.base, alt.amount);
+      return;
+    }
+    */
+    /*
+    if (dateClose === '2016-07-26T10:09:10Z') {
+      console.log('here2');
+      this.updateCurrency(alt.base, alt.amount);
+      position.compensationTrades = [alt];
+      return;
+
+    }
+    */
     if (dateClose === '2018-06-22T07:06:02Z' ||
         dateClose === '2018-04-27T21:01:48Z' ||
         dateClose === '2018-06-08T14:08:43Z') {
@@ -33,6 +56,42 @@ export default class ExchangeAccountant {
       }
     } else {
       this.updateCurrency(main.base, main.amount);
+    }
+  }
+
+  handlePosition(position) {
+    for (let settlement of position.compensationTrades) {
+      this.updateCurrency(settlement.base, settlement.amount);
+    }
+  }
+
+  handlePositionPoloniex2(position) {
+    const main = position.compensationTrades[0]; 
+    const alt = position.compensationTrades[1];
+    if (alt.type && position.compensationTrades.length == 2) {
+      if (this.maxBtc === 0) {
+        console.log('here1');
+        this.updateCurrency(main.base, main.amount);
+        this.maxEth += main.amount;
+        position.compensationTrades = [main];
+      } else if (this.maxBtc < -alt.amount) {
+        console.log('here2');
+        alt.amount = this.maxBtc;
+        this.updateCurrency(alt.base, alt.amount);
+        this.maxBtc = 0;
+        main.amount = (main.amount*main.price - alt.amount*alt.price)/main.price;
+        this.updateCurrency(main.base, main.amount);
+        this.maxEth += main.amount;
+        this.compensationTrades = [main, alt];
+      } else {
+        console.log('here3', this.maxBtc);
+        this.updateCurrency(alt.base, alt.amount);
+        position.compensationTrades = [alt];
+        this.maxBtc += alt.amount;
+      }
+    } else {
+      this.updateCurrency(main.base, main.amount);
+      console.log('here4');
     }
   }
 

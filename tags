@@ -502,6 +502,9 @@ amount	src/adapters/FtxAdapter.js	/^      amount: this.amount - amount,$/;"	p	cl
 amount	src/adapters/KrakenFuturesAdapter.js	/^      amount: -amount,$/;"	p	class:Position.createFuturesFundingTrade.trade
 amount	src/adapters/KrakenFuturesAdapter.js	/^      amount: parseFloat(line.change) \/ price,$/;"	p	class:Position.createBasisTrade.trade
 amount	src/adapters/KrakenFuturesAdapter.js	/^      amount: parseFloat(line['realized pnl']),$/;"	p	class:Position.createCompensationTrade.trade
+amount	src/adapters/PoloniexAdapter.js	/^        amount: this.netPnl\/(order.usdPrice\/order.price),$/;"	p	class:Position.buildCompensationTrade.trade
+amount	src/adapters/PoloniexAdapter.js	/^      amount: btcAmount,$/;"	p	class:Position.buildSettlements.btcSettlement
+amount	src/adapters/PoloniexAdapter.js	/^      amount: ethAmount,$/;"	p	class:Position.buildSettlements.ethSettlement
 amount	src/resources/GdaxAdapter.js	/^            amount: amount,$/;"	p	class:linesToTrades.trade
 amount	src/resources/GdaxAdapter.js	/^          amount: amount,$/;"	p	class:linesToTrades.trade
 amount	src/resources/GdaxAdapter.js	/^        amount: amount,$/;"	p	class:linesToTrades.trade
@@ -692,6 +695,9 @@ base	src/adapters/FtxAdapter.js	/^      base: this.base,$/;"	p	class:Order.split
 base	src/adapters/KrakenFuturesAdapter.js	/^      base: this.base,$/;"	p	class:Position.createBasisTrade.trade
 base	src/adapters/KrakenFuturesAdapter.js	/^      base: this.base,$/;"	p	class:Position.createCompensationTrade.trade
 base	src/adapters/KrakenFuturesAdapter.js	/^      base: this.base,$/;"	p	class:Position.createFuturesFundingTrade.trade
+base	src/adapters/PoloniexAdapter.js	/^        base: order.quote,$/;"	p	class:Position.buildCompensationTrade.trade
+base	src/adapters/PoloniexAdapter.js	/^      base: 'BTC',$/;"	p	class:Position.buildSettlements.btcSettlement
+base	src/adapters/PoloniexAdapter.js	/^      base: 'ETH',$/;"	p	class:Position.buildSettlements.ethSettlement
 base	src/resources/GdaxAdapter.js	/^            base: 'USD',$/;"	p	class:linesToTrades.trade
 base	src/resources/GdaxAdapter.js	/^          base: 'USD',$/;"	p	class:linesToTrades.trade
 base	src/resources/GdaxAdapter.js	/^        base: 'USD',$/;"	p	class:linesToTrades.trade
@@ -727,6 +733,7 @@ bser	package-lock.json	/^    "bser": {$/;"	o	object:dependencies
 bson	package-lock.json	/^        "bson": "^1.1.4",$/;"	s	object:dependencies.mongodb.requires
 bson	package-lock.json	/^        "bson": "^1.1.4",$/;"	s	object:dependencies.mongoose.requires
 bson	package-lock.json	/^    "bson": {$/;"	o	object:dependencies
+btcSettlement	src/adapters/PoloniexAdapter.js	/^    const btcSettlement = {$/;"	c	class:Position.buildSettlements
 btcTrade	src/adapters/BitfinexAdapter.js	/^      const btcTrade = {$/;"	c	class:Position.buildCompensationTrade
 buffer-from	package-lock.json	/^        "buffer-from": "^1.0.0",$/;"	s	object:dependencies.source-map-support.requires
 buffer-from	package-lock.json	/^    "buffer-from": {$/;"	o	object:dependencies
@@ -749,6 +756,7 @@ buildPair	src/adapters/PoloniexAdapter.js	/^  buildPair(line) {$/;"	m	class:Polo
 buildPositions	src/adapters/FtxAdapter.js	/^  async buildPositions(orders) {$/;"	m	class:FtxAdapter
 buildPrice	src/adapters/BitfinexAdapter.js	/^  buildPrice(line) {$/;"	m	class:BitfinexAdapter
 buildPrice	src/adapters/PoloniexAdapter.js	/^  buildPrice(line) {$/;"	m	class:PoloniexAdapter
+buildSettlements	src/adapters/PoloniexAdapter.js	/^  buildSettlements(btcMin, btcBalance, btcPrice, ethMin, ethBalance, ethPrice) {$/;"	m	class:Position
 buildTrade	src/adapters/BitfinexAdapter.js	/^  buildTrade(line) {$/;"	m	class:BitfinexAdapter
 buildTrade	src/adapters/PoloniexAdapter.js	/^  buildTrade(line) {$/;"	m	class:PoloniexAdapter
 buildTradeId	src/adapters/BitfinexAdapter.js	/^  buildTradeId(line) {$/;"	m	class:BitfinexAdapter
@@ -1068,6 +1076,9 @@ dateTime	src/adapters/FtxAdapter.js	/^      dateTime: this.dateTime,$/;"	p	class
 dateTime	src/adapters/KrakenFuturesAdapter.js	/^      dateTime: line.dateTime,$/;"	p	class:Position.createBasisTrade.trade
 dateTime	src/adapters/KrakenFuturesAdapter.js	/^      dateTime: line.dateTime,$/;"	p	class:Position.createCompensationTrade.trade
 dateTime	src/adapters/KrakenFuturesAdapter.js	/^      dateTime: line.dateTime,$/;"	p	class:Position.createFuturesFundingTrade.trade
+dateTime	src/adapters/PoloniexAdapter.js	/^        dateTime: order.dateTime,$/;"	p	class:Position.buildCompensationTrade.trade
+dateTime	src/adapters/PoloniexAdapter.js	/^      dateTime: this.basisTrades[this.basisTrades.length - 1].dateTime,$/;"	p	class:Position.buildSettlements.btcSettlement
+dateTime	src/adapters/PoloniexAdapter.js	/^      dateTime: this.basisTrades[this.basisTrades.length - 1].dateTime,$/;"	p	class:Position.buildSettlements.ethSettlement
 dateTime	src/resources/GdaxAdapter.js	/^            dateTime: dateTime,$/;"	p	class:linesToTrades.trade
 dateTime	src/resources/GdaxAdapter.js	/^          dateTime: dateTime,$/;"	p	class:linesToTrades.trade
 dateTime	src/resources/GdaxAdapter.js	/^        dateTime: dateTime,$/;"	p	class:linesToTrades.trade
@@ -2174,6 +2185,7 @@ esutils	package-lock.json	/^    "esutils": {$/;"	o	object:dependencies
 etag	package-lock.json	/^        "etag": "~1.8.1",$/;"	s	object:dependencies.express.requires
 etag	package-lock.json	/^        "etag": "~1.8.1",$/;"	s	object:dependencies.send.requires
 etag	package-lock.json	/^    "etag": {$/;"	o	object:dependencies
+ethSettlement	src/adapters/PoloniexAdapter.js	/^    const ethSettlement = {$/;"	c	class:Position.buildSettlements
 ethTrade	src/adapters/BitfinexAdapter.js	/^      const ethTrade = {$/;"	c	class:Position.buildCompensationTrade
 events	package-lock.json	/^        "events": "^3.2.0",$/;"	s	object:dependencies.webpack.requires
 events	package-lock.json	/^    "events": {$/;"	o	object:dependencies
@@ -2188,6 +2200,9 @@ exchange	src/adapters/FtxAdapter.js	/^      exchange: this.exchange,$/;"	p	class
 exchange	src/adapters/KrakenFuturesAdapter.js	/^      exchange: this.exchange,$/;"	p	class:Position.createBasisTrade.trade
 exchange	src/adapters/KrakenFuturesAdapter.js	/^      exchange: this.exchange,$/;"	p	class:Position.createCompensationTrade.trade
 exchange	src/adapters/KrakenFuturesAdapter.js	/^      exchange: this.exchange,$/;"	p	class:Position.createFuturesFundingTrade.trade
+exchange	src/adapters/PoloniexAdapter.js	/^        exchange: 'Poloniex',$/;"	p	class:Position.buildCompensationTrade.trade
+exchange	src/adapters/PoloniexAdapter.js	/^      exchange: 'Poloniex',$/;"	p	class:Position.buildSettlements.btcSettlement
+exchange	src/adapters/PoloniexAdapter.js	/^      exchange: 'Poloniex',$/;"	p	class:Position.buildSettlements.ethSettlement
 exchange	src/resources/GdaxAdapter.js	/^            exchange: 'gdax',$/;"	p	class:linesToTrades.trade
 exchange	src/resources/GdaxAdapter.js	/^          exchange: 'gdax',$/;"	p	class:linesToTrades.trade
 exchange	src/resources/GdaxAdapter.js	/^        exchange: 'gdax',$/;"	p	class:linesToTrades.trade
@@ -2276,6 +2291,9 @@ fee	src/adapters/BitfinexAdapter.js	/^        fee: 0.0,$/;"	p	class:Position.bui
 fee	src/adapters/BitfinexAdapter.js	/^      fee: 0.0,$/;"	p	class:Position.buildCompensationTrade.usdTrade
 fee	src/adapters/FtxAdapter.js	/^      fee: this.fee,$/;"	p	class:Order.split.orderLeft
 fee	src/adapters/FtxAdapter.js	/^      fee: this.fee,$/;"	p	class:Order.split.orderRight
+fee	src/adapters/PoloniexAdapter.js	/^        fee: 0.0,$/;"	p	class:Position.buildCompensationTrade.trade
+fee	src/adapters/PoloniexAdapter.js	/^      fee: 0.0,$/;"	p	class:Position.buildSettlements.btcSettlement
+fee	src/adapters/PoloniexAdapter.js	/^      fee: 0.0,$/;"	p	class:Position.buildSettlements.ethSettlement
 fee	src/resources/GdaxAdapter.js	/^            fee: 0.0,$/;"	p	class:linesToTrades.trade
 fee	src/resources/GdaxAdapter.js	/^          fee: fee,$/;"	p	class:linesToTrades.trade
 fee	src/resources/GdaxAdapter.js	/^        fee: fee,$/;"	p	class:linesToTrades.trade
@@ -2289,6 +2307,9 @@ feeCurrency	src/adapters/BitfinexAdapter.js	/^        feeCurrency: 'USD',$/;"	p	
 feeCurrency	src/adapters/BitfinexAdapter.js	/^      feeCurrency : 'USD',$/;"	p	class:Position.buildCompensationTrade.usdTrade
 feeCurrency	src/adapters/FtxAdapter.js	/^      feeCurrency: this.feeCurrency,$/;"	p	class:Order.split.orderLeft
 feeCurrency	src/adapters/FtxAdapter.js	/^      feeCurrency: this.feeCurrency,$/;"	p	class:Order.split.orderRight
+feeCurrency	src/adapters/PoloniexAdapter.js	/^        feeCurrency: 'USD',$/;"	p	class:Position.buildCompensationTrade.trade
+feeCurrency	src/adapters/PoloniexAdapter.js	/^      feeCurrency: 'USD',$/;"	p	class:Position.buildSettlements.btcSettlement
+feeCurrency	src/adapters/PoloniexAdapter.js	/^      feeCurrency: 'USD',$/;"	p	class:Position.buildSettlements.ethSettlement
 feeCurrency	src/resources/GdaxAdapter.js	/^            feeCurrency: 'USD',$/;"	p	class:linesToTrades.trade
 feeCurrency	src/resources/GdaxAdapter.js	/^          feeCurrency: 'USD'$/;"	p	class:linesToTrades.trade
 feeCurrency	src/resources/GdaxAdapter.js	/^        feeCurrency: feeCurrency$/;"	p	class:linesToTrades.trade
@@ -2455,8 +2476,10 @@ handleMarginOrder	src/adapters/PoloniexAdapter.js	/^  handleMarginOrder(order) {
 handleOrder	src/adapters/BitfinexAdapter.js	/^  handleOrder(order) {$/;"	m	class:Position
 handleOrder	src/adapters/FtxAdapter.js	/^  handleOrder(order) {$/;"	m	class:Position
 handleOrder	src/adapters/PoloniexAdapter.js	/^  handleOrder(order) {$/;"	m	class:Position
+handlePosition	src/adapters/ExchangeAccountant.js	/^  handlePosition(position) {$/;"	m	class:ExchangeAccountant
 handlePositionBitfinex	src/adapters/ExchangeAccountant.js	/^  handlePositionBitfinex(position) {$/;"	m	class:ExchangeAccountant
 handlePositionPoloniex	src/adapters/ExchangeAccountant.js	/^  handlePositionPoloniex(position) {$/;"	m	class:ExchangeAccountant
+handlePositionPoloniex2	src/adapters/ExchangeAccountant.js	/^  handlePositionPoloniex2(position) {$/;"	m	class:ExchangeAccountant
 handleTrade	src/adapters/ExchangeAccountant.js	/^  handleTrade(trade) {$/;"	m	class:ExchangeAccountant
 handleTransfer	src/adapters/ExchangeAccountant.js	/^  handleTransfer(transfer) {$/;"	m	class:ExchangeAccountant
 har-schema	package-lock.json	/^        "har-schema": "^2.0.0"$/;"	s	object:dependencies.har-validator.requires
@@ -4157,6 +4180,9 @@ price	src/adapters/FtxAdapter.js	/^      price: this.price,$/;"	p	class:Order.sp
 price	src/adapters/KrakenFuturesAdapter.js	/^      price: parseFloat(line['trade price']),$/;"	p	class:Position.createCompensationTrade.trade
 price	src/adapters/KrakenFuturesAdapter.js	/^      price: price,$/;"	p	class:Position.createBasisTrade.trade
 price	src/adapters/KrakenFuturesAdapter.js	/^      price: price,$/;"	p	class:Position.createFuturesFundingTrade.trade
+price	src/adapters/PoloniexAdapter.js	/^        price: order.usdPrice\/order.price,$/;"	p	class:Position.buildCompensationTrade.trade
+price	src/adapters/PoloniexAdapter.js	/^      price: btcPrice,$/;"	p	class:Position.buildSettlements.btcSettlement
+price	src/adapters/PoloniexAdapter.js	/^      price: ethPrice,$/;"	p	class:Position.buildSettlements.ethSettlement
 price	src/resources/GdaxAdapter.js	/^            price: price,$/;"	p	class:linesToTrades.trade
 price	src/resources/GdaxAdapter.js	/^          price: price,$/;"	p	class:linesToTrades.trade
 price	src/resources/GdaxAdapter.js	/^        price: price,$/;"	p	class:linesToTrades.trade
@@ -4222,6 +4248,9 @@ quote	src/adapters/FtxAdapter.js	/^      quote: this.quote,$/;"	p	class:Order.sp
 quote	src/adapters/KrakenFuturesAdapter.js	/^      quote: this.quote,$/;"	p	class:Position.createBasisTrade.trade
 quote	src/adapters/KrakenFuturesAdapter.js	/^      quote: this.quote,$/;"	p	class:Position.createCompensationTrade.trade
 quote	src/adapters/KrakenFuturesAdapter.js	/^      quote: this.quote,$/;"	p	class:Position.createFuturesFundingTrade.trade
+quote	src/adapters/PoloniexAdapter.js	/^        quote: 'USD',$/;"	p	class:Position.buildCompensationTrade.trade
+quote	src/adapters/PoloniexAdapter.js	/^      quote: 'USD',$/;"	p	class:Position.buildSettlements.btcSettlement
+quote	src/adapters/PoloniexAdapter.js	/^      quote: 'USD',$/;"	p	class:Position.buildSettlements.ethSettlement
 quote	src/resources/GdaxAdapter.js	/^            quote: line['CURRENCY'],$/;"	p	class:linesToTrades.trade
 quote	src/resources/GdaxAdapter.js	/^          quote: line['CURRENCY'],$/;"	p	class:linesToTrades.trade
 quote	src/resources/GdaxAdapter.js	/^        quote: line['CURRENCY'],$/;"	p	class:linesToTrades.trade
@@ -6085,6 +6114,7 @@ trade	src/adapters/FtxAdapter.js	/^      let trade = { $/;"	c	class:FtxAdapter.p
 trade	src/adapters/KrakenFuturesAdapter.js	/^    const trade = {$/;"	c	class:Position.createBasisTrade
 trade	src/adapters/KrakenFuturesAdapter.js	/^    var trade = {$/;"	c	class:Position.createCompensationTrade
 trade	src/adapters/KrakenFuturesAdapter.js	/^    var trade = {$/;"	c	class:Position.createFuturesFundingTrade
+trade	src/adapters/PoloniexAdapter.js	/^      const trade = {$/;"	c	class:Position.buildCompensationTrade
 trade	src/resources/GdaxAdapter.js	/^          let trade = {$/;"	c	class:linesToTrades
 trade	src/resources/GdaxAdapter.js	/^        let trade = {$/;"	c	class:linesToTrades
 trade	src/resources/GdaxAdapter.js	/^      var trade = {$/;"	c	class:linesToTrades
@@ -6092,6 +6122,9 @@ tradeId	src/adapters/BitfinexAdapter.js	/^        tradeId: null,$/;"	p	class:Pos
 tradeId	src/adapters/BitfinexAdapter.js	/^        tradeId: null,$/;"	p	class:Position.buildCompensationTrade.ethTrade
 tradeId	src/adapters/BitfinexAdapter.js	/^      tradeId: null,$/;"	p	class:Position.buildCompensationTrade.usdTrade
 tradeId	src/adapters/KrakenFuturesAdapter.js	/^      tradeId: line.uid,$/;"	p	class:Position.createBasisTrade.trade
+tradeId	src/adapters/PoloniexAdapter.js	/^        tradeId: null$/;"	p	class:Position.buildCompensationTrade.trade
+tradeId	src/adapters/PoloniexAdapter.js	/^      tradeId: null, $/;"	p	class:Position.buildSettlements.btcSettlement
+tradeId	src/adapters/PoloniexAdapter.js	/^      tradeId: null,$/;"	p	class:Position.buildSettlements.ethSettlement
 tradeIds	src/adapters/BitfinexAdapter.js	/^            tradeIds: null,$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
 tradeIds	src/adapters/BitfinexAdapter.js	/^          tradeIds: null,$/;"	p	class:BitfinexAdapter.processLedgerLines.trade
 tradeSchema	src/resources/trade/trade.model.js	/^var tradeSchema = new Schema({$/;"	v
@@ -6123,6 +6156,9 @@ type	src/adapters/FtxAdapter.js	/^      type: this.type,$/;"	p	class:Order.split
 type	src/adapters/KrakenFuturesAdapter.js	/^      type: 'future-basis',$/;"	p	class:Position.createBasisTrade.trade
 type	src/adapters/KrakenFuturesAdapter.js	/^      type: 'future-funding',	$/;"	p	class:Position.createFuturesFundingTrade.trade
 type	src/adapters/KrakenFuturesAdapter.js	/^      type: 'future-pnl',	$/;"	p	class:Position.createCompensationTrade.trade
+type	src/adapters/PoloniexAdapter.js	/^        type: 'settlement',$/;"	p	class:Position.buildCompensationTrade.trade
+type	src/adapters/PoloniexAdapter.js	/^      type: 'settlement'$/;"	p	class:Position.buildSettlements.btcSettlement
+type	src/adapters/PoloniexAdapter.js	/^      type: 'settlement'$/;"	p	class:Position.buildSettlements.ethSettlement
 type	src/resources/GdaxAdapter.js	/^            type: 'exchange',$/;"	p	class:linesToTrades.trade
 type	src/resources/GdaxAdapter.js	/^          type: 'exchange',$/;"	p	class:linesToTrades.trade
 type	src/resources/GdaxAdapter.js	/^        type: 'exchange',$/;"	p	class:linesToTrades.trade
@@ -6175,6 +6211,9 @@ usdPrice	src/adapters/BitfinexAdapter.js	/^          usdPrice: 1$/;"	p	class:Bit
 usdPrice	src/adapters/BitfinexAdapter.js	/^        usdPrice: 640.0,$/;"	p	class:Position.buildCompensationTrade.ethTrade
 usdPrice	src/adapters/BitfinexAdapter.js	/^        usdPrice: order.price,$/;"	p	class:Position.buildCompensationTrade.btcTrade
 usdPrice	src/adapters/BitfinexAdapter.js	/^      usdPrice: 1,$/;"	p	class:Position.buildCompensationTrade.usdTrade
+usdPrice	src/adapters/PoloniexAdapter.js	/^        usdPrice: order.usdPrice\/order.price,$/;"	p	class:Position.buildCompensationTrade.trade
+usdPrice	src/adapters/PoloniexAdapter.js	/^      usdPrice: btcPrice,$/;"	p	class:Position.buildSettlements.btcSettlement
+usdPrice	src/adapters/PoloniexAdapter.js	/^      usdPrice: ethPrice,$/;"	p	class:Position.buildSettlements.ethSettlement
 usdTrade	src/adapters/BitfinexAdapter.js	/^    const usdTrade = {$/;"	c	class:Position.buildCompensationTrade
 use	package-lock.json	/^        "use": "^3.1.0"$/;"	s	object:dependencies.snapdragon.requires
 use	package-lock.json	/^    "use": {$/;"	o	object:dependencies
@@ -6190,6 +6229,9 @@ userId	src/adapters/FtxAdapter.js	/^      userId: this.userId,$/;"	p	class:Order
 userId	src/adapters/KrakenFuturesAdapter.js	/^      userId: this.userId$/;"	p	class:Position.createBasisTrade.trade
 userId	src/adapters/KrakenFuturesAdapter.js	/^      userId: this.userId$/;"	p	class:Position.createCompensationTrade.trade
 userId	src/adapters/KrakenFuturesAdapter.js	/^      userId: this.userId$/;"	p	class:Position.createFuturesFundingTrade.trade
+userId	src/adapters/PoloniexAdapter.js	/^        userId: order.userId,$/;"	p	class:Position.buildCompensationTrade.trade
+userId	src/adapters/PoloniexAdapter.js	/^      userId: this.userId,$/;"	p	class:Position.buildSettlements.btcSettlement
+userId	src/adapters/PoloniexAdapter.js	/^      userId: this.userId,$/;"	p	class:Position.buildSettlements.ethSettlement
 userSchema	src/resources/user/user.model.js	/^const userSchema = new Schema({$/;"	C
 util-deprecate	package-lock.json	/^        "util-deprecate": "~1.0.1"$/;"	s	object:dependencies.readable-stream.requires
 util-deprecate	package-lock.json	/^    "util-deprecate": {$/;"	o	object:dependencies

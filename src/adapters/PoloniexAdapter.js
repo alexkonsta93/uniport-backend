@@ -103,19 +103,84 @@ export default class PoloniexAdapter {
       }
     }
 
+    const map = new MapOneToMany();
+    // First run without processing negative pnl positions
+    for (let action of this.actions.getValues()) {
+      //console.log(action.format());
+      if (action.dateOpen) {
+        if (action.netPnl > 0) {
+          this.accountant.handlePosition(action);
+        } else {
+          continue;
+        }
+      } else if (action.price) {
+        this.accountant.handleTrade(action); 
+      } else {
+        this.accountant.handleTransfer(action); 
+      }
+      map.insert('BTC', this.accountant.getBalance('BTC'));
+      map.insert('ETH', this.accountant.getBalance('ETH'));
+      //console.log('BTC', map.getValuesList('BTC'));
+      //console.log('ETH', map.getValuesList('ETH'));
+    }
+
+    // Second run processing negative pnl positions
+    const btcCurve = map.getValuesList('BTC');
+    const ethCurve = map.getValuesList('ETH');
+    for (let action of this.actions.getValues()) {
+      if (action.dateOpen && action.netPnl < 0) {
+        console.log('before', this.accountant.getBalances());
+        const btcMin = Math.min(...btcCurve);
+        const ethMin = Math.min(...ethCurve);
+        const btcBalance = btcCurve[0];
+        const ethBalance = ethCurve[0];
+        const btcPrice = this.btcHistory.getValueLE(action.dateClose.unix());
+        const ethPrice = this.ethHistory.getValueLE(action.dateClose.unix());
+        console.log('btcMin', btcMin);
+        console.log('btcBalance', btcBalance);
+        console.log('ethMin', ethMin);
+        console.log('ethBalance', ethBalance);
+        action.buildSettlements(btcMin, btcBalance, btcPrice, ethMin, ethBalance, ethPrice);
+        console.log(action.format());
+        this.accountant.handlePosition(action);
+        console.log('after', this.accountant.getBalances());
+      } else {
+        btcCurve.shift();  
+        ethCurve.shift();
+      }
+    }
+
+    console.log(this.accountant.getBalances());
+
+    /*
+    for (let action of this.actions.getValues()) {
+      console.log(action.format());
+      console.log(this.accountant.getBalances());
+    }
+    */
+    /*
     for (let action of this.actions.getValues()) {
       console.log(action.format());
       if (action.dateOpen) {
         // If position
-        this.accountant.handlePositionPoloniex(action);
+        this.accountant.handlePositionPoloniex2(action);
+        if (action.netPnl > 0) {
+          btcDLW += action.compensationTrades[0].amount;
+        }
       } else if (action.price) {
         // If order
         this.accountant.handleTrade(action);
         if (action.base === 'ETH') {
           ethDLW += action.amount;
         }
+        if (action.quote === 'ETH') {
+          ethDLW -= action.amount*action.price;
+        }
         if (action.base === 'BTC') {
           btcDLW += action.amount;
+        }
+        if (action.quote === 'BTC') {
+          btcDLW -= action.amount*action.price;
         }
       } else {
         // If transfer
@@ -123,6 +188,7 @@ export default class PoloniexAdapter {
       }
       console.log(this.accountant.getBalances());
     }
+    */
     //console.log('eth', ethDLW);
     //console.log('btc', btcDLW);
     /*
@@ -606,6 +672,7 @@ class Position {
     this.buildCompensationTrade(order);
   }
 
+  /*
   buildCompensationTrade(order) {
     const main = {};
     const alternative = {};
@@ -660,26 +727,74 @@ class Position {
     this.compensationTrades.push(main);
     this.compensationTrades.push(alternative);
   }
-  /*
+  */
+
   buildCompensationTrade(order) {
-    if (this.netPnl > 0 && this.quote !== 'USD') {
-      this.compensationTrades.push({ 
-        'dateTime' : order.dateTime,
-        'price' : order.usdPrice/order.price,
-        'usdPrice' : order.usdPrice/order.price,
-        'base' : order.quote,
-        'quote' : 'USD',
-        'userId' : order.userId,
-        'type' : 'spot',
-        'fee' : 0.0,
-        'feeCurrency' : 'USD',
-        'exchange' : 'Poloniex',
-        'amount' : this.netPnl/(order.usdPrice/order.price),
-        'tradeId' : null,
-      });
+    if (this.netPnl > 0) {
+      const trade = {
+        dateTime: order.dateTime,
+        price: order.usdPrice/order.price,
+        usdPrice: order.usdPrice/order.price,
+        base: order.quote,
+        quote: 'USD',
+        userId: order.userId,
+        type: 'settlement',
+        fee: 0.0,
+        feeCurrency: 'USD',
+        exchange: 'Poloniex',
+        amount: this.netPnl/(order.usdPrice/order.price),
+        tradeId: null
+      }
+      this.compensationTrades.push(trade);
     }
   }
-  */
+
+  buildSettlements(btcMin, btcBalance, btcPrice, ethMin, ethBalance, ethPrice) {
+    this.compensationTrades = [];
+    const btcAmount = this.netPnl / btcPrice;
+    const btcSettlement = {
+      dateTime: this.basisTrades[this.basisTrades.length - 1].dateTime,
+      base: 'BTC',
+      quote: 'USD',
+      amount: btcAmount,
+      price: btcPrice,
+      usdPrice: btcPrice,
+      exchange: 'Poloniex',
+      fee: 0.0,
+      feeCurrency: 'USD',
+      tradeId: null, 
+      userId: this.userId,
+      type: 'settlement'
+    };
+
+    const ethAmount = this.netPnl / ethPrice;
+    const ethSettlement = {
+      dateTime: this.basisTrades[this.basisTrades.length - 1].dateTime,
+      base: 'ETH',
+      quote: 'USD',
+      amount: ethAmount,
+      price: ethPrice,
+      usdPrice: ethPrice,
+      exchange: 'Poloniex',
+      fee: 0.0,
+      feeCurrency: 'USD',
+      tradeId: null,
+      userId: this.userId,
+      type: 'settlement'
+    };
+
+    if (btcMin > 0) {
+      if (btcBalance - Math.abs(btcAmount) < btcMin) {
+        btcSettlement.amount = -btcMin;
+        ethSettlement.amount = (this.netPnl - btcSettlement.amount*btcSettlement.price)/ethSettlement.price;
+        this.compensationTrades.push(btcSettlement, ethSettlement);
+      } else {
+        this.compensationTrades.push(btcSettlement);
+      }
+    } else {
+      this.compensationTrades.push(ethSettlement);
+    }
+  }
 
   flipCompensation() {
     const main = this.compensationTrades[0];
